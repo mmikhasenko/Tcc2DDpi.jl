@@ -1,0 +1,12 @@
+diff --git a/settings.json b/settings.json
+index c80e942..7c84d9e 100644
+--- a/settings.json
++++ b/settings.json
+@@ -1,6 +1,6 @@
+ {
+     "phspmatching": {
+-            "cutoff" : 4.0,
++            "cutoff" : 10.0,
+             "estep"  : 0.05
+     },
+ 
