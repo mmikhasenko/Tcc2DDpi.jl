@@ -37,6 +37,8 @@ pole_sv = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm0), itr_Γ(δm0)])
 ρInf = sum(ich.cutoffratio for ich in ichannels)
 w_matching = ichannels[1].cutoffratio*3/2 / ρInf * 2/e2m(0) * 1e-3 # 1/MeV
 inverse_scattering_length = denominator_I(Tuple(ichannels), 0.0, δm0) / ρInf / w_matching
+scattering_length = fm_times_mev/inverse_scattering_length
+
 
 # effective range
 reff(Γ) = 8 / (e2m(0)*1e3) / Γ / w_matching
@@ -49,7 +51,8 @@ writejson(joinpath("results","nominal","pole.json"), transformdictrecursively!(
             :effective_range_parameters => Dict{Symbol,Any}(
                 :Re_inv_scatt_length => real(inverse_scattering_length),
                 :Im_inv_scatt_length => imag(inverse_scattering_length),
-                :size => fm_times_mev/real(inverse_scattering_length),
+                :Re_scatt_length => real(scattering_length),
+                :Im_scatt_length => imag(scattering_length),
                 :effective_range => (; r_90CL, r_95CL),
                 :technical => Dict{Symbol,Any}(
                     :rho_inf => ρInf,
