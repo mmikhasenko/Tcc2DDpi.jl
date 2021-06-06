@@ -13,6 +13,10 @@
             "r_95CL": 13.4
         }
     },
+    "size_estimate": {
+        "momentum": "26.5 ± 1.5",
+        "R_eff_ΔE": "7.45 ± 0.41"
+    },
     "pole_position": {
         "pole_sv": {
             "m_pole": "-0.364 ± 0.04",

@@ -9,12 +9,14 @@ using Measurements
 using JSON
 
 
+export mγ
 export mπ⁰, mπ⁺
 export mD⁰, mD⁺
 export mDˣ⁺, ΓDˣ⁺
 export mDˣ⁰, ΓDˣ⁰
-export mγ
-
+# 
+export μDˣ⁺D⁰
+# 
 export e2m, m2e
 export fm_times_mev
 include("constants.jl")

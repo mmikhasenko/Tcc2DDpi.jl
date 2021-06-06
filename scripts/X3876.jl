@@ -33,6 +33,10 @@ itr_m, itr_Γ =
 pole_sv = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm0), itr_Γ(δm0)])
 
 
+# naive size estimation
+γ = sqrt(-2μDˣ⁺D⁰*1e3*δm0)
+R_ΔE = fm_times_mev/γ
+
 # scattering length
 ρInf = sum(ich.cutoffratio for ich in ichannels)
 w_matching = ichannels[1].cutoffratio*3/2 / ρInf * 2/e2m(0) * 1e-3 # 1/MeV
@@ -48,6 +52,10 @@ r_90CL, r_95CL = round.(reff.([Γ0_90CL, Γ0_95CL]) * fm_times_mev; digits=1)
 # save results to a file
 writejson(joinpath("results","nominal","pole.json"), transformdictrecursively!(
         Dict{Symbol,Any}(
+            :size_estimate => Dict{Symbol,Any}(
+                :momentum => γ,
+                :R_eff_ΔE => R_ΔE,
+            ),
             :effective_range_parameters => Dict{Symbol,Any}(
                 :Re_inv_scatt_length => real(inverse_scattering_length),
                 :Im_inv_scatt_length => imag(inverse_scattering_length),
@@ -73,3 +81,4 @@ writejson(joinpath("results","nominal","pole_interpolation.json"),
         )
     )
 #
+
