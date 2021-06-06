@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate(joinpath(@__DIR__,".."))
+# 
 using X2DDpi
 using Parameters
 using Measurements

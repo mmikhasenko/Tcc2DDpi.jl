@@ -1,0 +1,25 @@
+schema: '2.0'
+stages:
+  pole_position:
+    cmd: julia scripts/X3876.jl
+    deps:
+    - path: scripts/X3876.jl
+      md5: 1ec3366953b9467c44d9439bdc6caf13
+      size: 2588
+    - path: src/constants.jl
+      md5: 32d051b4462ecd9412ed270b4cea9b44
+      size: 459
+    params:
+      settings.json:
+        fitresults:
+          δm_sw: -363e-3 ± 40e-3
+          δm_ΔM: -375e-3 ± 40e-3
+          Γ0_90CL: 135.0
+          Γ0_95CL: 95.0
+        phspmatching:
+          cutoff: 4.0
+          estep: 0.05
+    outs:
+    - path: results/nominal/pole.json
+      md5: 2e84bff17d2dd2c1d2b65f62081a1796
+      size: 2309
