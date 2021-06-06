@@ -1,0 +1,13 @@
+stages:
+  pole_position:
+    cmd: julia scripts/X3876.jl
+    deps:
+    - scripts/X3876.jl
+    - src/constants.jl
+    params:
+    - settings.json:
+      - phspmatching
+      - fitresults
+    outs:
+    - results/nominal/pole.json:
+        cache: false
