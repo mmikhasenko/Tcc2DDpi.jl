@@ -1,8 +1,8 @@
 {
-        "phspmatching": {
+    "phspmatching": {
             "cutoff" : 4.0,
             "estep"  : 0.05
-        },
+    },
 
     "polepositiongrid": {
             "dm_min" : -0.8,

@@ -20,7 +20,7 @@ channels = [
     πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)),
     γDD((m1=mγ, m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰))]
 #
-ichannels = interpolated.(channels, 4.0) # cutoff
+ichannels = interpolated.(channels, cutoff; estep=estep) # cutoff
 
 # pole
 δmv = range(dm_min, dm_max, length=dm_N)
@@ -35,7 +35,6 @@ pole_ΔM = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm_ΔM), itr_Γ(δm_ΔM)])
 
 
 # scattering length
-
 ρInf = sum(ich.cutoffratio for ich in ichannels)
 w_matching = ichannels[1].cutoffratio*3/2 / ρInf * 2/e2m(0) * 1e-3 # 1/MeV
 inverse_scattering_length = denominator_I(Tuple(ichannels), 0.0, δm_ΔM) / ρInf / w_matching
@@ -45,7 +44,7 @@ reff(Γ) = 8 / (e2m(0)*1e3) / Γ / w_matching
 r_90CL, r_95CL = round.(reff.([Γ0_90CL, Γ0_95CL]) * fm_times_mev; digits=1)
 
 
-# save
+# save results to a file
 writejson(joinpath("results","nominal","pole.json"), transformdictrecursively!(
         Dict{Symbol,Any}(
             :effective_range_parameters => Dict{Symbol,Any}(
