@@ -11,7 +11,7 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 
 @unpack cutoff, estep = settings["phspmatching"]
 @unpack dm_min, dm_max, dm_N = settings["polepositiongrid"]
-@unpack δm_sw, δm_ΔM = settings["fitresults"]
+@unpack δm0 = settings["fitresults"]
 @unpack Γ0_90CL, Γ0_95CL = settings["fitresults"]
 
 # 
@@ -30,14 +30,13 @@ itr_m, itr_Γ =
 	interpolate((δmv,), getproperty.(sampledpp, :m_pole), Gridded(Linear())),
 	interpolate((δmv,), 2 .* getproperty.(sampledpp, :half_Γ_pole), Gridded(Linear()))
 # 
-pole_sv = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm_sw), itr_Γ(δm_sw)])
-pole_ΔM = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm_ΔM), itr_Γ(δm_ΔM)])
+pole_sv = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm0), itr_Γ(δm0)])
 
 
 # scattering length
 ρInf = sum(ich.cutoffratio for ich in ichannels)
 w_matching = ichannels[1].cutoffratio*3/2 / ρInf * 2/e2m(0) * 1e-3 # 1/MeV
-inverse_scattering_length = denominator_I(Tuple(ichannels), 0.0, δm_ΔM) / ρInf / w_matching
+inverse_scattering_length = denominator_I(Tuple(ichannels), 0.0, δm0) / ρInf / w_matching
 
 # effective range
 reff(Γ) = 8 / (e2m(0)*1e3) / Γ / w_matching
@@ -57,12 +56,17 @@ writejson(joinpath("results","nominal","pole.json"), transformdictrecursively!(
                     :w_matching => w_matching)
                 ),
             :pole_position => Dict{Symbol,Any}(
-                :pole_sv => pole_sv,
-                :pole_ΔM => pole_ΔM),
+                :pole_sv => pole_sv),
+        ), ifmeasurementgivestring)
+    )
+#
+
+writejson(joinpath("results","nominal","pole_interpolation.json"),
+        Dict(
             :pole_interpolation => Dict{Symbol,Any}(
                 :grid => δmv,
                 :values => sampledpp
-            )
-        ), ifmeasurementgivestring)
+            ),
+        )
     )
-# 
+#

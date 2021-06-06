@@ -11,3 +11,5 @@ stages:
     outs:
     - results/nominal/pole.json:
         cache: false
+    - results/nominal/pole_interpolation.json:
+        cache: false
