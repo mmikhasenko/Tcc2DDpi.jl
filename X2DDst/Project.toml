@@ -1,0 +1,4 @@
+name = "X2DDst"
+uuid = "c99ff116-89d7-4a16-9f49-1eb5fca7ac36"
+authors = ["Misha Mikhasenko <mikhail.mikhasenko@gmail.com>"]
+version = "0.1.0"
