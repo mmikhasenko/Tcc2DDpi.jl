@@ -16,6 +16,7 @@ export mDˣ⁰, ΓDˣ⁰
 export mγ
 
 export e2m, m2e
+export fm_times_mev
 include("constants.jl")
 
 

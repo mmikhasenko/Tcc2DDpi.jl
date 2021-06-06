@@ -1,4 +1,17 @@
 {
+    "effective_range_parameters": {
+        "technical": {
+            "w_matching": 0.0003198431308570355,
+            "rho_inf": 131.7627569338969
+        },
+        "size": "8.03 ± 0.61",
+        "Re_inv_scatt_length": "24.4 ± 1.8",
+        "Im_inv_scatt_length": "6.744963730568074 ± 0.0",
+        "effective_range": {
+            "r_90CL": 9.4,
+            "r_95CL": 13.3
+        }
+    },
     "pole_position": {
         "pole_ΔM": {
             "m_pole": "-0.376 ± 0.04",
