@@ -30,6 +30,7 @@ include("covariant_exptessions.jl")
 export J_I, J_II
 include("isobar.jl")
 export πDD, γDD
+export branch_points
 include("abstractxdd.jl")
 
 export ρ_thr

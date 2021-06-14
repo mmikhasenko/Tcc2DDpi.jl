@@ -51,3 +51,7 @@ function decay_matrix_element(d::γDD,s,σ3,σ2)
 # 	
 	h²*frakM/3
 end
+
+branch_points(d::AbstractxDD) = (
+	m2e(d.ms[3] + sqrt(pole_position(d.R12))),
+	m2e(d.ms[2] + sqrt(pole_position(d.R13))))
