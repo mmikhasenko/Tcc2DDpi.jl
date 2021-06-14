@@ -51,3 +51,5 @@ function ifmeasurementgivestring(x)
     end
     return x
 end
+
+d2nt(d; process=identity) = NamedTuple{Tuple(Symbol.(keys(d)))}(process.(Base.values(d)))

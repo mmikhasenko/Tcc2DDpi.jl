@@ -52,6 +52,7 @@ export writetoml, readtoml
 export transformdictrecursively!
 export ifstringgivemeasurement
 export ifmeasurementgivestring
+export d2nt
 include("io.jl")
 
 end
