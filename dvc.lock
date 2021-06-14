@@ -4,8 +4,8 @@ stages:
     cmd: julia scripts/X3876.jl
     deps:
     - path: scripts/X3876.jl
-      md5: dd4770e8a1751831e6eb931199456024
-      size: 2932
+      md5: b29f16930a19a5024ece2a7170074310
+      size: 2935
     - path: src/constants.jl
       md5: b552b91c2768f8c9f3050f503ebe1e28
       size: 523
@@ -20,8 +20,8 @@ stages:
           estep: 0.01
     outs:
     - path: results/nominal/pole.json
-      md5: ce3f25896eab7b4153c8004bd0068f27
+      md5: 86d2ecb9a88fa71bd374333d1c81baaa
       size: 700
     - path: results/nominal/pole_interpolation.json
-      md5: c81b6b98f67d1128864ad2d9a080b8a3
-      size: 1648
+      md5: b41a628f04fb9b45f432b5275971dd4e
+      size: 4586

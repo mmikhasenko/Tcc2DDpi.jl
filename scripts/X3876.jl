@@ -24,11 +24,11 @@ ichannels = interpolated.(channels, cutoff; estep=estep) # cutoff
 
 # pole
 δmv = range(dm_min, dm_max, length=dm_N)
-sampledpp = [pole_position(Tuple(ichannels),δm) for δm in δmv]
+ppsampled = [pole_position(Tuple(ichannels),δm) for δm in δmv]
 
 itr_m, itr_Γ =
-	interpolate((δmv,), getproperty.(sampledpp, :m_pole), Gridded(Linear())),
-	interpolate((δmv,), 2 .* getproperty.(sampledpp, :half_Γ_pole), Gridded(Linear()))
+	interpolate((δmv,), getproperty.(ppsampled, :m_pole), Gridded(Linear())),
+	interpolate((δmv,), 2 .* getproperty.(ppsampled, :half_Γ_pole), Gridded(Linear()))
 # 
 pole_sv = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm0), itr_Γ(δm0)])
 
@@ -75,8 +75,8 @@ writejson(joinpath("results","nominal","pole.json"), transformdictrecursively!(
 writejson(joinpath("results","nominal","pole_interpolation.json"),
         Dict(
             :pole_interpolation => Dict{Symbol,Any}(
-                :grid => δmv,
-                :values => sampledpp
+                :mgrid => δmv,
+                :ppvalues => ppsampled
             ),
         )
     )
