@@ -4,10 +4,10 @@
             "w_matching": 0.0003198431308570355,
             "rho_inf": 131.7627569338969
         },
-        "Re_scatt_length": "7.65 ± 0.51",
-        "Re_inv_scatt_length": "24.0 ± 1.9",
-        "Im_scatt_length": "-2.11 ± 0.31",
-        "Im_inv_scatt_length": "6.615365895053865 ± 0.0",
+        "Re_scatt_length": "-7.65 ± 0.51",
+        "Re_inv_scatt_length": "-24.0 ± 1.9",
+        "Im_scatt_length": "2.11 ± 0.31",
+        "Im_inv_scatt_length": "-6.604589784777223 ± 0.0",
         "effective_range": {
             "r_90CL": 9.4,
             "r_95CL": 13.4

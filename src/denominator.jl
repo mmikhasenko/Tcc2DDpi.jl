@@ -1,4 +1,4 @@
-denominator_I(d::interpolated,e,δm) = dispersive(d,e)-real(dispersive(d,δm))
+denominator_I(d::interpolated,e,δm) = - (dispersive(d,e)-real(dispersive(d,δm)))
 
 denominator_II(d::interpolated,e,δm) = imag(e) ≥ 0 ?
 	denominator_I(d,e,δm) :
