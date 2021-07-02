@@ -81,4 +81,30 @@ writejson(joinpath("results","nominal","pole_interpolation.json"),
         )
     )
 #
+# 
+ev = range(-1,3.0,length=100)
+D_advans_δm0(e) = denominator_I(Tuple(ichannels), e, δm0.val) / ρInf / (w_matching*1e3)
+D_nonrel_δm0(e) = denominator_I(NonRelBW(), e+1e-6im, δm0.val)
+# 
+invA_nonrel, invA_advans = D_nonrel_δm0.(ev), D_advans_δm0.(ev)
 
+writejson(joinpath("results","nominal","inverse_amplitude.json"),
+        Dict(
+            :inverse_amplitude => Dict{Symbol,Any}(
+                :mgrid => ev,
+                :invA_nonrel_real => real.(invA_nonrel),
+                :invA_nonrel_imag => imag.(invA_nonrel),
+                :invA_advans_real => real.(invA_advans),
+                :invA_advans_imag => imag.(invA_advans),
+            ),
+        )
+    )
+
+writejson(joinpath("results","nominal","pole_interpolation.json"),
+        Dict(
+            :pole_interpolation => Dict{Symbol,Any}(
+                :mgrid => δmv,
+                :ppvalues => ppsampled
+            ),
+        )
+    )

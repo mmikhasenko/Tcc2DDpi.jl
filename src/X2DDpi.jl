@@ -45,6 +45,7 @@ include("dispersion.jl")
 export pole_position
 export intensity
 export denominator_I, denominator_II
+export NonRelBW
 include("denominator.jl")
 
 export writejson, readjson

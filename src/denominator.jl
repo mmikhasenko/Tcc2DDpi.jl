@@ -17,3 +17,13 @@ function pole_position(d,δm; init = [δm,-0.1*δm])
 	return NamedTuple{(:m_pole, :half_Γ_pole, :invD)}(
 		[fitres.minimizer..., fitres.minimum])
 end
+
+
+struct NonRelBW
+end
+function denominator_I(d::NonRelBW, e, δm)
+	ik(e) = 1im*sqrt(λ(e2m(e)^2,mDˣ⁺^2,mD⁰^2))/(2*e2m(e))
+	ike = ik(e)
+	ik0 = ik(δm+1e-6im)
+	return -ike + real(ik0)
+end
