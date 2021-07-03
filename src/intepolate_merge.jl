@@ -8,7 +8,7 @@ function interpolated(channel::AbstractxDD, cutoff::Real; estep=0.01)
     eth = m2e(sum(channel.ms))
     ev = eth:estep:(cutoff+2*estep)
     calv = ρ_thr.(Ref(channel),ev)
-    itr = interpolate((ev,), real.(calv), Gridded(Linear()))
+    itr = interpolate((ev,), calv, Gridded(Linear()))
     cutoffratio = real(ρ_thr(channel,cutoff))/ρ_tb(channel,cutoff)
     interpolated(channel,cutoff,cutoffratio,itr)
 end
