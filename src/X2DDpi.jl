@@ -42,6 +42,7 @@ include("intepolate_merge.jl")
 export dispersive
 include("dispersion.jl")
 
+export Amplitude
 export pole_position
 export intensity
 export denominator_I, denominator_II

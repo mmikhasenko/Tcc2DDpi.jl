@@ -1,18 +1,29 @@
-denominator_I(d::interpolated,e,δm) = - (dispersive(d,e)-real(dispersive(d,δm)))
+struct Amplitude{T,F}
+	ik::T
+	corrections::F
+end
 
-denominator_II(d::interpolated,e,δm) = imag(e) ≥ 0 ?
-	denominator_I(d,e,δm) :
-	denominator_I(d,e,δm)+2im*ρ_thr(d,e)
+Amplitude(ik) = Amplitude(ik, zero)
+
+denominator_I(a::Amplitude{interpolated},e,δm) =
+	-(dispersive(a.ik,e)-real(dispersive(a.ik,δm))) + a.corrections(e)
+
+denominator_II(a::Amplitude{interpolated},e,δm) = imag(e) ≥ 0 ?
+	denominator_I(a.ik,e,δm) :
+	denominator_I(a.ik,e,δm)-2im*ρ_thr(a.ik,e)
 
 # sum of several channels
-denominator_I(ds::Tuple,e,δm) = sum(denominator_I(d,e,δm) for d in ds)
-denominator_II(ds::Tuple,e,δm) = sum(denominator_II(d,e,δm) for d in ds)
+denominator_I(a::Amplitude{T},e,δm) where {T <: Tuple{Vararg{interpolated}}} =
+	sum(-(dispersive(ik,e)-real(dispersive(ik,δm))) for ik in a.ik) +
+		a.corrections(e)
+denominator_II(a::Amplitude{T},e,δm) where {T <: Tuple{Vararg{interpolated}}} =
+	imag(e) ≥ 0 ?
+		denominator_I(a,e,δm) :
+		denominator_I(a,e,δm)-2im*sum(ρ_thr(ik,e) for ik in a.ik)
+#
 
-intensity(e; δm) =
-	1/abs2(denominator_II(Tuple(ichannels),e,δm))*ρ_thr(ichannels[1],e)
-
-function pole_position(d,δm; init = [δm,-0.1*δm])
-	abs2D(x) = abs2(denominator_II(d, complex(x...),δm))
+function pole_position(a,δm; init = [δm,-0.1*δm])
+	abs2D(x) = abs2(denominator_II(a, complex(x...),δm))
 	fitres = optimize(abs2D, init)
 	return NamedTuple{(:m_pole, :half_Γ_pole, :invD)}(
 		[fitres.minimizer..., fitres.minimum])
