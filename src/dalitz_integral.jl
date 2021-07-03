@@ -11,12 +11,12 @@ function integrand_mapped_thr(d::AbstractxDD,s,x)
 	σ2 = σ2_0 + x[2]*(σ2_e-σ2_0) # straight path
 	#
 	jac = (σ3_e-σ3_0)*(σ2_e-σ2_0)
-	decay_matrix_element(d,s,σ3,σ2) / s * jac
+	decay_matrix_element(d,s,σ3,σ2) / (2π*s) * jac
 end
 
 function ρ_thr(d::AbstractxDD, e)
 	integrand(x,f) = f[1:2] .= reim(integrand_mapped_thr(d,e2m(e)^2,x))
 	v = cuhre(integrand, 2, 2)[1]
-	complex(v...)
+	complex(v...) / (8π)^2
 end
 
