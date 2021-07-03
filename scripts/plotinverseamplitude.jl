@@ -18,14 +18,14 @@ settings = transformdictrecursively!(
 let
     ev = range(-1,3.0,length=100)
     plot()
-    f(e) = denominator_I(Tuple(ichannels), e, δm0.val) / ρInf / (w_matching*1e3)
+    f(e) = denominator_I(Tuple(ichannels), e, δm0.val) / (w_matching*ρInf)
     g(e) = denominator_I(NonRelBW(), e+1e-6im, δm0.val)
     # 	real
-    plot!(mgrid, invA_advans_real, lab="", l=(:red,))
-    plot!(mgrid, invA_nonrel_real, lab="", l=(:red,:dash))
+    plot!(mgrid, invA_advans_real, lab="", l=(:black,))
+    plot!(mgrid, invA_nonrel_real, lab="", l=(:black,:dash))
     # 	imag
-    plot!(mgrid, invA_advans_imag, l=(:black,), lab=L"\mathrm{advanced\,\,BW}")
-    plot!(mgrid, invA_nonrel_imag, l=(:black,:dash), lab=L"\mathrm{non}\textrm{-}\mathrm{rel}")
+    plot!(mgrid, invA_advans_imag, l=(:red,), lab=L"\mathrm{advanced\,\,BW}")
+    plot!(mgrid, invA_nonrel_imag, l=(:red,:dash), lab=L"\mathrm{non}\textrm{-}\mathrm{rel}")
     #
     vline!([δm0.val], lab="", c=2)
     vline!([0 m2e(mDˣ⁰+mD⁺)], lab="", c=[:green :magenta], lw=0.5)
