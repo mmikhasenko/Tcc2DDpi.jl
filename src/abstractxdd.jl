@@ -1,9 +1,12 @@
 abstract type AbstractxDD end
 #
-function ρ_tb(d::AbstractxDD, e)
-    sqrt(λ(e2m(e)^2,mDˣ⁺^2,mD⁰^2))/e2m(e)^2
+function ρ_tb(d::AbstractxDD, e::Real)
+	M,m = d.R13.m, d.ms.m2
+	sqrts = e2m(e)
+	sqrts < M+m ? 0.0 :
+    	sqrt(λ(e2m(e)^2,M^2,m^2))/e2m(e)^2
 end	
-    
+
 # πDD
 struct πDD{T1,T2,T3} <: AbstractxDD
     ms::NamedTuple{(:m1,:m2,:m3),T1}
