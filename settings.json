@@ -6,13 +6,15 @@
 
     "polepositiongrid": {
             "dm_min" : -0.8,
-            "dm_max" : -0.1,
-            "dm_N"   : 22
+            "dm_max" : -0.05,
+            "dm_N"   : 25
     },
     
     "fitresults": {
               "δm0": "-363e-3 ± 40e-3",
-          "Γ0_90CL": 135.0,
-          "Γ0_95CL": 95.0
+          "Γ0_90CL_syst": 135.0,
+          "Γ0_95CL_syst": 95.0,
+          "Γ0_90CL_stat": 309.0,
+          "Γ0_95CL_stat": 204.0
     }
 }

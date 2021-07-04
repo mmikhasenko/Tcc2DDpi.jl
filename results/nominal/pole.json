@@ -1,20 +1,20 @@
 {
     "effective_range_parameters": {
         "technical": {
-            "w_matching": 0.3198431308570355,
-            "rho_inf": 131.7627569338969
+            "w_matching": 0.2533567684222205,
+            "rho_inf": 0.04191192444230688
         },
-        "Re_scatt_length": "-7.65 ± 0.51",
+        "Re_scatt_length": "-7.12 ± 0.5",
         "g_coupling": {
-            "g_90CL": 89.10999971112756,
-            "g_95CL": 74.75174937178193
+            "g_90CL": 4.996362931313341,
+            "g_95CL": 4.191301434437752
         },
-        "Re_inv_scatt_length": "-24.0 ± 1.9",
-        "Im_scatt_length": "2.11 ± 0.31",
-        "Im_inv_scatt_length": "-6.604589784777223 ± 0.0",
+        "Re_inv_scatt_length": "-26.0 ± 2.1",
+        "Im_scatt_length": "1.83 ± 0.28",
+        "Im_inv_scatt_length": "-6.687196607734609 ± 0.0",
         "effective_range": {
-            "r_90CL": 0.072,
-            "r_95CL": 0.102
+            "r_90CL": 11.91,
+            "r_95CL": 16.925
         }
     },
     "size_estimate": {
@@ -24,7 +24,7 @@
     "pole_position": {
         "pole_sv": {
             "m_pole": "-0.364 ± 0.04",
-            "Γ_pole": "-0.0514 ± 0.0022"
+            "Γ_pole": "-0.0479 ± 0.0025"
         }
     }
 }
