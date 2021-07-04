@@ -16,6 +16,20 @@ settings = transformdictrecursively!(
 
 # precalculated
 @unpack mgrid, ppvalues = readjson(joinpath("results","nominal","pole_interpolation.json"))["pole_interpolation"]
+@unpack ppvalues_66CL_stat,
+		ppvalues_90CL_stat,
+		ppvalues_95CL_stat,
+		ppvalues_66CL_syst,
+		ppvalues_90CL_syst,
+		ppvalues_95CL_syst = readjson(joinpath("results","nominal","pole_interpolation_stat_syst.json"))["pole_interpolation"]
+# 
+ppsampled_66CL_stat = d2nt.(ppvalues_66CL_stat)
+ppsampled_90CL_stat = d2nt.(ppvalues_90CL_stat)
+ppsampled_95CL_stat = d2nt.(ppvalues_95CL_stat)
+ppsampled_66CL_syst = d2nt.(ppvalues_66CL_syst)
+ppsampled_90CL_syst = d2nt.(ppvalues_90CL_syst)
+ppsampled_95CL_syst = d2nt.(ppvalues_95CL_syst)
+
 @unpack pole_sv = transformdictrecursively!(
     readjson(joinpath("results","nominal","pole.json"))["pole_position"],
     ifstringgivemeasurement)
@@ -36,6 +50,25 @@ channels = [
 #
 let
     plot(grid=false)
+	plot!(
+        getproperty.(ppsampled_66CL_stat, :m_pole),
+		getproperty.(ppsampled_66CL_stat, :half_Γ_pole), l=(1,:magenta), lab="")
+	plot!(
+        getproperty.(ppsampled_90CL_stat, :m_pole),
+		getproperty.(ppsampled_90CL_stat, :half_Γ_pole), l=(1,:magenta), lab="")
+	plot!(
+        getproperty.(ppsampled_95CL_stat, :m_pole),
+		getproperty.(ppsampled_95CL_stat, :half_Γ_pole), l=(1,:magenta), lab="")
+	plot!(
+        getproperty.(ppsampled_66CL_syst, :m_pole),
+		getproperty.(ppsampled_66CL_syst, :half_Γ_pole), l=(1,:orange), lab="")
+	plot!(
+        getproperty.(ppsampled_90CL_syst, :m_pole),
+		getproperty.(ppsampled_90CL_syst, :half_Γ_pole), l=(1,:orange), lab="")
+	plot!(
+        getproperty.(ppsampled_95CL_syst, :m_pole),
+		getproperty.(ppsampled_95CL_syst, :half_Γ_pole), l=(1,:orange), lab="")
+	#
 	plot!(
         getproperty.(ppsampled, :m_pole),
 		getproperty.(ppsampled, :half_Γ_pole), l=(1,:gray), lab="")

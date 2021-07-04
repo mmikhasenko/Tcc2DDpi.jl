@@ -5,9 +5,9 @@
     },
 
     "polepositiongrid": {
-            "dm_min" : -0.8,
-            "dm_max" : -0.05,
-            "dm_N"   : 25
+            "dm_min" : -1.5,
+            "dm_max" : -0.01,
+            "dm_N"   : 20
     },
     
     "fitresults": {

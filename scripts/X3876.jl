@@ -52,7 +52,27 @@ writejson(joinpath("results","nominal","pole_interpolation.json"),
             ),
         )
     )
+# 
 
+#######################################################################
+
+ppsampled_stat_syst = [(@show δm; pole_position(ampX(Γ),δm))
+    for δm in δmv, Γ in [Γ0_66CL_stat, Γ0_90CL_stat, Γ0_95CL_stat,
+                         Γ0_66CL_syst, Γ0_90CL_syst, Γ0_95CL_syst]]
+# 
+writejson(joinpath("results","nominal","pole_interpolation_stat_syst.json"),
+        Dict(
+            :pole_interpolation => Dict{Symbol,Any}(
+                :mgrid => δmv,
+                :ppvalues_66CL_stat => ppsampled_stat_syst[:,1],
+                :ppvalues_90CL_stat => ppsampled_stat_syst[:,2],
+                :ppvalues_95CL_stat => ppsampled_stat_syst[:,3],
+                :ppvalues_66CL_syst => ppsampled_stat_syst[:,4],
+                :ppvalues_90CL_syst => ppsampled_stat_syst[:,5],
+                :ppvalues_95CL_syst => ppsampled_stat_syst[:,6],
+            ),
+        )
+    )
 #######################################################################
 
 # naive size estimation
