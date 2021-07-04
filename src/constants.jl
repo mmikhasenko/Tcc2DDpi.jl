@@ -22,3 +22,8 @@ const μ₊ = 1.0
 # conversion functinos
 e2m(e) = (mD⁰+mDˣ⁺)+e*1e-3
 m2e(m) = (m-mD⁰-mDˣ⁺)*1e3
+
+
+const ΔNLL_90CL = 1.352
+const ΔNLL_95CL = 1.921
+const ΔNLL_66CL = 1.0

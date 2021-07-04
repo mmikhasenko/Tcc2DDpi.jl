@@ -14,6 +14,11 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 @unpack δm0 = settings["fitresults"]
 @unpack Γ0_90CL, Γ0_95CL = settings["fitresults"]
 
+# estimation of Γ0_66CL under assumption that ΔLLH is linear on 1/Γ0
+r1 = 1/Γ0_90CL / ΔNLL_90CL
+r2 = 1/Γ0_95CL / ΔNLL_95CL
+Γ0_66CL = mean([1/r1,1/r2])
+
 # 
 channels = [
     πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
