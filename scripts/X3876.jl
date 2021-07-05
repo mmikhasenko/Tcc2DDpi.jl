@@ -15,12 +15,13 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 @unpack Γ0_90CL_syst, Γ0_95CL_syst = settings["fitresults"]
 @unpack Γ0_90CL_stat, Γ0_95CL_stat = settings["fitresults"]
 
-# estimation of Γ0_66CL under assumption that ΔLLH is linear on 1/Γ0
-Γ0_66CL_syst = mean([Γ0_90CL_syst * ΔNLL_90CL,
-                     Γ0_95CL_syst * ΔNLL_95CL])
-Γ0_66CL_stat = mean([Γ0_90CL_stat * ΔNLL_90CL,
-                     Γ0_95CL_stat * ΔNLL_95CL])
-# 
+# estimation of Γ0_68CL computes ΔLLH of 1/2
+#  under assumption that ΔLLH is linear on 1/Γ0
+Γ0_68CL_syst = mean([Γ0_90CL_syst * ΔNLL_90CL / ΔNLL_68CL,
+                     Γ0_95CL_syst * ΔNLL_95CL / ΔNLL_68CL])
+Γ0_68CL_stat = mean([Γ0_90CL_stat * ΔNLL_90CL / ΔNLL_68CL,
+                     Γ0_95CL_stat * ΔNLL_95CL / ΔNLL_68CL])
+#
 channels = [
     πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
     πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)),
@@ -57,17 +58,17 @@ writejson(joinpath("results","nominal","pole_interpolation.json"),
 #######################################################################
 
 ppsampled_stat_syst = [(@show δm; pole_position(ampX(Γ),δm))
-    for δm in δmv, Γ in [Γ0_66CL_stat, Γ0_90CL_stat, Γ0_95CL_stat,
-                         Γ0_66CL_syst, Γ0_90CL_syst, Γ0_95CL_syst]]
+    for δm in δmv, Γ in [Γ0_68CL_stat, Γ0_90CL_stat, Γ0_95CL_stat,
+                         Γ0_68CL_syst, Γ0_90CL_syst, Γ0_95CL_syst]]
 # 
 writejson(joinpath("results","nominal","pole_interpolation_stat_syst.json"),
         Dict(
             :pole_interpolation => Dict{Symbol,Any}(
                 :mgrid => δmv,
-                :ppvalues_66CL_stat => ppsampled_stat_syst[:,1],
+                :ppvalues_68CL_stat => ppsampled_stat_syst[:,1],
                 :ppvalues_90CL_stat => ppsampled_stat_syst[:,2],
                 :ppvalues_95CL_stat => ppsampled_stat_syst[:,3],
-                :ppvalues_66CL_syst => ppsampled_stat_syst[:,4],
+                :ppvalues_68CL_syst => ppsampled_stat_syst[:,4],
                 :ppvalues_90CL_syst => ppsampled_stat_syst[:,5],
                 :ppvalues_95CL_syst => ppsampled_stat_syst[:,6],
             ),

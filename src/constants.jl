@@ -26,4 +26,4 @@ m2e(m) = (m-mD⁰-mDˣ⁺)*1e3
 
 const ΔNLL_90CL = 1.352
 const ΔNLL_95CL = 1.921
-const ΔNLL_66CL = 1.0
+const ΔNLL_68CL = 0.5
