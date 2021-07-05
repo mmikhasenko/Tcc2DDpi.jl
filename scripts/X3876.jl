@@ -12,15 +12,8 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 @unpack cutoff, estep = settings["phspmatching"]
 @unpack dm_min, dm_max, dm_N = settings["polepositiongrid"]
 @unpack δm0 = settings["fitresults"]
-@unpack Γ0_90CL_syst, Γ0_95CL_syst = settings["fitresults"]
-@unpack Γ0_90CL_stat, Γ0_95CL_stat = settings["fitresults"]
-
-# estimation of Γ0_68CL computes ΔLLH of 1/2
-#  under assumption that ΔLLH is linear on 1/Γ0
-Γ0_68CL_syst = mean([Γ0_90CL_syst * ΔNLL_90CL / ΔNLL_68CL,
-                     Γ0_95CL_syst * ΔNLL_95CL / ΔNLL_68CL])
-Γ0_68CL_stat = mean([Γ0_90CL_stat * ΔNLL_90CL / ΔNLL_68CL,
-                     Γ0_95CL_stat * ΔNLL_95CL / ΔNLL_68CL])
+@unpack Γ0_68CL_syst, Γ0_90CL_syst, Γ0_95CL_syst = settings["fitresults"]
+@unpack Γ0_68CL_stat, Γ0_90CL_stat, Γ0_95CL_stat = settings["fitresults"]
 #
 channels = [
     πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
@@ -61,6 +54,8 @@ ppsampled_stat_syst = [(@show δm; pole_position(ampX(Γ),δm))
     for δm in δmv, Γ in [Γ0_68CL_stat, Γ0_90CL_stat, Γ0_95CL_stat,
                          Γ0_68CL_syst, Γ0_90CL_syst, Γ0_95CL_syst]]
 # 
+[Γ0_68CL_stat, Γ0_90CL_stat, Γ0_95CL_stat,
+                         Γ0_68CL_syst, Γ0_90CL_syst, Γ0_95CL_syst]
 writejson(joinpath("results","nominal","pole_interpolation_stat_syst.json"),
         Dict(
             :pole_interpolation => Dict{Symbol,Any}(
