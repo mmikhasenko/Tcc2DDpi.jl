@@ -9,8 +9,8 @@ using Statistics
 
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
 #
-@unpack dm_min, dm_max, dm_N = settings["polepositiongrid"]
 @unpack δm0 = settings["fitresults"]
+@unpack dm_min, dm_max, dm_N = settings["polepositiongrid"]
 
 @unpack Γ0_68CL_syst, Γ0_90CL_syst, Γ0_95CL_syst = settings["fitresults"]
 @unpack Γ0_68CL_stat, Γ0_90CL_stat, Γ0_95CL_stat = settings["fitresults"]
