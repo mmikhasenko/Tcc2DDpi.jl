@@ -58,3 +58,16 @@ end
 branch_points(d::AbstractxDD) = (
 	m2e(d.ms[3] + sqrt(pole_position(d.R12))),
 	m2e(d.ms[2] + sqrt(pole_position(d.R13))))
+
+
+# serilization
+obj2nt(ch::AbstractxDD) =
+    (type=string(typeof(ch)),
+        ms=ch.ms, R12=ch.R12, R13=ch.R13)
+
+# deserilization
+function constructchannel(ser::NamedTuple{(:R12, :R13, :ms, :type),T} where T)
+    type = eval(Meta.parse(ser.type))
+    ms = NamedTuple{(:m1,:m2,:m3)}(ser.ms)
+    type(ms, ser.R12, ser.R13)
+end

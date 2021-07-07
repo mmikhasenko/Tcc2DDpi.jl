@@ -37,3 +37,5 @@ savefig(joinpath("plots","nominal","inverse_amplitude.pdf"))
 # latex
 pgfplotsx()
 savefig(joinpath("plots","latex","inverse_amplitude.tex"))
+
+# 

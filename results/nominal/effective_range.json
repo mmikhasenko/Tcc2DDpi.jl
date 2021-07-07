@@ -1,0 +1,24 @@
+{
+    "effective_range_parameters": {
+        "technical": {
+            "w_matching": 0.2533567684222205,
+            "rho_inf": 0.04191192444230688
+        },
+        "Re_scatt_length": "-7.12 ± 0.5",
+        "g_coupling": {
+            "g_90CL": 4.996362931313341,
+            "g_95CL": 4.191301434437752
+        },
+        "Re_inv_scatt_length": "-26.0 ± 2.1",
+        "Im_scatt_length": "1.83 ± 0.28",
+        "Im_inv_scatt_length": "-6.687196607734609 ± 0.0",
+        "effective_range": {
+            "r_90CL": 11.91,
+            "r_95CL": 16.925
+        }
+    },
+    "size_estimate": {
+        "momentum": "26.5 ± 1.5",
+        "R_eff_ΔE": "7.45 ± 0.41"
+    }
+}

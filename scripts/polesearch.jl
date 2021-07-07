@@ -8,25 +8,22 @@ using Interpolations
 using Statistics
 
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
-
-@unpack cutoff, estep = settings["phspmatching"]
+#
 @unpack dm_min, dm_max, dm_N = settings["polepositiongrid"]
 @unpack δm0 = settings["fitresults"]
+
 @unpack Γ0_68CL_syst, Γ0_90CL_syst, Γ0_95CL_syst = settings["fitresults"]
 @unpack Γ0_68CL_stat, Γ0_90CL_stat, Γ0_95CL_stat = settings["fitresults"]
-#
-channels = [
-    πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
-    πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)),
-    γDD((m1=mγ, m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰))]
 
-ichannels = interpolated.(channels, cutoff; estep=estep) # cutoff
+# retrieve the model
+modelDict = readjson(joinpath("results","nominal","model.json"))
+ichannels = interpolated.(d2nt.(modelDict["ichannels"]))
+channels = getproperty.(ichannels, :channel)
 
+# 
 ρInf = sum(ich.cutoffratio for ich in ichannels)
 
 ampX0 = Amplitude(Tuple(ichannels), zero)
-ampX(Γ) = Amplitude(Tuple(ichannels),
-    e->(e2m(δm0.val)^2-e2m(e)^2)/(e2m(δm0.val)*Γ/1e3/ρInf))
 #
 # pole
 δmv = range(dm_min, dm_max, length=20) # dm_N 
@@ -38,24 +35,27 @@ itr_m, itr_Γ =
 # 
 pole_sv = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm0), itr_Γ(δm0)])
 
-writejson(joinpath("results","nominal","pole_interpolation.json"),
-        Dict(
+writejson(joinpath("results","nominal","pole_interpolation.json"), transformdictrecursively!(
+        Dict{Symbol,Any}(
+            :pole_position => Dict{Symbol,Any}(
+                :pole_sv => pole_sv
+            ),
             :pole_interpolation => Dict{Symbol,Any}(
                 :mgrid => δmv,
                 :ppvalues => ppsampled
             ),
-        )
+        ), ifmeasurementgivestring)
     )
 # 
 
 #######################################################################
+ampX(Γ) = Amplitude(Tuple(ichannels),
+    e->(e2m(δm0.val)^2-e2m(e)^2)/(e2m(δm0.val)*Γ/1e3/ρInf))
 
 ppsampled_stat_syst = [(@show δm; pole_position(ampX(Γ),δm))
     for δm in δmv, Γ in [Γ0_68CL_stat, Γ0_90CL_stat, Γ0_95CL_stat,
                          Γ0_68CL_syst, Γ0_90CL_syst, Γ0_95CL_syst]]
 # 
-[Γ0_68CL_stat, Γ0_90CL_stat, Γ0_95CL_stat,
-                         Γ0_68CL_syst, Γ0_90CL_syst, Γ0_95CL_syst]
 writejson(joinpath("results","nominal","pole_interpolation_stat_syst.json"),
         Dict(
             :pole_interpolation => Dict{Symbol,Any}(
@@ -70,23 +70,6 @@ writejson(joinpath("results","nominal","pole_interpolation_stat_syst.json"),
         )
     )
 #######################################################################
-
-# naive size estimation
-γ = sqrt(-2μDˣ⁺D⁰*1e3*δm0)
-R_ΔE = fm_times_mev/γ
-
-# scattering length
-ρInf = sum(ich.cutoffratio for ich in ichannels)
-w_matching = ichannels[1].cutoffratio*3/2 / ρInf * 2/e2m(0) # 1/GeV
-inverse_scattering_length = denominator_I(ampX0, 0.0, δm0) / (w_matching * ρInf) * 1e3 # MeV
-scattering_length = fm_times_mev/inverse_scattering_length
-
-# effective range
-#          1 / (GeV * MeV) / (1/GeV)             = 1/MeV
-reff(Γ) = 8 / (e2m(0) * Γ) / (w_matching) # 1/MeV
-
-g_90CL, g_95CL = sqrt.((2*e2m(0)).*[Γ0_90CL_syst, Γ0_95CL_syst] .* 1e-3 /ρInf)  # GeV
-r_90CL, r_95CL = round.(reff.([Γ0_90CL_syst, Γ0_95CL_syst]) * fm_times_mev; digits=3)  # fm
 
 # save results to a file
 writejson(joinpath("results","nominal","pole.json"), transformdictrecursively!(
@@ -132,3 +115,4 @@ writejson(joinpath("results","nominal","inverse_amplitude.json"),
             ),
         )
     )
+#

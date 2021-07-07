@@ -1,4 +1,10 @@
 {
+    "pole_position": {
+        "pole_sv": {
+            "m_pole": "-0.364 ± 0.04",
+            "Γ_pole": "-0.0478 ± 0.0023"
+        }
+    },
     "pole_interpolation": {
         "ppvalues": [
             {

@@ -31,9 +31,13 @@ include("covariant_exptessions.jl")
 
 export J_I, J_II
 include("isobar.jl")
+
 export πDD, γDD
 export branch_points
+export constructchannel
 include("abstractxdd.jl")
+
+export obj2nt
 
 export ρ_thr
 include("dalitz_integral.jl")
@@ -58,5 +62,6 @@ export ifstringgivemeasurement
 export ifmeasurementgivestring
 export d2nt
 include("io.jl")
+
 
 end
