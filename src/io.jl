@@ -52,4 +52,6 @@ function ifmeasurementgivestring(x)
     return x
 end
 
-d2nt(d; process=identity) = NamedTuple{Tuple(Symbol.(keys(d)))}(process.(Base.values(d)))
+d2nt(x; process=identity) = process(x)
+d2nt(d::Dict; process=identity) = NamedTuple{Tuple(Symbol.(keys(d)))}(d2nt.(values(d); process))
+d2nt(x::Vector{Any}; process=identity) = vcat(d2nt.(x; process)...)
