@@ -5,8 +5,11 @@ const mπ⁺ = 0.13957039
 const mD⁰ = 1.86483
 const mD⁺ = 1.86965
 # 
-const mDˣ⁺ = 2.01026; const ΓDˣ⁺ = 83.4e-6
-const mDˣ⁰ = 2.00685; const ΓDˣ⁰ = 55.2e-6
+const mDˣ⁺ = 1.86483+145.4258e-3 # m(D) + Δm(D*,D) from PDG
+const mDˣ⁰ = 2.00685
+# 
+const ΓDˣ⁺ = 83.4e-6
+const ΓDˣ⁰ = 55.2e-6
 const mγ = 0.0
 # 
 const μDˣ⁺D⁰ = mDˣ⁺*mD⁰ / (mDˣ⁺+mD⁰)
