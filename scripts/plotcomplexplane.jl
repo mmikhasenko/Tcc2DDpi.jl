@@ -15,7 +15,10 @@ settings = transformdictrecursively!(
 @unpack δm0 = settings["fitresults"]
 
 # precalculated
-@unpack mgrid, ppvalues = readjson(joinpath("results","nominal","pole_interpolation.json"))["pole_interpolation"]
+pole_default = transformdictrecursively!(readjson(
+		joinpath("results","nominal","pole_default.json")), ifstringgivemeasurement)
+# 
+@unpack mgrid, ppvalues = pole_default["pole_interpolation"]
 @unpack ppvalues_68CL_stat,
 		ppvalues_90CL_stat,
 		ppvalues_95CL_stat,
@@ -30,9 +33,7 @@ ppsampled_68CL_syst = d2nt.(ppvalues_68CL_syst)
 ppsampled_90CL_syst = d2nt.(ppvalues_90CL_syst)
 ppsampled_95CL_syst = d2nt.(ppvalues_95CL_syst)
 
-@unpack pole_sv = transformdictrecursively!(
-    readjson(joinpath("results","nominal","pole.json"))["pole_position"],
-    ifstringgivemeasurement)
+@unpack pole_sv = pole_default["pole_position"]
 
 # inferred
 ppsampled = d2nt.(ppvalues)

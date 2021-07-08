@@ -3,7 +3,6 @@ stages:
     cmd: julia scripts/model.jl
     deps:
     - src/constants.jl
-    - src/constants.jl
     params:
     - settings.json:
       - phspmatching
@@ -15,15 +14,13 @@ stages:
   polesearch:
     cmd: julia scripts/polesearch.jl
     deps:
-    - scripts/model.json
+    - results/nominal/model.json
     params:
     - settings.json:
       - fitresults
       - polepositiongrid
     outs:
-    - results/nominal/pole.json:
-        cache: false
-    - results/nominal/pole_interpolation.json:
+    - results/nominal/pole_default.json:
         cache: false
     - results/nominal/pole_interpolation_stat_syst.json:
         cache: false
@@ -31,7 +28,7 @@ stages:
   effectiverange:
     cmd: julia scripts/effectiverange.jl
     deps:
-    - scripts/model.json
+    - results/nominal/model.json
     params:
     - settings.json:
       - fitresults
@@ -40,17 +37,3 @@ stages:
         cache: false
     - results/nominal/inverse_amplitude.json:
         cache: false
-
-  effectiverange:
-    cmd: julia scripts/effectiverange.jl
-    deps:
-    - scripts/model.json
-    params:
-    - settings.json:
-      - fitresults
-    outs:
-    - results/nominal/effective_range.json:
-        cache: false
-    - results/nominal/inverse_amplitude.json:
-        cache: false
-

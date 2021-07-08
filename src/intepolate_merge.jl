@@ -22,7 +22,7 @@ end
 
 # serialization
 obj2nt(ich::interpolated) =
-    (channel = channel2nt(ich.channel),
+    (channel = obj2nt(ich.channel),
     cutoff = ich.cutoff,
     cutoffratio = ich.cutoffratio,
     knots = ich.itr.knots[1],

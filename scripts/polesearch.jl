@@ -35,7 +35,7 @@ itr_m, itr_Γ =
 # 
 pole_sv = NamedTuple{(:m_pole, :Γ_pole)}([itr_m(δm0), itr_Γ(δm0)])
 
-writejson(joinpath("results","nominal","pole_interpolation.json"), transformdictrecursively!(
+writejson(joinpath("results","nominal","pole_default.json"), transformdictrecursively!(
         Dict{Symbol,Any}(
             :pole_position => Dict{Symbol,Any}(
                 :pole_sv => pole_sv
@@ -69,50 +69,4 @@ writejson(joinpath("results","nominal","pole_interpolation_stat_syst.json"),
             ),
         )
     )
-#######################################################################
-
-# save results to a file
-writejson(joinpath("results","nominal","pole.json"), transformdictrecursively!(
-        Dict{Symbol,Any}(
-            :size_estimate => Dict{Symbol,Any}(
-                :momentum => γ,
-                :R_eff_ΔE => R_ΔE,
-            ),
-            :effective_range_parameters => Dict{Symbol,Any}(
-                :Re_inv_scatt_length => real(inverse_scattering_length),
-                :Im_inv_scatt_length => imag(inverse_scattering_length),
-                :Re_scatt_length => real(scattering_length),
-                :Im_scatt_length => imag(scattering_length),
-                :effective_range => (; r_90CL, r_95CL),
-                :g_coupling => (; g_90CL, g_95CL),
-                :technical => Dict{Symbol,Any}(
-                    :rho_inf => ρInf,
-                    :w_matching => w_matching)
-                ),
-            :pole_position => Dict{Symbol,Any}(
-                :pole_sv => pole_sv),
-        ), ifmeasurementgivestring)
-    )
-#
-
-#######################################################################
-
-#
-ev = range(-1,3.0,length=100)
-D_advans_δm0(e) = denominator_I(ampX0, e, δm0.val) / (w_matching * ρInf)
-D_nonrel_δm0(e) = denominator_I(NonRelBW(), e+1e-6im, δm0.val)
 # 
-invA_nonrel, invA_advans = D_nonrel_δm0.(ev), D_advans_δm0.(ev)
-
-writejson(joinpath("results","nominal","inverse_amplitude.json"),
-        Dict(
-            :inverse_amplitude => Dict{Symbol,Any}(
-                :mgrid => ev,
-                :invA_nonrel_real => real.(invA_nonrel),
-                :invA_nonrel_imag => imag.(invA_nonrel),
-                :invA_advans_real => real.(invA_advans),
-                :invA_advans_imag => imag.(invA_advans),
-            ),
-        )
-    )
-#
