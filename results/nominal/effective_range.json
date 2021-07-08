@@ -1,28 +1,28 @@
 {
     "effective_range_parameters": {
         "technical": {
-            "w_matching": 0.25318407661393155,
+            "w_matching": 0.25318435102672565,
             "rho_inf": 0.0418951605230331
         },
-        "Re_scatt_length": "-7.16 ± 0.51",
+        "Re_scatt_length": "-7.17 ± 0.51",
         "g_coupling": {
-            "g_90CL": 4.99736245305624,
-            "g_95CL": 4.19213990373479
+            "g_90CL": 4.9973597448703675,
+            "g_95CL": 4.192137631917572
         },
         "Re_inv_scatt_length": "-25.8 ± 2.1",
-        "Im_scatt_length": "1.85 ± 0.28",
-        "Im_inv_scatt_length": "-6.6907124791867965 ± 0.0",
+        "Im_scatt_length": "1.86 ± 0.28",
+        "Im_inv_scatt_length": "-6.69070515429382 ± 0.0",
         "effective_range": {
             "r_90CL": 11.919,
             "r_95CL": 16.937
         },
         "compositeness": {
-            "Z_90CL": "0.52 ± 0.013",
+            "Z_90CL": "0.519 ± 0.013",
             "Z_95CL": "0.582 ± 0.012"
         }
     },
     "size_estimate": {
         "momentum": "26.4 ± 1.5",
-        "R_eff_ΔE": "7.48 ± 0.42"
+        "R_eff_ΔE": "7.49 ± 0.42"
     }
 }

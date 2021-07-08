@@ -34,7 +34,7 @@ stages:
     params:
       settings.json:
         fitresults:
-          δm0: -360e-3 ± 40e-3
+          δm0: -359.123e-3 ± 40.1579e-3
           Γ0_68CL_syst: 342.5
           Γ0_90CL_syst: 135.0
           Γ0_95CL_syst: 95.0
@@ -57,7 +57,7 @@ stages:
     params:
       settings.json:
         fitresults:
-          δm0: -360e-3 ± 40e-3
+          δm0: -359.2e-3 ± 40.2e-3
           Γ0_68CL_syst: 342.5
           Γ0_90CL_syst: 135.0
           Γ0_95CL_syst: 95.0
@@ -66,11 +66,11 @@ stages:
           Γ0_95CL_stat: 204.0
     outs:
     - path: results/nominal/effective_range.json
-      md5: 531539c89b09692bafc8d1fa4f74a15a
-      size: 678
+      md5: 2dca509736e9ec992a603eb0d9ad2bd5
+      size: 795
     - path: results/nominal/inverse_amplitude.json
-      md5: 2a69f49040f0077ca984fc103156b587
-      size: 17163
+      md5: 52001ca488d5b87c5e2304877f7a9bd3
+      size: 17171
   polesearch:
     cmd: julia scripts/polesearch.jl
     deps:
@@ -80,7 +80,7 @@ stages:
     params:
       settings.json:
         fitresults:
-          δm0: -360e-3 ± 40e-3
+          δm0: -359.2e-3 ± 40.2e-3
           Γ0_68CL_syst: 342.5
           Γ0_90CL_syst: 135.0
           Γ0_95CL_syst: 95.0
@@ -93,8 +93,8 @@ stages:
           dm_N: 20
     outs:
     - path: results/nominal/pole_default.json
-      md5: 327130cc0966d42eabaed8827a202455
-      size: 4407
+      md5: 50b1f05b32472a1d7b5b6ba9ffd9f92f
+      size: 4406
     - path: results/nominal/pole_interpolation_stat_syst.json
-      md5: 64bf3a6f334d0f3c0a1b83fc8d934f2b
-      size: 22124
+      md5: 2422120bd536925524669ff590e17e59
+      size: 22145
