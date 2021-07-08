@@ -38,6 +38,10 @@ reff(Γ) = 8 / (e2m(0) * Γ) / (w_matching) # 1/MeV
 g_90CL, g_95CL = sqrt.((2*e2m(0)).*[Γ0_90CL_syst, Γ0_95CL_syst] .* 1e-3 /ρInf)  # GeV
 r_90CL, r_95CL = round.(reff.([Γ0_90CL_syst, Γ0_95CL_syst]) * fm_times_mev; digits=3)  # fm
 
+Z(r,a) = 1-sqrt(1/(1+abs(2r/a)))
+
+Z_90CL, Z_95CL = Z.([r_90CL, r_95CL],real(scattering_length))
+
 # save results to a file
 writejson(joinpath("results","nominal","effective_range.json"), transformdictrecursively!(
         Dict{Symbol,Any}(
@@ -51,6 +55,7 @@ writejson(joinpath("results","nominal","effective_range.json"), transformdictrec
                 :Re_scatt_length => real(scattering_length),
                 :Im_scatt_length => imag(scattering_length),
                 :effective_range => (; r_90CL, r_95CL),
+                :compositeness => (; Z_90CL, Z_95CL),
                 :g_coupling => (; g_90CL, g_95CL),
                 :technical => Dict{Symbol,Any}(
                     :rho_inf => ρInf,
