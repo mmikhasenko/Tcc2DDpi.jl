@@ -1,5 +1,5 @@
-cd(joinpath(@__DIR__,".."))
 using Pkg
+cd(joinpath(@__DIR__,".."))
 Pkg.activate(".")
 
 using X2DDpi

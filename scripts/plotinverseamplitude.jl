@@ -1,3 +1,6 @@
+using Pkg
+cd(joinpath(@__DIR__,".."))
+Pkg.activate(".")
 
 using Plots
 using LaTeXStrings

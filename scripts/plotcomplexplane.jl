@@ -1,3 +1,8 @@
+using Pkg
+cd(joinpath(@__DIR__,".."))
+Pkg.activate(".")
+
+
 using Parameters
 using Interpolations
 
