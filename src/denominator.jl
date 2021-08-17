@@ -22,7 +22,7 @@ denominator_II(a::Amplitude{T},e,δm) where {T <: Tuple{Vararg{interpolated}}} =
 		denominator_I(a,e,δm)-2im*sum(ρ_thr(ik,e) for ik in a.ik)
 #
 
-function pole_position(a,δm; init = [δm,0.1*δm])
+function pole_position(a::Amplitude{T},δm; init = [δm,0.1*δm]) where {T <: Tuple{Vararg{interpolated}}}
 	abs2D(x) = abs2(1000*denominator_II(a, complex(x...),δm))
 	fitres = optimize(abs2D, init)
 	return NamedTuple{(:m_pole, :half_Γ_pole, :invD)}(
