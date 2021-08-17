@@ -9,6 +9,9 @@ using CSV
 using DataFrames
 using ProgressLogging
 # using Plots
+# using LaTeXStrings
+# theme(:wong2, frame=:box, grid=false, minorticks=true, 
+#     guidefontvalign=:top, guidefonthalign=:right)
 
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
 #
@@ -19,11 +22,6 @@ modelDict = readjson(joinpath("results","nominal","model.json"))
 const ichannels = interpolated.(d2nt.(modelDict["ichannels"]))
 const channels = getproperty.(ichannels, :channel)
 # 
-
-const ampX0 = Amplitude(Tuple(ichannels))
-@time pole_position(ampX0, δm0.val)
-# 
-
 
 import X2DDpi:pole_position
 pole_position(δm::Float64,g::Float64) = pole_position(
@@ -40,7 +38,7 @@ push!(nt_gdm, (;nt_gdm[end]..., g=0.001,
     dm = extrapolate(0.001, [nt_gdm[end-2].g,  nt_gdm[end].g],
                             [nt_gdm[end-2].dm, nt_gdm[end].dm]) ))
 #
-plot(getproperty.(nt_gdm,:g), getproperty.(nt_gdm,:dm))
+# plot(getproperty.(nt_gdm,:g), getproperty.(nt_gdm,:dm), m=:o, ylab=L"\delta m", xlab=L"g")
 # 
 pole_mddl = let 
     a = []
@@ -74,7 +72,7 @@ writejson(joinpath("results","nominal","scang.json"),
     )
 #
 # let
-#     plot()
+#     plot(leg=:bottomright, xlab=L"\mathrm{Re}\,\delta m", ylab=L"\mathrm{Im}\,\delta m")
 #     plot!(getproperty.(pole_left,:m_pole),
 #         getproperty.(pole_left,:half_Γ_pole))
 #     #
