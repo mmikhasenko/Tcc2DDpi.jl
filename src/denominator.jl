@@ -5,12 +5,12 @@ end
 
 Amplitude(ik) = Amplitude(ik, zero)
 
-denominator_I(a::Amplitude{interpolated},e,δm) =
+denominator_I(a::Amplitude{<:interpolated},e,δm) =
 	-(dispersive(a.ik,e)-real(dispersive(a.ik,δm))) + a.corrections(e)
 
-denominator_II(a::Amplitude{interpolated},e,δm) = imag(e) ≥ 0 ?
-	denominator_I(a.ik,e,δm) :
-	denominator_I(a.ik,e,δm)-2im*ρ_thr(a.ik,e)
+denominator_II(a::Amplitude{<:interpolated},e,δm) = imag(e) ≥ 0 ?
+	denominator_I(a,e,δm) :
+	denominator_I(a,e,δm)-2im*ρ_thr(a.ik,e)
 
 # sum of several channels
 denominator_I(a::Amplitude{T},e,δm) where {T <: Tuple{Vararg{interpolated}}} =
