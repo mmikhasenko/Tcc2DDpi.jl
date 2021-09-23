@@ -85,4 +85,6 @@ f = plot(surface(
         z_end=zexts[2]-0.15dz,
     ),
 ), layout)
-savefig(f, joinpath("results","nominal","complexplane.html"))
+savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.html"))
+savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.png"))
+savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.pdf"))
