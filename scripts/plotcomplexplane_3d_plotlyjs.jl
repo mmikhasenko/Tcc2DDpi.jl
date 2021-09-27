@@ -1,4 +1,6 @@
 using X2DDpi
+
+using Plotly
 using PlotlyJS, LaTeXStrings
 
 # get data
@@ -22,16 +24,20 @@ end
 
 
 layout = Layout(
-    title="√s complex plane",
+    title=L"T_{cc}^+\to D^{0}D^{0}\pi^+\,\,\mathrm{amplitude\,\,in\,\,the\,\,complex\,\,plane.\,\,Schematic\,\,view}",
     # autosize=true,
     automargin=true,
     # paper_bgcolor="LightSteelBlue",
     scene_camera_eye=attr(x=0.8, y=-2.0, z=0.6),
-    width=600, height=550,
+    width=650, height=550,
     scene_camera_center = attr(x=-0.1, y=0, z=-0.1),
     scene = attr(xaxis_title="Re √s [MeV]",
                  yaxis_title="Im √s [MeV]",
                  zaxis_title="log |A|²",
+                 xaxis_backgroundcolor="rgb(245,245,255)",
+                 xaxis_showbackground=true,
+                 yaxis_backgroundcolor="rgb(245,245,255)",
+                 yaxis_showbackground=true,
                  #  
                  zaxis_range=zlims,
                  #  
@@ -42,7 +48,7 @@ layout = Layout(
                     x=xc,
                     y=yc,
                     z=zcut,
-                    text="Dˣ⁺D⁰ branch point",
+                    text=L"D^{*+}D^0\,\,\mathrm{branch\,\,point}",
                     textangle=0,
                     ax=0,
                     ay=-75,
@@ -50,7 +56,7 @@ layout = Layout(
                         color="black",
                         size=12
                     ),
-                    arrowcolor="yellow",
+                    arrowcolor="#FDE725",
                     arrowsize=2,
                     arrowwidth=1,
                     arrowhead=2),
@@ -58,7 +64,7 @@ layout = Layout(
                     x=xp,
                     y=yp,
                     z=zlims[2],
-                    text="Tcc pole",
+                    text=L"T_{cc}^{+}\,\,\mathrm{pole}",
                     textangle=0,
                     ax=60,
                     ay=0,
@@ -66,7 +72,7 @@ layout = Layout(
                         color="black",
                         size=14
                     ),
-                    arrowcolor="yellow",
+                    arrowcolor="#95D840",
                     arrowsize=2,
                     arrowwidth=1,
                     arrowhead=2)],
@@ -85,6 +91,14 @@ f = plot(surface(
         z_end=zexts[2]-0.15dz,
     ),
 ), layout)
-savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.html"))
-savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.png"))
-savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.pdf"))
+# savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.html"))
+# savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.png"))
+# savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.pdf"))
+
+
+Plotly.set_credentials_file(Dict("username"=>"misha_mikhasenko","api_key"=>"dpeK5rPdg5E3z93DOMgN"))
+
+Plotly.signin("misha_mikhasenko","dpeK5rPdg5E3z93DOMgN")
+remote_plot = post(f)
+Plotly.set_credentials_file(Dict("username"=>"misha_mikhasenko","api_key"=>"dpeK5rPdg5E3z93DOMgN"))
+
