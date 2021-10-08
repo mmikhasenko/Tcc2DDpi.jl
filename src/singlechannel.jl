@@ -27,7 +27,11 @@ function integrand_mapped_thr(d::DˣD,s,x)
     #         (σ3_e-σ3_i) / 0.5
     #
     σ2 = 0.0
-	othervar = sqrt(λ(s,σ3,d.ms[3]^2)*λ(σ3,d.ms[1]^2,d.ms[2]^2)) / σ3
+	othervar = 
+		sqrt((sqrt(s)-d.ms[3])^2-σ3) *
+		sqrt((sqrt(s)+d.ms[3])^2-σ3) *
+		sqrt(σ3-(d.ms[1]-d.ms[2])^2) *
+		sqrt(σ3-(d.ms[1]+d.ms[2])^2) / σ3
 	decay_matrix_element(d,s,σ3,σ2) / (2π*s) * jac * othervar * 2
 end
 
