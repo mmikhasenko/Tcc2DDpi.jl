@@ -55,6 +55,9 @@ export denominator_I, denominator_II
 export NonRelBW
 include("denominator.jl")
 
+export DˣD
+include("singlechannel.jl")
+
 export writejson, readjson
 export writetoml, readtoml
 export transformdictrecursively!
