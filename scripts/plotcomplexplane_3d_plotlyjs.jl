@@ -98,10 +98,6 @@ f = plot(surface(
 # savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.png"))
 # savefig(f, joinpath("plots","nominal","complexplane_model_without_interference.pdf"))
 
-
-# Plotly.set_credentials_file(Dict("username"=>"misha_mikhasenko","api_key"=>"dpeK5rPdg5E3z93DOMgN"))
-
-Plotly.signin("misha_mikhasenko","dpeK5rPdg5E3z93DOMgN")
+# Plotly.signin()
 remote_plot = post(f)
-# Plotly.set_credentials_file(Dict("username"=>"misha_mikhasenko","api_key"=>"dpeK5rPdg5E3z93DOMgN"))
 
