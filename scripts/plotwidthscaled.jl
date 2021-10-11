@@ -17,15 +17,19 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
 #
+# retrieve the model
+modelDict = readjson(joinpath("results","nominal","model.json"))
+ichs1 = interpolated.(d2nt.(modelDict["ichannels"]))
+# full = [
+#     πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
+#     πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)),
+#     γDD((m1=mγ, m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰))]
+full = getproperty.(ichs1, :channel)
 
-sngl = [DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺))]
 # 
-full = [
-    πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
-    πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)),
-    γDD((m1=mγ, m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰))]
-#
+sngl = [DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺))]
 
+# 
 models = [sngl, full[1:1], full]
 labels = ["(D⁰π⁺)D⁰", "(D⁰π⁺)D⁰+D⁰(π⁺D⁰)", "all channels"]
 
@@ -56,28 +60,45 @@ savefig(joinpath("plots","nominal","rhothrscaled.pdf"))
 
 
 
-ichs1 = interpolated.(full, cutoff; estep=estep)
-ichs2 = ichs1[[1]]
-ichs3 = interpolated.(sngl, cutoff; estep=estep) # cutoff
+ichvs = [
+    ichs1,
+    ichs1[[1]],
+    interpolated.(sngl, cutoff; estep=estep)]
 # 
-amp1 = Amplitude(Tuple(ichs1), zero)
-amp2 = Amplitude(Tuple(ichs2), zero)
-amp3 = Amplitude(Tuple(ichs3), zero)
+amps = [Amplitude(Tuple(ichv), zero) for ichv in ichvs]
 # 
 
-pole1 = pole_position(amp1, δm0_val)
-pole2 = pole_position(amp2, δm0_val)
-pole3 = pole_position(amp3, δm0_val)
+poles = pole_position.(amps, δm0_val)
 
-let xmax = 0.5
-    plot(xlim=(-0.5,xmax), ylim=(-0.06, 0.0), title="pole position",
+
+p1 = let xmax = 0.5
+    plot(xlim=(-0.5,xmax), ylim=(-0.06, 0.0),
         xlab="Re δ√s [MeV]", ylab="Im δ√s [MeV]")
     vline!([δm0_val], lab="δm₀=-369keV", l=(0.6,:gray))
     scatter!(
-        [pole1.m_pole pole2.m_pole pole3.m_pole],
-        [pole1.half_Γ_pole pole2.half_Γ_pole pole3.half_Γ_pole], mc=[2 3 4], ms=5,
-        lab=["(D⁰π⁺)D⁰" "(D⁰π⁺)D⁰+D⁰(π⁺D⁰)" "all channels"])
+        getproperty.(poles, :m_pole)',
+        getproperty.(poles, :half_Γ_pole)', mc=[2 3 4], ms=5,
+        lab=permutedims(labels))
     plot!([0, xmax], -ΓDˣ⁺*1e3/2 .* [1, 1], lab="", lc=:red, lw=2)
-    scatter!([0], [-ΓDˣ⁺*1e3/2], lab="", m=(:red, 6))
+    scatter!([0], [-ΓDˣ⁺*1e3/2], lab="", m=(:red, 6),
+        top_margin=-1mm)
 end
+
+p2 = let
+    plot()
+    xv = range(-0.5, 0.5, length=300)
+    yvs = [map(e->1/abs2(denominator_I(a, e, δm0_val)), xv) for a in amps]
+    norm_yvs = yvs ./ maximum.(yvs)
+    plot!(xv, [norm_yvs[1] norm_yvs[2] norm_yvs[3]],
+        lab=permutedims(labels), c=[2 3 4],
+        xtickfont=(:white,), bottom_margin=-1mm)
+end
+
+plot(
+    p2,
+    plot(p1, bottom_margin=8mm),
+    layout=grid(2,1,heights=(0.3,0.7)), size=(500,600), link=:x)
 savefig(joinpath("plots","nominal","polethreemodel.pdf"))
+
+import Plots.PlotMeasures: mm
+plot(rand(10), xtickfont=(:white,), bottom_margin=0mm)
