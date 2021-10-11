@@ -54,3 +54,30 @@ savefig(joinpath("plots","nominal","rhothrscaled.pdf"))
 #     plot!()
 # end
 
+
+
+ichs1 = interpolated.(full, cutoff; estep=estep)
+ichs2 = ichs1[[1]]
+ichs3 = interpolated.(sngl, cutoff; estep=estep) # cutoff
+# 
+amp1 = Amplitude(Tuple(ichs1), zero)
+amp2 = Amplitude(Tuple(ichs2), zero)
+amp3 = Amplitude(Tuple(ichs3), zero)
+# 
+
+pole1 = pole_position(amp1, δm0_val)
+pole2 = pole_position(amp2, δm0_val)
+pole3 = pole_position(amp3, δm0_val)
+
+let xmax = 0.5
+    plot(xlim=(-0.5,xmax), ylim=(-0.06, 0.0), title="pole position",
+        xlab="Re δ√s [MeV]", ylab="Im δ√s [MeV]")
+    vline!([δm0_val], lab="δm₀=-369keV", l=(0.6,:gray))
+    scatter!(
+        [pole1.m_pole pole2.m_pole pole3.m_pole],
+        [pole1.half_Γ_pole pole2.half_Γ_pole pole3.half_Γ_pole], mc=[2 3 4], ms=5,
+        lab=["(D⁰π⁺)D⁰" "(D⁰π⁺)D⁰+D⁰(π⁺D⁰)" "all channels"])
+    plot!([0, xmax], -ΓDˣ⁺*1e3/2 .* [1, 1], lab="", lc=:red, lw=2)
+    scatter!([0], [-ΓDˣ⁺*1e3/2], lab="", m=(:red, 6))
+end
+savefig(joinpath("plots","nominal","polethreemodel.pdf"))
