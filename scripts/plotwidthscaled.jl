@@ -7,6 +7,7 @@ using Parameters
 using QuadGK
 
 using Plots
+import Plots.PlotMeasures: mm
 theme(:wong2, frame=:box, grid=false, minorticks=true, 
     guidefontvalign=:top, guidefonthalign=:right,
     xlim=(:auto,:auto), ylim=(:auto,:auto))
@@ -68,17 +69,20 @@ ichvs = [
 amps = [Amplitude(Tuple(ichv), zero) for ichv in ichvs]
 # 
 
-poles = pole_position.(amps, δm0_val)
 
 
 p1 = let xmax = 0.5
     plot(xlim=(-0.5,xmax), ylim=(-0.06, 0.0),
         xlab="Re δ√s [MeV]", ylab="Im δ√s [MeV]")
     vline!([δm0_val], lab="δm₀=-369keV", l=(0.6,:gray))
-    scatter!(
-        getproperty.(poles, :m_pole)',
-        getproperty.(poles, :half_Γ_pole)', mc=[2 3 4], ms=5,
-        lab=permutedims(labels))
+
+    for (i,δm) in enumerate([-0.42,δm0_val,-0.25,-0.15,-0.1, -0.05, -0.03, -0.02, -0.01, -0.001])
+        poles = pole_position.(amps, δm)
+        scatter!(
+            getproperty.(poles, :m_pole)',
+            getproperty.(poles, :half_Γ_pole)', mc=[2 3 4], ms=5,
+            lab=(i==1 ? permutedims(labels) : ""))
+    end
     plot!([0, xmax], -ΓDˣ⁺*1e3/2 .* [1, 1], lab="", lc=:red, lw=2)
     scatter!([0], [-ΓDˣ⁺*1e3/2], lab="", m=(:red, 6),
         top_margin=-1mm)
@@ -96,9 +100,71 @@ end
 
 plot(
     p2,
-    plot(p1, bottom_margin=8mm),
+    plot(p1),
     layout=grid(2,1,heights=(0.3,0.7)), size=(500,600), link=:x)
 savefig(joinpath("plots","nominal","polethreemodel.pdf"))
 
-import Plots.PlotMeasures: mm
-plot(rand(10), xtickfont=(:white,), bottom_margin=0mm)
+#
+
+using FiniteDiff
+
+ρ_thr(full[1],δm0_val)
+
+
+derivative_data = let
+    xv = range(-0.5, 2.5, length=300)
+    yvs = [map(
+        e->FiniteDiff.finite_difference_derivative(ex->sum(ρ_thr.(m,ex)), e),
+        xv) for m in models]
+    norm_yvs = yvs ./ [sum(ρ_thr.(m,δm0_val)) for m in models]
+    (; xv, yvs=norm_yvs)
+end
+
+function relacemax(yv)
+    _,i = findmax(yv)
+    yv′ = copy(yv)
+    yv′[i] = (yv′[i-1]+yv′[i+1])/2
+    return yv′
+end
+function relacemin(yv)
+    _,i = findmin(yv)
+    yv′ = copy(yv)
+    yv′[i] = (yv′[i-1]+yv′[i+1])/2
+    return yv′
+end
+
+corr_derivative_data = let 
+    @unpack xv, yvs = derivative_data
+    yvs = [yvs[1],relacemin(relacemax(derivative_data.yvs[2])),relacemin(relacemax(derivative_data.yvs[3]))]
+    (; xv, yvs)
+end
+
+let
+    @unpack xv, yvs = corr_derivative_data
+    plot(xlab="e [MeV]", ylab="ρ'(e) / ρ(δm₀)")
+    plot!(xv, [yvs[1] yvs[2] yvs[3]],
+        lab=permutedims(labels), c=[2 3 4])
+end
+savefig(joinpath("plots","nominal","rhoprimeoverrho.pdf"))
+
+
+integrals_m1_p2h = 
+    [sum(y ./
+        (corr_derivative_data.xv .- δm0_val) .*
+        (corr_derivative_data.xv .> 0.0)) for y in corr_derivative_data.yvs]
+#
+
+writejson(joinpath("results","nominal","widththreemodels.json"), Dict(
+        :integral_m1_p2h => integrals_m1_p2h
+        )
+    )
+
+derivative_data_middle = let
+    xv = range(2.5, 10.5, length=30)
+    yvs = [map(
+        e->FiniteDiff.finite_difference_derivative(ex->sum(ρ_thr.(m,ex)), e),
+        xv) for m in models]
+    norm_yvs = yvs ./ [sum(ρ_thr.(m,δm0_val)) for m in models]
+    (; xv, yvs=norm_yvs)
+end
+
