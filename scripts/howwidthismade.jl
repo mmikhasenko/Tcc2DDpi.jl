@@ -5,6 +5,7 @@ Pkg.activate(".")
 using X2DDpi
 using Parameters
 using QuadGK
+using FiniteDiff
 
 using Plots
 import Plots.PlotMeasures: mm
@@ -20,19 +21,24 @@ const δm0_val = δm0.val
 #
 # retrieve the model
 modelDict = readjson(joinpath("results","nominal","model.json"))
-ichs1 = interpolated.(d2nt.(modelDict["ichannels"]))
-# full = [
-#     πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
+ifull = interpolated.(d2nt.(modelDict["ichannels"]))
+#   [ πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
 #     πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)),
-#     γDD((m1=mγ, m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰))]
-full = getproperty.(ichs1, :channel)
-
+#     γDD((m1=mγ, m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)) ]
+full = getproperty.(ifull, :channel)
 # 
 sngl = [DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺))]
+isngl = interpolated.(sngl, cutoff; estep=estep)
 
 # 
-models = [sngl, full[1:1], full]
+models = [ sngl,  full[1:1],  full]
+ichvs  = [isngl, ifull[1:1], ifull]
 labels = ["(D⁰π⁺)D⁰", "(D⁰π⁺)D⁰+D⁰(π⁺D⁰)", "all channels"]
+
+# 
+amps = [Amplitude(Tuple(ichv), zero) for ichv in ichvs]
+# 
+
 
 plt = let
     plot()
@@ -49,27 +55,10 @@ plt = let
 end
 savefig(joinpath("plots","nominal","rhothrscaled.pdf"))
 
-# plt = let
-#     plot()
-#     for (f,l) in zip([sngl, full[1:1], full],
-#                      ["(D⁰π⁺)D⁰", "(D⁰π⁺)D⁰+D⁰(π⁺D⁰)", "all channels"])
-#         n = 1
-#         plot!(e->sum(ρ_thr.(f,e)) / n * (ΓDˣ⁺*1e6), -2:0.02:1, lab=l)
-#     end
-#     plot!()
-# end
 
-
-
-ichvs = [
-    ichs1,
-    ichs1[[1]],
-    interpolated.(sngl, cutoff; estep=estep)]
-# 
-amps = [Amplitude(Tuple(ichv), zero) for ichv in ichvs]
-# 
-
-
+@time pole_position(amps[1], δm0_val)
+@time pole_position(amps[2], δm0_val)
+@time pole_position(amps[3], δm0_val)
 
 p1 = let xmax = 0.5
     plot(xlim=(-0.5,xmax), ylim=(-0.06, 0.0),
@@ -103,13 +92,7 @@ plot(
     plot(p1),
     layout=grid(2,1,heights=(0.3,0.7)), size=(500,600), link=:x)
 savefig(joinpath("plots","nominal","polethreemodel.pdf"))
-
 #
-
-using FiniteDiff
-
-ρ_thr(full[1],δm0_val)
-
 
 derivative_data = let
     xv = range(-0.5, 2.5, length=300)
