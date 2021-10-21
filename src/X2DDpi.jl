@@ -39,7 +39,7 @@ include("abstractxdd.jl")
 
 export obj2nt
 
-export ρ_thr
+export ρ_thr, ρ_tb
 include("dalitz_integral.jl")
 
 export interpolated
