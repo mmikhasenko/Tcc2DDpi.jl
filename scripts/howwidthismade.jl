@@ -128,7 +128,18 @@ let
     plot!(xv, [yvs[1] yvs[2] yvs[3]],
         lab=permutedims(labels), c=[2 3 4])
 end
+
+ρ_DˣD(e) = real(sqrt(
+    X2DDpi.λ(e2m(e)^2,(mDˣ⁺-0.5im*ΓDˣ⁺)^2,mD⁰^2))/e2m(e)^2)
+plot!(
+    e->FiniteDiff.finite_difference_derivative(ex->ρ_DˣD(ex), e) / ρ_DˣD(δm0_val),
+    -0.5, 2.5, lc=2, ls=:dash, lab="(D⁰π⁺)D⁰ approx")
 savefig(joinpath("plots","nominal","rhoprimeoverrho.pdf"))
+
+plot(xlab="e [MeV]", ylab="ρ(e)")
+plot!(e->ρ_DˣD(e)/ρ_DˣD(0), -1.0, 1.0, lab="(D⁰π⁺)D⁰", lc=2)
+plot!(e->ρ_thr(full[1],e)/ρ_thr(full[1],0), -1.0, 1.0, lab="(D⁰π⁺)D⁰ approx", lc=2, ls=:dash)
+
 
 
 integrals_m1_p2h = 
