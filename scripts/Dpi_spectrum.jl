@@ -15,7 +15,8 @@ using QuadGK
 using ThreeBodyDecay
 using AlgebraPDF
 using LaTeXStrings
-
+using Cuba
+using SpecialFunctions
 
 theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
     guidefontvalign=:top, guidefonthalign=:right,
@@ -24,6 +25,49 @@ theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
     xlim=(:auto,:auto), ylim=(:auto,:auto))
 # 
 
+function CrystallBall(x,α,n,xbar,σ) 
+    μ = (x-xbar)/σ
+
+    C = n/α/(n-1)*exp(-α^2/2)
+    D = sqrt(2π)*erf(α/sqrt(2))
+    N = 1/(2C+D)/σ
+    # 
+    abs(μ) < α && return N*exp(-(x-xbar)^2/(2σ^2))
+    A = (n/α)^n * exp(-α^2/2)
+    B = n/α - α
+    return N*A*(B+abs(x-xbar)/σ)^(-n)
+end
+
+
+import AlgebraPDF: AbstractPDF, pars, lims, func, updatevalueorflag
+struct convCrystallBall{T} <: AbstractPDF{1}
+    source::T
+    σ::Float64
+    α::Float64
+    n::Float64
+end
+
+pars(d::convCrystallBall, isfree::Bool) = pars(d.source, isfree)
+lims(d::convCrystallBall) = lims(d.source)
+updatevalueorflag(d::convCrystallBall, s::Symbol, isfree::Bool, v=getproperty(pars(d),s)) = 
+    convCrystallBall(
+        AlgebraPDF.ispar(d.source,s) ? updatevalueorflag(d.source,s,isfree,v) : d.source,
+        d.σ, d.α, d.n)
+
+function func(d::convCrystallBall, x::NumberOrTuple; p=pars(d))
+    σ = func(d.σ, x; p)
+    g(z) = CrystallBall(z,d.α,d.n,0,d.σ)
+    f(z) = func(d.source, z; p)
+    return quadgk(y->f(x-y) * g(y), -7*σ, +7*σ)[1]
+end
+
+t = Normalized(FunctionWithParameters((x;p)->x>0,∅), (-1,1))
+tc = convGauss(t,207.6e-3)
+tb = convCrystallBall(t,207.6e-3,1.33,4.58)
+
+plot(t)
+plot!(tc)
+plot!(tb)
 
 function projectto3(d, s, σ3)
 
@@ -36,6 +80,40 @@ function projectto3(d, s, σ3)
     return quadgk(M²of2, σ2_0, σ2_e)[1] / (2π*s)
 end
 # 
+function bw_e(s,e0,Γ)
+    m = e2m(e0)
+    return sqrt(m*(Γ*1e-3) / π) / (m^2-s-1im*m*(Γ*1e-3))
+end
+# 
+function projectto3(d, σ3, lineshape, smin, smax)
+    σ3_0 = (d.ms[1]+d.ms[2])^2
+    σ3 < σ3_0 && return 0.0
+    # 
+    M²of2(s, σ2) = abs2(X2DDpi.decay_matrix_element(d,s,σ3,σ2) * lineshape(s))
+    function M²of2(x)
+        s = smin + x[1]*(smax-smin)
+        # 
+        σ3_e = (√s-d.ms[3])^2
+        σ3 > σ3_e && return 0.0
+        # 
+        σ2_0, σ2_e = X2DDpi.σ2of3_pm(σ3, d.ms^2, s)
+        σ2 = σ2_0 + x[2]*(σ2_e-σ2_0)
+        M²of2(s, σ2)*(σ2_e-σ2_0)*(smax-smin) / (2π*s)
+    end 
+    return cuhre((x,f)->(f[1]=M²of2(x)), 2, 1)[1][1]
+end
+
+# @time projectto3(π⁺D⁰D⁰, e2m(δm0_val)^2, 2.007^2)
+# @time projectto3(π⁺D⁰D⁰, 2.007^2)
+
+# let d = π⁺D⁰D⁰, m = m_fig3
+#     plot(e3->projectto3(d, m^2, e3^2),
+#         2.004, 2.011, lab="")
+# # 
+#     plot!(e3->projectto3(d, e3^2)*1.19,
+#         2.004, 2.011, lab="")
+# end
+
 
 polyakovfactor(m) = max(0, tanh((mDˣ⁺ - m ) / 350e-6))
 
@@ -61,10 +139,13 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 #
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
+const Γ0 = 48e-3 # keV
 
 π⁺D⁰D⁰ = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺))
 # 
-m_fig3 = e2m(δm0_val) # δm0_val
+projectto3(d, σ3) = projectto3(d, σ3,
+    s->bw_e(s,δm0_val,Γ0),
+    e2m(δm0_val-2Γ0)^2, e2m(δm0_val+2Γ0)^2)
 
 # # text
 # let d = π⁺D⁰D⁰, m = m_fig3
@@ -76,21 +157,19 @@ m_fig3 = e2m(δm0_val) # δm0_val
 #         lc=:red, lab="Polyakov factor", leg=:topleft)
 # end
 
-lims0 = let d = π⁺D⁰D⁰, m = m_fig3
-    (d.ms[1]+d.ms[2]), (m-d.ms[3])
-end
+m_fig3 = e2m(δm0_val) # δm0_val
 lims_fig3 = (2.004, 2.0105)
-
 
 
 function project_convolv(d, e; lims)
     proj(e3) = projectto3(d, e2m(e)^2, e3^2)
     pdf = Normalized(FunctionWithParameters((x;p)->proj(x); p=∅), lims)
     c = convGauss(pdf, 363e-6)
+    # c = convCrystallBall(pdf, 207.6e-6,1.33,5.58)
     return c
 end
 
-c3      = project_convolv(π⁺D⁰D⁰,      δm0_val; lims=lims_fig3)
+c3 = project_convolv(π⁺D⁰D⁰, δm0_val; lims=lims_fig3)
 # 
 data_nominal = let c = c3
     intensity(m3) = func(c, m3)*polyakovfactor(m3)
