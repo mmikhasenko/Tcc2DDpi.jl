@@ -22,8 +22,15 @@ theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
     guidefontvalign=:top, guidefonthalign=:right,
     foreground_color_legend = nothing,
     legendfontsize=9, legend =:topright,
-    xlim=(:auto,:auto), ylim=(:auto,:auto))
+    xlim=(:auto,:auto), ylim=(:auto,:auto), lab="")
 # 
+
+#            _|                  _|              _|                _|  _|  
+#    _|_|_|  _|_|_|    _|  _|_|        _|_|_|  _|_|_|_|    _|_|_|  _|  _|  
+#  _|        _|    _|  _|_|      _|  _|_|        _|      _|    _|  _|  _|  
+#  _|        _|    _|  _|        _|      _|_|    _|      _|    _|  _|  _|  
+#    _|_|_|  _|    _|  _|        _|  _|_|_|        _|_|    _|_|_|  _|  _|  
+
 
 function CrystallBall(x,α,n,xbar,σ) 
     μ = (x-xbar)/σ
@@ -61,6 +68,7 @@ function func(d::convCrystallBall, x::NumberOrTuple; p=pars(d))
     return quadgk(y->f(x-y) * g(y), -7*σ, +7*σ)[1]
 end
 
+# tests
 t = Normalized(FunctionWithParameters((x;p)->x>0,∅), (-1,1))
 tc = convGauss(t,207.6e-3)
 tb = convCrystallBall(t,207.6e-3,1.33,4.58)
@@ -68,6 +76,16 @@ tb = convCrystallBall(t,207.6e-3,1.33,4.58)
 plot(t)
 plot!(tc)
 plot!(tb)
+
+
+#                                              _|_|                                
+#  _|_|_|    _|  _|_|    _|_|    _|_|_|      _|      _|    _|  _|_|_|      _|_|_|  
+#  _|    _|  _|_|      _|_|_|_|  _|    _|  _|_|_|_|  _|    _|  _|    _|  _|        
+#  _|    _|  _|        _|        _|    _|    _|      _|    _|  _|    _|  _|        
+#  _|_|_|    _|          _|_|_|  _|_|_|      _|        _|_|_|  _|    _|    _|_|_|  
+#  _|                            _|                                                
+#  _|                            _|                                                
+
 
 function projectto3(d, s, σ3)
 
@@ -234,15 +252,40 @@ data_noDˣ = let c = c3_noDˣ
     (; xv,yv)
 end
 # 
+
+λλ3(ms,s,σ) = λ(σ,ms[1]^2,ms[2]^2)*λ(s,σ,ms[3]^2)
+ρ3(ms,s,σ) = (λλ = λλ3(ms,s,σ); λλ<0 ? 0.0 : sqrt(λλ)/(2*σ))
+ρ3(σ) = ρ3(π⁺D⁰D⁰.ms,e2m(δm0_val)^2,σ)
+# 
+data_phsp = let
+    pdf = Normalized(FunctionWithParameters((x;p)->ρ3(x^2); p=∅), lims_fig3)
+    c = convGauss(pdf, 363e-6)
+    intensity(m3) = c(m3)*polyakovfactor(m3)
+    xv = range(lims_fig3..., length=100)
+    yv = intensity.(xv)
+    (; xv,yv)
+end
+
 # plot
 let scale = 0.0027
     plot(xlab=L"m(D^0\pi^+)\,\,[\mathrm{GeV}]", leg=:topleft)
-    plot!(data_nominal.xv, data_nominal.yv*scale./ sum(data_nominal.yv),
-        fill=0, α=0.3, c=2, lab=L"\mathrm{nominal}")
-    plot!(data_nominal.xv, data_nominal.yv*scale./ sum(data_nominal.yv), lab="", l=(:black,1))
+    N_nominal = 10e3/sum(data_nominal.yv)
+    # plot!(data_nominal.xv, data_nominal.yv*scale  .* N_nominal,
+    #     fill=0, α=0.3, c=2, lab=L"\mathrm{nominal}")
+    # plot!(data_nominal.xv, data_nominal.yv*scale .* N_nominal, lab="", l=(:black,1))
     # 
-    plot!(data_noDˣ.xv, data_noDˣ.yv*scale./ sum(data_noDˣ.yv), 
+    N_noDˣ = 10e3/sum(data_noDˣ.yv)
+    plot!(data_noDˣ.xv, data_noDˣ.yv*scale .* N_noDˣ, 
         fill=0, α=0.3, c=3, lab=L"\mathrm{no}\,\,D^*")
-    plot!(data_noDˣ.xv, data_noDˣ.yv*scale./ sum(data_noDˣ.yv), lab="", l=(:black,1))
-    #
+    plot!(data_noDˣ.xv, data_noDˣ.yv*scale .* N_noDˣ, lab="", l=(:black,1))
+    # 
+    N_phsp = 10e3/sum(data_phsp.yv)
+    plot!(data_phsp.xv, data_phsp.yv*scale .* N_phsp, 
+        fill=0, α=0.3, c=4, lab=L"\mathrm{phase\,\,space}")
+    plot!(data_phsp.xv, data_phsp.yv*scale .* N_phsp, lab="", l=(:black,1))
 end
+savefig(joinpath("plots", "Dpi_noDstar.pdf"))
+
+using DelimitedFiles
+writedlm(joinpath("results", "nominal", "Dpi_noDstar.txt"), [data_nominal.xv data_nominal.yv data_noDˣ.xv data_noDˣ.yv data_phsp.xv data_phsp.yv])
+
