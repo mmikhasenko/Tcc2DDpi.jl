@@ -18,6 +18,7 @@ using LaTeXStrings
 using Cuba
 using SpecialFunctions
 
+
 theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
     guidefontvalign=:top, guidefonthalign=:right,
     foreground_color_legend = nothing,
@@ -94,7 +95,7 @@ function projectto3(d, s, σ3)
     # 
 	σ2_0, σ2_e = X2DDpi.σ2of3_pm(σ3, d.ms^2, s)
     
-    M²of2(σ2) = abs2(X2DDpi.decay_matrix_element(d,s,σ3,σ2))
+    M²of2(σ2) = real(X2DDpi.decay_matrix_element(d,s,σ3,σ2))
     return quadgk(M²of2, σ2_0, σ2_e)[1] / (2π*s)
 end
 # 
@@ -107,7 +108,7 @@ function projectto3(d, σ3, lineshape, smin, smax)
     σ3_0 = (d.ms[1]+d.ms[2])^2
     σ3 < σ3_0 && return 0.0
     # 
-    M²of2(s, σ2) = abs2(X2DDpi.decay_matrix_element(d,s,σ3,σ2) * lineshape(s))
+    M²of2(s, σ2) = real(X2DDpi.decay_matrix_element(d,s,σ3,σ2)) * abs2(lineshape(s))
     function M²of2(x)
         s = smin + x[1]*(smax-smin)
         # 
@@ -121,8 +122,8 @@ function projectto3(d, σ3, lineshape, smin, smax)
     return cuhre((x,f)->(f[1]=M²of2(x)), 2, 1)[1][1]
 end
 
-# @time projectto3(π⁺D⁰D⁰, e2m(δm0_val)^2, 2.007^2)
-# @time projectto3(π⁺D⁰D⁰, 2.007^2)
+@time projectto3(π⁺D⁰D⁰, e2m(δm0_val)^2, 2.007^2)
+@time projectto3(π⁺D⁰D⁰, 2.007^2)
 
 # let d = π⁺D⁰D⁰, m = m_fig3
 #     plot(e3->projectto3(d, m^2, e3^2),
@@ -197,11 +198,12 @@ data_nominal = let c = c3
 end
 
 # plot
-let scale = 0.0027
+let scale = 0.051
     plot(xlab=L"m(D^0\pi^+) [\mathrm{GeV}]")
-    plot!(data_nominal.xv, data_nominal.yv*scale, lab="",
+    N_nominal = 10e3/sum(data_nominal.yv) * scale
+    plot!(data_nominal.xv, data_nominal.yv*N_nominal, lab="",
         fill=0, c=:red, α=0.3)
-    plot!(data_nominal.xv, data_nominal.yv*scale, lab="", l=(:black,1))
+    plot!(data_nominal.xv, data_nominal.yv*N_nominal, lab="", l=(:black,1))
 end
 # overlap with the data
 h = Plots.StatsBase.fit(Histogram, data_fig3.mass .* 1e-3,
@@ -267,25 +269,31 @@ data_phsp = let
 end
 
 # plot
-let scale = 0.0027
+let scale = 0.055
     plot(xlab=L"m(D^0\pi^+)\,\,[\mathrm{GeV}]", leg=:topleft)
-    N_nominal = 10e3/sum(data_nominal.yv)
-    # plot!(data_nominal.xv, data_nominal.yv*scale  .* N_nominal,
-    #     fill=0, α=0.3, c=2, lab=L"\mathrm{nominal}")
-    # plot!(data_nominal.xv, data_nominal.yv*scale .* N_nominal, lab="", l=(:black,1))
+    N_nominal = 10e3/sum(data_nominal.yv) * scale
+    plot!(data_nominal.xv, data_nominal.yv  .* N_nominal,
+        fill=0, α=0.3, c=2, lab=L"\mathrm{nominal}")
+    plot!(data_nominal.xv, data_nominal.yv .* N_nominal, lab="", l=(:black,1))
+    
+    N_noDˣ = 10e3/sum(data_noDˣ.yv) * scale
+    plot!(data_noDˣ.xv, data_noDˣ.yv .* N_noDˣ, 
+        fill=0, α=0.3, c=3, lab=L"\mathrm{broad}\,\,D^*")
+    plot!(data_noDˣ.xv, data_noDˣ.yv .* N_noDˣ, lab="", l=(:black,1))
     # 
-    N_noDˣ = 10e3/sum(data_noDˣ.yv)
-    plot!(data_noDˣ.xv, data_noDˣ.yv*scale .* N_noDˣ, 
-        fill=0, α=0.3, c=3, lab=L"\mathrm{no}\,\,D^*")
-    plot!(data_noDˣ.xv, data_noDˣ.yv*scale .* N_noDˣ, lab="", l=(:black,1))
-    # 
-    N_phsp = 10e3/sum(data_phsp.yv)
-    plot!(data_phsp.xv, data_phsp.yv*scale .* N_phsp, 
+    N_phsp = 10e3/sum(data_phsp.yv) * scale
+    plot!(data_phsp.xv, data_phsp.yv .* N_phsp, 
         fill=0, α=0.3, c=4, lab=L"\mathrm{phase\,\,space}")
-    plot!(data_phsp.xv, data_phsp.yv*scale .* N_phsp, lab="", l=(:black,1))
+    plot!(data_phsp.xv, data_phsp.yv .* N_phsp, lab="", l=(:black,1))
+    #
+    let ed = h.edges[1]
+        xv = (ed[1:end-1]+ed[2:end]) ./ 2
+        scatter!(xv, h.weights, yerr=sqrt.(h.weights), lab="Data", c=:black, leg=:topleft)
+    end
 end
 savefig(joinpath("plots", "Dpi_noDstar.pdf"))
 
 using DelimitedFiles
-writedlm(joinpath("results", "nominal", "Dpi_noDstar.txt"), [data_nominal.xv data_nominal.yv data_noDˣ.xv data_noDˣ.yv data_phsp.xv data_phsp.yv])
+writedlm(joinpath("results", "nominal", "Dpi_noDstar.txt"),
+    [data_nominal.xv data_nominal.yv data_noDˣ.xv data_noDˣ.yv data_phsp.xv data_phsp.yv])
 
