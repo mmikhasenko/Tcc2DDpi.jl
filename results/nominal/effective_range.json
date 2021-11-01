@@ -1,7 +1,7 @@
 {
     "effective_range_parameters": {
         "technical": {
-            "w_matching": 0.25318435102672565,
+            "w_matching": 0.2531843510267258,
             "rho_inf": 0.0418951605230331
         },
         "Re_scatt_length": "-7.17 ± 0.51",
@@ -11,7 +11,7 @@
         },
         "Re_inv_scatt_length": "-25.8 ± 2.1",
         "Im_scatt_length": "1.86 ± 0.28",
-        "Im_inv_scatt_length": "-6.69070515429382 ± 0.0",
+        "Im_inv_scatt_length": "-6.690705154293815 ± 0.0",
         "effective_range": {
             "r_90CL": 11.919,
             "r_95CL": 16.937
