@@ -7,9 +7,6 @@ using InteractiveUtils
 # ╔═╡ d433d680-3375-11ec-26dd-c359f027b37e
 using SymPy
 
-# ╔═╡ 3ec4a449-95ec-4e07-a005-958447d5f647
-using LinearAlgebra
-
 # ╔═╡ 4bcd6f88-d35a-41c2-aa15-915f0e06b721
 md"""
 # K-matrix with non-diagonal G
@@ -19,7 +16,7 @@ using `SymPy`
 # ╔═╡ 0499f433-9cd0-475f-9974-e0c041ebde1d
 begin
 	@vars G_11 G_12 G_22 real=true
-	@vars g_1 g_2
+	@vars g_1 g_2 real=true
 end
 
 # ╔═╡ 9112eb24-62e4-40dd-a6a5-e942f5ccda91
@@ -33,7 +30,8 @@ end
 
 # ╔═╡ 348f8ea1-e675-46ff-8a42-7e987e468746
 begin
-	D = [1 0; 0 1] - G*K
+	𝕀₂ = [1 0; 0 1]
+	D = 𝕀₂ - G*K
 	invD = inv(D)
 	T = K*invD
 end;
@@ -41,30 +39,28 @@ end;
 # ╔═╡ 15af2ecd-9823-4fa2-992c-edbc9e2666fa
 simplify.(T)
 
-# ╔═╡ 58809ef9-79f4-48b4-a5c3-2ac062d10a4c
-@vars a b real=true
+# ╔═╡ c22aaa1c-d390-4493-ad47-f1063953742e
+simplify.([g_1 g_2] * invD)
 
-# ╔═╡ 99bde53b-79cc-4cc3-aad3-271871cfb399
-h_λ = [a,b]
+# ╔═╡ 48cc47f5-cf11-47a8-a2a4-010cbdf71f6f
+md"""
+### Expression in the paper
+$\begin{align}
+    \mathcal{A}_{\mathrm{U}} \begin{pmatrix} \phantom{-} g\\- g  \end{pmatrix}
+= [1- K G]^{-1}P\,.
+\end{align}$
+"""
 
-# ╔═╡ b7c880cf-06e0-4ed1-856d-a19c56480a18
-Ip = h_λ' .* h_λ
-
-# ╔═╡ 22b93105-49c3-47e5-8ffb-18d9e3d13a7d
+# ╔═╡ 2312e552-1cbf-4b74-8014-08d30e337833
 begin
-	i = [1 0; 0 1];
-	σ1 = [0 1; 1 0];
-	σ2 = [0 -1im;1im 0]
-	σ3 = [1 0; 0 -1]
+	P = transpose([g_1 g_2])
+	A_UP = inv(𝕀₂ - K*G)*P
+	simplify.(A_UP)
 end
-
-# ╔═╡ 1e98e28b-6dc4-41c1-b51f-9fe097d026df
-sum(diag(Ip*σ2))
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 SymPy = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
 
 [compat]
@@ -380,11 +376,8 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═9112eb24-62e4-40dd-a6a5-e942f5ccda91
 # ╠═348f8ea1-e675-46ff-8a42-7e987e468746
 # ╠═15af2ecd-9823-4fa2-992c-edbc9e2666fa
-# ╠═58809ef9-79f4-48b4-a5c3-2ac062d10a4c
-# ╠═99bde53b-79cc-4cc3-aad3-271871cfb399
-# ╠═b7c880cf-06e0-4ed1-856d-a19c56480a18
-# ╠═22b93105-49c3-47e5-8ffb-18d9e3d13a7d
-# ╠═3ec4a449-95ec-4e07-a005-958447d5f647
-# ╠═1e98e28b-6dc4-41c1-b51f-9fe097d026df
+# ╠═c22aaa1c-d390-4493-ad47-f1063953742e
+# ╟─48cc47f5-cf11-47a8-a2a4-010cbdf71f6f
+# ╠═2312e552-1cbf-4b74-8014-08d30e337833
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
