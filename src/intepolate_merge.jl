@@ -14,8 +14,9 @@ function interpolated(channel::AbstractxDD, cutoff::Real; estep=0.01)
 end
 # 
 function ρ_thr(d::interpolated, e::Real)
-e < d.cutoff ?
-    d.itr(e) :
+    e < m2e(sum(d.channel.ms)) && return 0.0
+    e < d.cutoff ?
+        d.itr(e) :
     ρ_tb( d.channel, e) * d.cutoffratio
 end
 ρ_thr(d::interpolated, e::Complex) = ρ_thr(d.channel,e)
