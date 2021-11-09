@@ -9,9 +9,11 @@ using FiniteDiff
 
 using Plots
 import Plots.PlotMeasures: mm
+using LaTeXStrings
 theme(:wong2, frame=:box, grid=false, minorticks=true, 
     guidefontvalign=:top, guidefonthalign=:right,
-    xlim=(:auto,:auto), ylim=(:auto,:auto))
+    xlim=(:auto,:auto), ylim=(:auto,:auto),
+    xlab=L"\delta m_{D^0D^0\pi^+}\,\,[\mathrm{MeV}]", lw=1.2)
 
 
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
@@ -33,7 +35,9 @@ isngl = interpolated.(sngl, cutoff; estep=estep)
 # 
 models = [ sngl,  full[1:1],  full]
 ichvs  = [isngl, ifull[1:1], ifull]
-labels = ["(D⁰π⁺)D⁰", "(D⁰π⁺)D⁰+D⁰(π⁺D⁰)", "all channels"]
+labels = [L"(D^{0}\pi^{+})D^{0}",
+          L"(D^{0}\pi^{+})D^{0}+D^{0}(\pi^{+}D^{0})",
+          L"\mathrm{all\,\,channels}"]
 
 # 
 amps = [Amplitude(Tuple(ichv), zero) for ichv in ichvs]
@@ -50,7 +54,7 @@ plt = let
     scatter!([0], [ΓDˣ⁺*1e6], lab="", m=(2, :red))
     scatter!([δm0_val δm0_val δm0_val],
         [sum(ρ_thr.(f, δm0_val)) / sum(ρ_thr.(f, 0.0)) * (ΓDˣ⁺*1e6) for f in models]',
-        c=[1 2 3], lab="", xlab="δm [MeV]", ylab="ρ_thr / norm")
+        c=[1 2 3], lab="", ylab=L"\rho_\mathrm{thr}\,\,/\,\,\mathrm{norm}")
     lens!(-0.360 .+ 0.05 .* [-1,1], [0,30], inset = (1, bbox(0.1, 0.1, 0.5, 0.5)))
 end
 savefig(joinpath("plots","nominal","rhothrscaled.pdf"))
@@ -63,7 +67,7 @@ savefig(joinpath("plots","nominal","rhothrscaled.pdf"))
 p1 = let xmax = 0.5
     plot(xlim=(-0.5,xmax), ylim=(-0.06, 0.0),
         xlab="Re δ√s [MeV]", ylab="Im δ√s [MeV]")
-    vline!([δm0_val], lab="δm₀=-369keV", l=(0.6,:gray))
+    vline!([δm0_val], lab=L"\delta m_0 = -369\,\,\mathrm{keV}", l=(0.6,:gray))
 
     for (i,δm) in enumerate([-0.42,δm0_val,-0.25,-0.15,-0.1, -0.05, -0.03, -0.02, -0.01, -0.001])
         poles = pole_position.(amps, δm)
@@ -125,7 +129,7 @@ end
 
 let
     @unpack xv, yvs = derivative_data
-    plot(xlab="e [MeV]", ylab="ρ'(e) / ρ(δm₀)")
+    plot(ylab=L"\rho'(\delta m) / \rho(\delta m_0)")
     plot!(xv, [yvs[1] yvs[2] yvs[3]],
         lab=permutedims(labels), c=[2 3 4])
 end
@@ -134,13 +138,15 @@ end
     X2DDpi.λ(e2m(e)^2,(mDˣ⁺-0.5im*ΓDˣ⁺)^2,mD⁰^2))/e2m(e)^2)
 plot!(
     e->FiniteDiff.finite_difference_derivative(ex->ρ_DˣD(ex), e) / ρ_DˣD(δm0_val),
-    -0.5, 2.5, lc=2, ls=:dash, lab="(D⁰π⁺)D⁰ approx")
+    -0.5, 2.5, lc=2, ls=:dash, lab=L"(D^0\pi^+)D^0\,\,\mathrm{approx}")
 savefig(joinpath("plots","nominal","rhoprimeoverrho.pdf"))
 
-plot(xlab="e [MeV]", ylab="ρ(e)")
-plot!(e->ρ_DˣD(e)/ρ_DˣD(0), -1.0, 1.0, lab="(D⁰π⁺)D⁰", lc=2)
-plot!(e->ρ_thr(full[1],e)/ρ_thr(full[1],0), -1.0, 1.0, lab="(D⁰π⁺)D⁰ approx", lc=2, ls=:dash)
-
+let
+    plot(ylab=L"\rho(\delta m)")
+    plot!(e->ρ_DˣD(e)/ρ_DˣD(0), -1.0, 1.0, lab=labels[1], lc=2)
+    plot!(e->ρ_thr(full[1],e)/ρ_thr(full[1],0), -1.0, 1.0,
+        lab=L"(D^0\pi^+)D^0\,\,\mathrm{approx}", lc=2, ls=:dash)
+end
 
 integrals_m1_p2h = let
     dx = corr_derivative_data.xv[2]-corr_derivative_data.xv[1]
