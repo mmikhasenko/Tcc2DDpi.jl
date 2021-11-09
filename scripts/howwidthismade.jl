@@ -97,33 +97,34 @@ savefig(joinpath("plots","nominal","polethreemodel.pdf"))
 derivative_data = let
     xv = range(-0.5, 2.5, length=300)
     yvs = [map(
-        e->FiniteDiff.finite_difference_derivative(ex->sum(ρ_thr.(m,ex)), e),
+        e->FiniteDiff.finite_difference_derivative(
+            ex->sum(ρ_thr.(m,ex)), e,
+            absstep=1e-2),
         xv) for m in models]
     norm_yvs = yvs ./ [sum(ρ_thr.(m,δm0_val)) for m in models]
     (; xv, yvs=norm_yvs)
 end
 
-function relacemax(yv)
-    _,i = findmax(yv)
-    yv′ = copy(yv)
-    yv′[i] = (yv′[i-1]+yv′[i+1])/2
-    return yv′
-end
-function relacemin(yv)
-    _,i = findmin(yv)
-    yv′ = copy(yv)
-    yv′[i] = (yv′[i-1]+yv′[i+1])/2
-    return yv′
-end
-
-corr_derivative_data = let 
-    @unpack xv, yvs = derivative_data
-    yvs = [yvs[1],relacemin(relacemax(derivative_data.yvs[2])),relacemin(relacemax(derivative_data.yvs[3]))]
-    (; xv, yvs)
-end
+# function relacemax(yv)
+#     _,i = findmax(yv)
+#     yv′ = copy(yv)
+#     yv′[i] = (yv′[i-1]+yv′[i+1])/2
+#     return yv′
+# end
+# function relacemin(yv)
+#     _,i = findmin(yv)
+#     yv′ = copy(yv)
+#     yv′[i] = (yv′[i-1]+yv′[i+1])/2
+#     return yv′
+# end
+# corr_derivative_data = let 
+#     @unpack xv, yvs = derivative_data
+#     yvs = [yvs[1],relacemin(relacemax(derivative_data.yvs[2])),relacemin(relacemax(derivative_data.yvs[3]))]
+#     (; xv, yvs)
+# end
 
 let
-    @unpack xv, yvs = corr_derivative_data
+    @unpack xv, yvs = derivative_data
     plot(xlab="e [MeV]", ylab="ρ'(e) / ρ(δm₀)")
     plot!(xv, [yvs[1] yvs[2] yvs[3]],
         lab=permutedims(labels), c=[2 3 4])
@@ -141,12 +142,58 @@ plot!(e->ρ_DˣD(e)/ρ_DˣD(0), -1.0, 1.0, lab="(D⁰π⁺)D⁰", lc=2)
 plot!(e->ρ_thr(full[1],e)/ρ_thr(full[1],0), -1.0, 1.0, lab="(D⁰π⁺)D⁰ approx", lc=2, ls=:dash)
 
 
-
-integrals_m1_p2h = 
-    [sum(y ./
+integrals_m1_p2h = let
+    dx = corr_derivative_data.xv[2]-corr_derivative_data.xv[1]
+    # 
+    [sum(y .* (dx/(2π)) ./
         (corr_derivative_data.xv .- δm0_val) .*
         (corr_derivative_data.xv .> 0.0)) for y in corr_derivative_data.yvs]
+end
 #
+integrals_m1_p2h[1]
+1 ./ integrals_m1_p2h
+
+@time analytic_width(models[1],δm0_val)
+
+function analytic_width(model, δm0)
+    ρ(e) = sum(ρ_thr.(model,e))
+    ρ′(e) = FiniteDiff.finite_difference_derivative(ρ,e)
+    ρ0 = ρ(δm0)
+    Γ⁻¹ = real(quadgk(e->ρ′(e) / ρ0 / (e-δm0-1e-5im), -0.5, Inf)[1])/(2π)
+    1 / Γ⁻¹
+end
+
+const xmax = 2.5
+const invwidth_contribution_above_xmax = 
+    let
+    model = models[1]
+    ρ(e) = sum(ρ_thr.(model,e))
+    ρ′(e) = FiniteDiff.finite_difference_derivative(ρ,e)
+    ρ′max = ρ′(xmax)
+    ΔΓ⁻¹ = real(quadgk(e->ρ′(e) / ρ′max / (e-δm0_val-1e-5im), xmax, Inf)[1])/(2π)
+    ΔΓ⁻¹
+end
+
+using Interpolations
+
+function analytic_width_from_intepolated(xv, yv, δm0)
+    itr = interpolate((xv,), yv, Gridded(Linear()))
+    ρ′max = itr.coefs[end]
+    ρ′(e) = itr(e)
+    Δ = real(quadgk(e->ρ′(e) / ρ′max / (e-δm0-1e-5im), -0.5, xmax)[1])/(2π)
+    Γ⁻¹ = (Δ + invwidth_contribution_above_xmax) * ρ′max
+    1 / Γ⁻¹
+end
+
+analytic_width(models[1], δm0_val)
+
+[analytic_width_from_intepolated(
+        derivative_data.xv,
+        derivative_data.yvs[i],
+        δm0_val)
+        for i in 1:3]
+
+[2pole_position(amps[i],δm0_val).half_Γ_pole for i in 1:3]
 
 writejson(joinpath("results","nominal","widththreemodels.json"), Dict(
         :integral_m1_p2h => integrals_m1_p2h
