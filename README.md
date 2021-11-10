@@ -12,7 +12,7 @@ The main types exported are:
 struct πDD <: AbstractxDD  # both isospin channels
 struct γDD <: AbstractxDD
 ```
-with a specific `decay_matrix_element(d::AbstractxDD,s,σ3,σ2)` for every type.
+with a specific `decay_matrix_element_squared(d::AbstractxDD,s,σ3,σ2)` for every type.
 
 The decay amplitude integrated over the phase space is called via
 

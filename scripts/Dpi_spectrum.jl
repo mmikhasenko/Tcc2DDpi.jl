@@ -95,7 +95,7 @@ function projectto3(d, s, σ3)
     # 
 	σ2_0, σ2_e = X2DDpi.σ2of3_pm(σ3, d.ms^2, s)
     
-    M²of2(σ2) = real(X2DDpi.decay_matrix_element(d,s,σ3,σ2))
+    M²of2(σ2) = real(X2DDpi.decay_matrix_element_squared(d,s,σ3,σ2))
     return quadgk(M²of2, σ2_0, σ2_e)[1] / (2π*s)
 end
 # 
@@ -108,7 +108,7 @@ function projectto3(d, σ3, lineshape, smin, smax)
     σ3_0 = (d.ms[1]+d.ms[2])^2
     σ3 < σ3_0 && return 0.0
     # 
-    M²of2(s, σ2) = real(X2DDpi.decay_matrix_element(d,s,σ3,σ2)) * abs2(lineshape(s))
+    M²of2(s, σ2) = real(X2DDpi.decay_matrix_element_squared(d,s,σ3,σ2)) * abs2(lineshape(s))
     function M²of2(x)
         s = smin + x[1]*(smax-smin)
         # 
@@ -224,11 +224,11 @@ end
 
 
 # new decay chain: no D*
-import X2DDpi: decay_matrix_element, AbstractxDD
+import X2DDpi: decay_matrix_element_squared, AbstractxDD
 struct πDD_noDˣ{T1} <: AbstractxDD
     ms::NamedTuple{(:m1,:m2,:m3),T1}
 end
-function decay_matrix_element(d::πDD_noDˣ,s,σ3,σ2)
+function decay_matrix_element_squared(d::πDD_noDˣ,s,σ3,σ2)
 	msq = d.ms^2
 	v = (;s,s12=σ3,s13=σ2,msq)
 # 	

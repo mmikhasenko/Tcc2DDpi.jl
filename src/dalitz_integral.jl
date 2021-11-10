@@ -11,7 +11,7 @@ function integrand_mapped_thr(d::AbstractxDD,s,x)
 	σ2 = σ2_0 + x[2]*(σ2_e-σ2_0) # straight path
 	#
 	jac = (σ3_e-σ3_0)*(σ2_e-σ2_0)
-	decay_matrix_element(d,s,σ3,σ2) / (2π*s) * jac
+	decay_matrix_element_squared(d,s,σ3,σ2) / (2π*s) * jac
 end
 
 function ρ_thr(d::AbstractxDD, e::Complex)

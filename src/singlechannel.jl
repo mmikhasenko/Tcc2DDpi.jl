@@ -3,7 +3,7 @@ struct DˣD{T1,T2} <: AbstractxDD
     R::NamedTuple{T2}
 end
 
-function decay_matrix_element(d::DˣD,s,σ3,σ2)
+function decay_matrix_element_squared(d::DˣD,s,σ3,σ2)
 	A = λ(σ3,d.ms[1]^2,d.ms[2]^2)/(4*σ3)
 	return J_I(σ3,d.R) * J_II(σ3,d.R) * f²/3/4 * A
 end
@@ -32,7 +32,7 @@ function integrand_mapped_thr(d::DˣD,s,x)
 		sqrt((sqrt(s)+d.ms[3])^2-σ3) *
 		sqrt(σ3-(d.ms[1]-d.ms[2])^2) *
 		sqrt(σ3-(d.ms[1]+d.ms[2])^2) / σ3
-	decay_matrix_element(d,s,σ3,σ2) / (2π*s) * jac * othervar * 2
+	decay_matrix_element_squared(d,s,σ3,σ2) / (2π*s) * jac * othervar * 2
 end
 
 function ρ_thr(d::DˣD, e::Complex)

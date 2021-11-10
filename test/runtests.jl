@@ -28,8 +28,8 @@ end
 struct TestCh{T} <: X2DDpi.AbstractxDD
 	ms::T
 end
-import X2DDpi:decay_matrix_element
-decay_matrix_element(d::TestCh,s,σ3,σ2) = 1.0
+import X2DDpi:decay_matrix_element_squared
+decay_matrix_element_squared(d::TestCh,s,σ3,σ2) = 1.0
 
 @testset "implementation of the phase-space integral" begin
 

@@ -337,7 +337,7 @@ begin
 end;
 
 # ╔═╡ 10eccd1f-3956-4cd8-a416-4da8bf384c12
-function decay_matrix_element(d::πDD,s,σ3,σ2)
+function decay_matrix_element_squared(d::πDD,s,σ3,σ2)
 	msq = d.ms^2
 	v = (;s,s12=σ3,s13=σ2,msq)
 # 	
@@ -351,7 +351,7 @@ function decay_matrix_element(d::πDD,s,σ3,σ2)
 end
 
 # ╔═╡ 581a83d6-62ea-4d7d-8728-4fddfb533409
-function decay_matrix_element(d::γDD,s,σ3,σ2)
+function decay_matrix_element_squared(d::γDD,s,σ3,σ2)
 	msq = d.ms^2
 	v = (;s,s12=σ3,s13=σ2,msq)
 # 	
@@ -380,7 +380,7 @@ function integrand_mapped_thr(d::AbstractxDD,s,x)
 	σ2 = σ2_0 + x[2]*(σ2_e-σ2_0) # straight path
 	#
 	jac = (σ3_e-σ3_0)*(σ2_e-σ2_0)
-	decay_matrix_element(d,s,σ3,σ2) / s * jac
+	decay_matrix_element_squared(d,s,σ3,σ2) / s * jac
 end
 
 # ╔═╡ 49058565-1ca9-409c-b3f1-5a5739610d4e

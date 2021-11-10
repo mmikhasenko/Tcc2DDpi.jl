@@ -44,13 +44,13 @@ const ms = ThreeBodyMasses(ch1.ms...;m0)
     model, = hp.args
     iσx := 2
     iσy := 3
-    density = σs->what2apply(X2DDpi.decay_matrix_element(model,s0,σs.σ3,σs.σ2))
+    density = σs->what2apply(X2DDpi.decay_matrix_element_squared(model,s0,σs.σ3,σs.σ2))
     (ms, density)
 end
 
 ###################################################################
 
-import X2DDpi: decay_matrix_element
+import X2DDpi: decay_matrix_element_squared
 import X2DDpi: AbstractxDD
 
 @with_kw struct πDD_heli <: AbstractxDD
@@ -63,7 +63,7 @@ end
 pDπ(σ) = σ > (mD⁰+mπ⁺)^2 ? sqrt(λ(σ,mD⁰^2,mπ⁺^2)/(4*σ)) : 0.0
 pDˣD(σ) = σ < (m0-mD⁰)^2 ? sqrt(λ(s0,σ,mD⁰^2)/(4*s0)) : 0.0
 
-function decay_matrix_element(d::πDD_heli,s,σ3,σ2)
+function decay_matrix_element_squared(d::πDD_heli,s,σ3,σ2)
     s != s0 && println("\nHm, s != s0 !\n")
     # 
     @unpack j, j0, L, plus = d
@@ -96,7 +96,7 @@ end
 
 hel = πDD_heli(;plus=false)
 let σs = randomPoint(ms)
-    decay_matrix_element(hel,s0, σs.σ3,σs.σ2)
+    decay_matrix_element_squared(hel,s0, σs.σ3,σs.σ2)
 end
 
 dalitz(hel; what2apply=real)

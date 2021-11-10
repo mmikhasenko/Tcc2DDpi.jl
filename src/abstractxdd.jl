@@ -22,7 +22,7 @@ struct γDD{T1,T2,T3} <: AbstractxDD
 end
 
 
-function decay_matrix_element(d::πDD,s,σ3,σ2)
+function decay_matrix_element_squared(d::πDD,s,σ3,σ2)
 	msq = d.ms^2
 	v = (;s,s12=σ3,s13=σ2,msq)
 # 	
@@ -36,7 +36,7 @@ function decay_matrix_element(d::πDD,s,σ3,σ2)
 end
 
 
-function decay_matrix_element(d::γDD,s,σ3,σ2)
+function decay_matrix_element_squared(d::γDD,s,σ3,σ2)
 	msq = d.ms^2
 	v = (;s,s12=σ3,s13=σ2,msq)
 # 	
