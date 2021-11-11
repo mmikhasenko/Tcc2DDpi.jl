@@ -11,3 +11,13 @@ function J_II(σ,pars::NamedTuple{(:m,:Γ)})
 end
 
 pole_position(R::NamedTuple{(:m,:Γ),T} where T) = R.m^2-1im*R.m*R.Γ
+
+
+struct BW_Swave
+    m::Float64
+    g::Float64
+    ma::Float64
+    mb::Float64
+end
+J_I( σ, pars::BW_Swave) = 1 / (pars.m^2 - σ - 1im*pars.g^2*sqrt(λ(σ,ma^2,mb^2))/σ)
+J_II(σ, pars::BW_Swave) = 1 / (pars.m^2 - σ + 1im*pars.g^2*sqrt(λ(σ,ma^2,mb^2))/σ)
