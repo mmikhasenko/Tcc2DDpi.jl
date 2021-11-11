@@ -1,7 +1,21 @@
 σ2of3_pm(σ,msq,s) = (msq[1]+msq[3]+
 	(σ+msq[1]-msq[2])*(s-σ-msq[3])/(2*σ)) .+ [-1,1] .*
 		sqrt(λ(σ,msq[1],msq[2])*λ(s,σ,msq[3]))/(2*σ)
+#
+σ3of1_pm(σ,msq,s) = (msq[2]+msq[1]+
+	(σ+msq[2]-msq[3])*(s-σ-msq[1])/(2*σ)) .+ [-1,1] .*
+		sqrt(λ(σ,msq[2],msq[3])*λ(s,σ,msq[1]))/(2*σ)
+# 
 
+σ3of1(σ1, cos23, msq, s) = msq[1]+msq[2]+
+    (s-σ1-msq[1])*(σ1+msq[2]-msq[3])/(2σ1) + 
+    cos23*sqrt(λ(s,σ1,msq[1])*λ(σ1,msq[2],msq[3])) / σ1
+# 
+σ2of1(σ1, cos23, msq, s) = msq[1]+msq[3]+
+    (s-σ1-msq[1])*(σ1-msq[2]+msq[3])/(2σ1) - 
+    cos23*sqrt(λ(s,σ1,msq[1])*λ(σ1,msq[2],msq[3])) / σ1
+#
+ 
 function integrand_mapped_thr(d::AbstractxDD,s,x)
 	# 	
 	σ3_0, σ3_e = (d.ms[1]+d.ms[2])^2, (√s-d.ms[3])^2

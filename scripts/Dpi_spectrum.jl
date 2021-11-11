@@ -26,6 +26,20 @@ theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
     xlim=(:auto,:auto), ylim=(:auto,:auto), lab="")
 # 
 
+
+###################################################################
+
+@userplot Dalitz
+@recipe function f(hp::Dalitz; what2apply=real)
+    model, = hp.args
+    iσx := 2
+    iσy := 3
+    density = σs->what2apply(X2DDpi.decay_matrix_element_squared(model,e2m(δm0_val)^2,σs.σ3,σs.σ2))
+    (ThreeBodyMasses(m0=e2m(δm0_val), model.ms...), density)
+end
+
+###################################################################
+
 #            _|                  _|              _|                _|  _|  
 #    _|_|_|  _|_|_|    _|  _|_|        _|_|_|  _|_|_|_|    _|_|_|  _|  _|  
 #  _|        _|    _|  _|_|      _|  _|_|        _|      _|    _|  _|  _|  
@@ -69,14 +83,14 @@ function func(d::convCrystallBall, x::NumberOrTuple; p=pars(d))
     return quadgk(y->f(x-y) * g(y), -7*σ, +7*σ)[1]
 end
 
-# tests
-t = Normalized(FunctionWithParameters((x;p)->x>0,∅), (-1,1))
-tc = convGauss(t,207.6e-3)
-tb = convCrystallBall(t,207.6e-3,1.33,4.58)
+# # tests
+# t = Normalized(FunctionWithParameters((x;p)->x>0,∅), (-1,1))
+# tc = convGauss(t,207.6e-3)
+# tb = convCrystallBall(t,207.6e-3,1.33,4.58)
 
-plot(t)
-plot!(tc)
-plot!(tb)
+# plot(t)
+# plot!(tc)
+# plot!(tb)
 
 
 #                                              _|_|                                
@@ -86,6 +100,35 @@ plot!(tb)
 #  _|_|_|    _|          _|_|_|  _|_|_|      _|        _|_|_|  _|    _|    _|_|_|  
 #  _|                            _|                                                
 #  _|                            _|                                                
+
+using ThreeBodyDecay
+
+function project_cos23(d, s, cos23)
+    !(-1 < cos23 < 1) && return 0.0
+    
+    σ1_0, σ1_e = (d.ms[2]+d.ms[3])^2, (√s-d.ms[1])^2
+        
+    M²of1(σ1) = real(
+        X2DDpi.decay_matrix_element_squared(d,s,
+            X2DDpi.σ3of1(σ1, cos23, d.ms^2, s),
+            X2DDpi.σ2of1(σ1, cos23, d.ms^2, s))
+        ) *
+        sqrt(λ(σ1,d.ms[2]^2,d.ms[3]^2)*λ(s,σ1,d.ms[1]^2)) / σ1
+    return quadgk(M²of1, σ1_0, σ1_e)[1] / (2π*s)
+end
+
+function projectto1(d, s, σ1)
+
+    σ1_0, σ1_e = (d.ms[2]+d.ms[3])^2, (√s-d.ms[1])^2
+    !(σ1_0 < σ1 < σ1_e) && return 0.0
+    # 
+	σ3_0, σ3_e = X2DDpi.σ3of1_pm(σ1, d.ms^2, s)
+    
+    M²of3(σ3) = real(
+        X2DDpi.decay_matrix_element_squared(d,s,
+            σ3,sum(d.ms^2)+s-σ3-σ1))
+    return quadgk(M²of3, σ3_0, σ3_e)[1] / (2π*s)
+end
 
 
 function projectto3(d, s, σ3)
@@ -122,8 +165,8 @@ function projectto3(d, σ3, lineshape, smin, smax)
     return cuhre((x,f)->(f[1]=M²of2(x)), 2, 1)[1][1]
 end
 
-@time projectto3(π⁺D⁰D⁰, e2m(δm0_val)^2, 2.007^2)
-@time projectto3(π⁺D⁰D⁰, 2.007^2)
+# @time projectto3(π⁺D⁰D⁰, e2m(δm0_val)^2, 2.007^2)
+# @time projectto3(π⁺D⁰D⁰, 2.007^2)
 
 # let d = π⁺D⁰D⁰, m = m_fig3
 #     plot(e3->projectto3(d, m^2, e3^2),
@@ -143,7 +186,7 @@ polyakovfactor(m) = max(0, tanh((mDˣ⁺ - m ) / 350e-6))
 #  _|    _|  _|    _|    _|      _|    _|  
 #    _|_|_|    _|_|_|      _|_|    _|_|_|  
 
-data_fig3 = CSV.read(joinpath("quickcheck", "Fig3.txt"), DataFrame)
+data_fig3 = CSV.read(joinpath("quickcheck", "Fig_3.csv"), DataFrame)
 rename!(data_fig3, map(s->filter(x -> !isspace(x), s), names(data_fig3)))
 
 
@@ -222,7 +265,6 @@ end
 #                                      _|                                                              
 #                                      _|                                                              
 
-
 # new decay chain: no D*
 import X2DDpi: decay_matrix_element_squared, AbstractxDD
 struct πDD_noDˣ{T1} <: AbstractxDD
@@ -257,7 +299,7 @@ end
 
 λλ3(ms,s,σ) = λ(σ,ms[1]^2,ms[2]^2)*λ(s,σ,ms[3]^2)
 ρ3(ms,s,σ) = (λλ = λλ3(ms,s,σ); λλ<0 ? 0.0 : sqrt(λλ)/(2*σ))
-ρ3(σ) = ρ3(π⁺D⁰D⁰.ms,e2m(δm0_val)^2,σ)
+ρ3(σ) = ρ3(π⁺D⁰D⁰.ms,m_fig3^2,σ)
 # 
 data_phsp = let
     pdf = Normalized(FunctionWithParameters((x;p)->ρ3(x^2); p=∅), lims_fig3)
@@ -296,4 +338,144 @@ savefig(joinpath("plots", "Dpi_noDstar.pdf"))
 using DelimitedFiles
 writedlm(joinpath("results", "nominal", "Dpi_noDstar.txt"),
     [data_nominal.xv data_nominal.yv data_noDˣ.xv data_noDˣ.yv data_phsp.xv data_phsp.yv])
+# 
+
+
+#  _|_|_|      _|    _|_|_|      _|    
+#  _|    _|  _|  _|  _|    _|  _|  _|  
+#  _|    _|  _|  _|  _|    _|  _|  _|  
+#  _|    _|  _|  _|  _|    _|  _|  _|  
+#  _|_|_|      _|    _|_|_|      _|    
+
+# new decay chain: no DD resonance
+import X2DDpi: decay_matrix_element_squared, AbstractxDD
+struct πDD_DD{T} <: AbstractxDD
+    ms::NamedTuple{(:m1,:m2,:m3),NTuple{3,Float64}}
+    R::T
+end
+function decay_matrix_element_squared(d::πDD_DD,s,σ3,σ2)
+	msq = d.ms^2
+	v = (;s,s12=σ3,s13=σ2,msq)
+    σ = X2DDpi.s23(v)
+# 	
+	J23_I, J23_II = J_I(σ,d.R), J_II(σ,d.R)
+    qsq = λ(s,σ,msq[1]^2) / (4s)
+# 	
+	frakM = qsq * J23_I * J23_II
+    return frakM
+end
+
+
+BW_D⁰D⁰(m,g) = BW_Swave(m,g,mD⁰,mD⁰)
+
+resonance_DD = BW_D⁰D⁰(2mD⁰+0.5e-3, 0.5)
+let X = resonance_DD
+    plot(e->real(λ(m_fig3^2,e^2,π⁺D⁰D⁰_DD.ms[1]^2) *
+        J_I( e^2,X)*
+        J_II(e^2,X)), 2mD⁰, (m_fig3-mπ⁺))
+end
+#
+
+π⁺D⁰D⁰_DD = πDD_DD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), resonance_DD)
+
+dalitz(π⁺D⁰D⁰_DD, color=:lajolla)
+
+# convolve
+c3_DD = project_convolv(π⁺D⁰D⁰_DD, δm0_val; lims=lims_fig3)
+
+# calculate
+data_DD = let c = c3_DD
+    intensity(m3) = func(c, m3)*polyakovfactor(m3)
+    xv = range(lims_fig3..., length=100)
+    yv = intensity.(xv)
+    (; xv,yv)
+end
+# 
+
+# plot
+p1 = let scale = 0.055
+    plot(xlab=L"m(D^0\pi^+)\,\,[\mathrm{GeV}]", leg=:topleft)
+    N_nominal = 10e3/sum(data_nominal.yv) * scale
+    plot!(data_nominal.xv, data_nominal.yv  .* N_nominal,
+        fill=0, α=0.3, c=2, lab=L"\mathrm{nominal}")
+    plot!(data_nominal.xv, data_nominal.yv .* N_nominal, lab="", l=(:black,1))
+    # 
+    N_DD = 10e3/sum(data_DD.yv) * scale
+    plot!(data_DD.xv, data_DD.yv .* N_DD, 
+        fill=0, α=0.3, c=:red, lab=L"DD\,\,\mathrm{resonance}")
+    plot!(data_DD.xv, data_DD.yv .* N_DD, lab="", l=(:red,1))
+    # 
+    N_phsp = 10e3/sum(data_phsp.yv) * scale
+    plot!(data_phsp.xv, data_phsp.yv .* N_phsp, 
+        fill=0, α=0.3, c=4, lab=L"\mathrm{phase\,\,space}")
+    plot!(data_phsp.xv, data_phsp.yv .* N_phsp, lab="", l=(:black,1))
+    #
+    let ed = h.edges[1]
+        xv = (ed[1:end-1]+ed[2:end]) ./ 2
+        scatter!(xv, h.weights, yerr=sqrt.(h.weights), lab="Data", c=:black, leg=:topleft)
+    end
+end
+savefig(joinpath("plots", "Dpi_DDresonance.pdf"))
+
+
+
+p2 = let scale = 1e3
+    plot(xlab=L"m(D^0D^0)\,\,[\mathrm{GeV}]", leg=:topright)
+    # 
+    xv = range(2mD⁰, 3.740, length=300) # e2m(δm0_val)-mπ⁺
+    # 
+    d = π⁺D⁰D⁰
+    proj(e1) = projectto1(d, e2m(δm0_val)^2, e1^2)
+    yv = proj.(xv)
+    N_nominal = 1/sum(yv) * scale
+    plot!(xv, yv  .* N_nominal,
+        fill=0, α=0.3, c=2, lab=L"\mathrm{nominal}")
+    plot!(xv, yv .* N_nominal, lab="", l=(:black,1))
+# 
+    d = π⁺D⁰D⁰_DD
+    proj(e1) = projectto1(d, e2m(δm0_val)^2, e1^2)
+    yv = proj.(xv)
+    N_DD = 1/sum(yv) * scale
+    plot!(xv, yv .* N_DD, 
+        fill=0, α=0.3, c=:red, lab=L"DD\,\,\mathrm{resonance}")
+    plot!(xv, yv .* N_DD, lab="", l=(:red,1))
+end
+savefig(joinpath("plots", "DD_DDresonance.pdf"))
+
+
+plot(p1,p2, size=(800,300), bottom_margin=5Plots.PlotMeasures.mm)
+savefig(joinpath("plots", "Dpi-DD_DDresonance.pdf"))
+
+
+p2 = let scale = 1e3
+    plot(xlab=L"\cos\,\theta_{D^0D^0}", leg=:top)
+    # 
+    xv = range(-1+1e-5, 1-1e-5, length=300) # e2m(δm0_val)-mπ⁺
+    # 
+    proj(z) = project_cos23(d, e2m(δm0_val)^2, z)
+    # 
+    d = π⁺D⁰D⁰
+    yv = proj.(xv)
+    N_nominal = 1/sum(yv) * scale
+    plot!(xv, yv  .* N_nominal,
+        fill=0, α=0.3, c=2, lab=L"\mathrm{nominal}")
+    plot!(xv, yv .* N_nominal, lab="", l=(:black,1))
+    # 
+    d = π⁺D⁰D⁰_DD
+    proj(z) = project_cos23(d, e2m(δm0_val)^2, z)
+    # 
+    yv = proj.(xv)
+    N_DD = 1/sum(yv) * scale
+    plot!(xv, yv .* N_DD, 
+        fill=0, α=0.3, c=:red, lab=L"DD\,\,\mathrm{resonance}")
+    plot!(xv, yv .* N_DD, lab="", l=(:black,1))
+end
+savefig(joinpath("plots", "costhetaDD_DDresonance.pdf"))
+
+
+plot(
+    dalitz(π⁺D⁰D⁰, color=:lajolla, title=L"\mathrm{nominal}"),
+    dalitz(π⁺D⁰D⁰_DD, color=:lajolla, title=L"DD\,\,\mathrm{resonance}"),
+    size=(800,400), bottom_margin=5Plots.PlotMeasures.mm)
+savefig(joinpath("plots", "dalitz_DDresonance.pdf"))
 
