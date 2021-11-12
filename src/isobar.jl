@@ -19,5 +19,5 @@ struct BW_Swave
     ma::Float64
     mb::Float64
 end
-J_I( σ, pars::BW_Swave) = 1 / (pars.m^2 - σ - 1im*pars.g^2*sqrt(λ(σ,ma^2,mb^2))/σ)
-J_II(σ, pars::BW_Swave) = 1 / (pars.m^2 - σ + 1im*pars.g^2*sqrt(λ(σ,ma^2,mb^2))/σ)
+J_I( σ, pars::BW_Swave) = 1 / (pars.m^2 - σ - 1im*pars.g^2*sqrt(λ(σ,pars.ma^2,pars.mb^2))/σ)
+J_II(σ, pars::BW_Swave) = 1 / (pars.m^2 - σ + 1im*pars.g^2*sqrt(λ(σ,pars.ma^2,pars.mb^2))/σ)

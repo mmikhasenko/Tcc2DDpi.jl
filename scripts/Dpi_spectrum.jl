@@ -367,12 +367,15 @@ end
 
 
 BW_D⁰D⁰(m,g) = BW_Swave(m,g,mD⁰,mD⁰)
+BW_mΓ_D⁰D⁰(m,Γ) = BW_Swave(m,sqrt(m*Γ/sqrt(λ(m^2,mD⁰^2,mD⁰^2))*m^2),mD⁰,mD⁰)
 
-resonance_DD = BW_D⁰D⁰(2mD⁰+0.5e-3, 0.5)
+resonance_DD = BW_mΓ_D⁰D⁰(2mD⁰+0.5e-3, 1.5e-3) #BW_D⁰D⁰(, 0.2)
 let X = resonance_DD
-    plot(e->real(λ(m_fig3^2,e^2,π⁺D⁰D⁰_DD.ms[1]^2) *
-        J_I( e^2,X)*
-        J_II(e^2,X)), 2mD⁰, (m_fig3-mπ⁺))
+    plot(e->real(λ(m_fig3^2,(1e-3*e+2mD⁰)^2,mπ⁺^2) *
+        J_I( (1e-3*e+2mD⁰)^2,X)*
+        J_II((1e-3*e+2mD⁰)^2,X)), 0, (m_fig3-mπ⁺-2mD⁰)*1e3,
+        lab=L"\left|\mathrm{BW}_{D^0D^0}\right|^2",
+        xlab=L"m(D^0D^0)-m_{D^0}-m_{D^0}\,\,[\mathrm{MeV}]")
 end
 #
 
@@ -417,8 +420,6 @@ p1 = let scale = 0.055
 end
 savefig(joinpath("plots", "Dpi_DDresonance.pdf"))
 
-
-
 p2 = let scale = 1e3
     plot(xlab=L"m(D^0D^0)\,\,[\mathrm{GeV}]", leg=:topright)
     # 
@@ -445,6 +446,41 @@ savefig(joinpath("plots", "DD_DDresonance.pdf"))
 
 plot(p1,p2, size=(800,300), bottom_margin=5Plots.PlotMeasures.mm)
 savefig(joinpath("plots", "Dpi-DD_DDresonance.pdf"))
+
+# LLH scan
+function llh_DD_scan(ΓDD=0.8e-3; ΔmDD = 0.5e-3) 
+    resonance_DD = BW_mΓ_D⁰D⁰(2mD⁰+ΔmDD, ΓDD) #BW_D⁰D⁰(, 0.2)
+    π⁺D⁰D⁰_DD = πDD_DD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), resonance_DD)
+
+    c = project_convolv(π⁺D⁰D⁰_DD, δm0_val; lims=lims_fig3)
+
+    intensity(m3) = func(c, m3)*polyakovfactor(m3)
+    # quadgk(intensity, lims_fig3...)[1]
+    const_integral = sum(intensity.(range(lims_fig3..., length=100)))
+    # 
+    xv = data_fig3.mass .* 1e-3
+    yv = log.(intensity.(xv) ./ const_integral)
+    return -sum(yv .* data_fig3.weight)
+end
+
+let ΔmDDv=range(0.2e-3,0.5e-3, length=5)
+    Γv = 0.95:0.05:2.5
+    # 
+    plot(xlab=L"\Gamma_{D^0D^0}\,\,[\mathrm{MeV}]", ylab=L"\Delta \mathrm{NLL}")
+    profiles = []
+    for ΔmDD in ΔmDDv
+        p = map(Γ->llh_DD_scan(Γ*1e-3; ΔmDD), Γv)
+        push!(profiles, p)
+    end
+    pmin = minimum(vcat(profiles...))
+    for (ΔmDD,p) in zip(ΔmDDv,profiles)
+        plot!(Γv, p .- pmin, lab="ΔmDD=$(1e3*ΔmDD) MeV")
+    end
+    hline!([1.0], lc=:red)
+    plot!()
+end
+savefig(joinpath("plots", "nllscan_DDresonance.pdf"))
+
 
 
 p2 = let scale = 1e3
