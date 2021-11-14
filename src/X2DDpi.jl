@@ -7,6 +7,7 @@ using Optim
 # using ThreeBodyDecay
 using Measurements
 using JSON
+using Parameters
 
 
 export mγ
@@ -29,7 +30,7 @@ import Base.^
 
 include("covariant_exptessions.jl")
 
-export BW_Swave
+export BW, BW_norm, BW_Swave
 export J_I, J_II
 include("isobar.jl")
 

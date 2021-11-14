@@ -10,15 +10,15 @@ end
 # πDD
 struct πDD{T1,T2,T3} <: AbstractxDD
     ms::NamedTuple{(:m1,:m2,:m3),T1}
-    R12::NamedTuple{T2}
-    R13::NamedTuple{T3}
+    R12::T2
+    R13::T3
 end
 
 # γDD
 struct γDD{T1,T2,T3} <: AbstractxDD
     ms::NamedTuple{(:m1,:m2,:m3),T1}
-    R12::NamedTuple{T2}
-    R13::NamedTuple{T3}
+    R12::T2
+    R13::T3
 end
 
 
@@ -63,11 +63,27 @@ branch_points(d::AbstractxDD) = (
 # serilization
 obj2nt(ch::AbstractxDD) =
     (type=string(typeof(ch)),
-        ms=ch.ms, R12=ch.R12, R13=ch.R13)
+        ms=ch.ms,
+		R12=obj2nt(ch.R12), R13=obj2nt(ch.R13))
+#
+obj2nt(nt::NamedTuple) = nt
 
 # deserilization
 function constructchannel(ser::NamedTuple{(:R12, :R13, :ms, :type),T} where T)
     type = eval(Meta.parse(ser.type))
     ms = NamedTuple{(:m1,:m2,:m3)}(ser.ms)
-    type(ms, ser.R12, ser.R13)
+	R12 = constructlineshape(ser.R12)
+	R13 = constructlineshape(ser.R13)
+    type(ms, R12, R13)
 end
+
+constructlineshape(R::NamedTuple{(:m,:Γ),T} where T) = R
+# 
+function constructlineshape(R::NamedTuple)
+    type = eval(Meta.parse(R.type))
+	keysnotype =  filter(x->x!=:type, keys(R))
+	args = NamedTuple{keysnotype}(R)
+	type(args...)
+end
+
+
