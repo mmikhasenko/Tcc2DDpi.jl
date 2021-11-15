@@ -9,6 +9,7 @@ using Measurements
 using JSON
 using Parameters
 using RecipesBase
+using LaTeXStrings
 
 
 export mγ
@@ -75,7 +76,9 @@ export d2nt
 include("io.jl")
 
 
-export dalitz
+export dalitzplot
+export dpdzspectum, dzdzspectum
+export dzdzpipspectum 
 include("plotrecipes.jl")
 
 

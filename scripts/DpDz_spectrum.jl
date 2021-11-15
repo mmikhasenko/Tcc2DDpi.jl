@@ -146,3 +146,29 @@ let
 end
 # 
 savefig(joinpath("plots","nominal","DpDz_spectrum_with_full.pdf"))
+
+
+# let
+#     plot()
+#     n23 = sum(data_2.yv+data_3.yv) / 1e3
+#     plot!(data_3.xv, data_3.yv ./ n23, lab=L"\gamma D^+D^0", fill=0, c=3, α=0.5)
+#     plot!(data_3.xv, data_3.yv ./ n23, lab="", l=(:black, 1.5))
+#     # 
+#     plot!(data_3.xv, (data_2.yv+data_3.yv) ./ n23, lab=L"\pi^0 D^+D^0", fill_between=data_3.yv./ n23, c=:red, α=0.3)
+#     plot!(data_3.xv, (data_2.yv+data_3.yv) ./ n23, lab="", l=(:black, 1.5))
+# end
+
+@time data_DpD0 = let 
+    ch = channels
+    Nbins = 100
+    xv = range(3.734, 3.758, length=Nbins+1)
+    m = e2m(δm0_val)
+    # 
+    y2v = map(e1->projectto1(ch[2], m^2, e1^2), xv)
+    y3v = map(e1->projectto1(ch[3], m^2, e1^2), xv)
+    # 
+    (; xv, y2v, y3v)
+end
+
+dpdzspectrum(data_DpD0.xv, data_DpD0.y2v, data_DpD0.y3v)
+

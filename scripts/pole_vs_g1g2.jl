@@ -67,7 +67,6 @@ setofmodelg1g2 = readjson(joinpath("results","nominal","setofmodelg1g2.json"))
 @unpack angles, sermodels = setofmodelg1g2
 
 
-sermodels[1]
 function dict2model(d::Dict)
     ichannels = interpolated.(d2nt.(d["ichannels"]))
     return Amplitude(Tuple(ichannels))
@@ -93,3 +92,97 @@ end
 # 
 savefig(joinpath("plots","nominal","pole_vs_g1g2.pdf"))
 
+
+ps1 = [let ch = getproperty.(m.ik, :channel)
+    Nbins = 100
+    xv = range(3.734, 3.758, length=Nbins+1)
+    m = e2m(δm0_val)
+    # 
+    y2v = map(e1->projectto1(ch[2], m^2, e1^2), xv)
+    y3v = map(e1->projectto1(ch[3], m^2, e1^2), xv)
+
+    dpdzspectrum(xv, y2v, y3v)
+end for m in models]
+
+# ps2 = [let #m = models[6]
+#     ch = getproperty.(m.ik, :channel)
+#     Nbins = 100
+#     xv = range(3.734, 3.758, length=Nbins+1)
+#     m = e2m(δm0_val)
+#     # 
+#     y2v = map(e1->projectto1(ch[2], m^2, e1^2), xv)
+#     y3v = map(e1->projectto1(ch[3], m^2, e1^2), xv)
+
+#     dpdzspectrum(xv, y2v, y3v)
+# end for m in models]
+
+# DzDzpip
+ps2 = [let #m = models[6]
+    ich = m.ik
+    ch = getproperty.(m.ik, :channel)
+    # 
+    Nbins = 200
+    ev = range(-1, 2.5, length=Nbins+1)
+    calv = map(e->1/abs2(denominator_I(m, e, δm0_val)), ev)/1e3
+    phsps = map(e->ρ_thr(ich[1],e), ev)
+
+    plot(xlab=L"e\,\,[MeV]", ylab=L"|A|^2 \rho")
+    plot!(ev, calv .* phsps, lab="", fill=0, α=0.5, c=:red)
+    plot!(ev, calv .* phsps, lab="", l=(:black, 1.5))
+end for m in models]
+
+# DzDzpip
+ps3 = [let #m = models[6]
+    ich = m.ik
+    ch = getproperty.(m.ik, :channel)
+    # 
+    Nbins = 200
+    xv = range(3.729, 3.740, length=Nbins+1)
+    m = e2m(δm0_val)
+    # 
+    y1v = map(e1->projectto1(ch[1], m^2, e1^2), xv)
+    # 
+    plot(xlab=L"m(D^0D^0)\,\,[\mathrm{GeV}]")
+    plot!(xv, y1v, lab="", fill=0, α=0.5, c=:red)
+    plot!(xv, y1v, lab="", l=(:black, 1.5))
+end for m in models]
+
+# Dzpip
+ps4 = [let #m = models[6]
+    ich = m.ik
+    ch = getproperty.(m.ik, :channel)
+    # 
+    Nbins = 200
+    xv = range(2.004, 2.0105, length=Nbins+1)
+    m = e2m(δm0_val)
+    # 
+    y1v = map(e1->projectto3(ch[1], m^2, e1^2), xv)
+    # 
+    plot(xlab=L"m(D^0\pi^+)\,\,[\mathrm{GeV}]")
+    plot!(xv, y1v, lab="", fill=0, α=0.5, c=:red)
+    plot!(xv, y1v, lab="", l=(:black, 1.5))
+end for m in models]
+
+let
+    plot(permutedims([[plot() for i in 1:length(ps2)] ps2 ps3 ps1 ps4])...,
+        layout=grid(11,5, widths=(0.08,0.23,0.23,0.23,0.23)),
+        size=(1000,1000),
+        xlab="", ylab="", 
+        xaxis=nothing, yaxis=nothing, lab="", frame=:nothing)
+    # 
+    plot!(sp=1, title=L"g_1/g_2")
+    plot!(sp=2, title=L"m(D^0D^0\pi^+)")
+    plot!(sp=3, title=L"m(D^0D^0)")
+    plot!(sp=4, title=L"m(D^0D^+)")
+    plot!(sp=5, title=L"m(D^0\pi^+)")
+    # 
+    for i in 1:11
+        sm = sermodels[i]
+        @unpack g1, g2 = sm
+        plot!(sp=1+5*(i-1),
+            ann=(0.5,0.5,text("$(round(g1, digits=1))/$(round(-g2, digits=1))", 13)),
+            xaxis=false, yaxis=false)
+    end
+    plot!()
+end
+savefig(joinpath("plots","nominal","summary_g1g2.pdf"))
