@@ -29,37 +29,59 @@ function rotate((x,y), ϕ)
 end
 
 
-function pole_with_g1g2(g1,g2)
+function precalculate_channels_g1g2(g1,g2)
     channels = [
         πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1)),
         πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1), BW_norm(m=mDˣ⁰,Γ=ΓDˣ⁰,n=g2)),
         γDD((m1=mγ, m2=mD⁺,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1), BW_norm(m=mDˣ⁰,Γ=ΓDˣ⁰,n=g2))]
     #
-    ichannels = interpolated.(channels, cutoff; estep=estep) # cutoff
-    #
-    ampX0 = Amplitude(Tuple(ichannels), zero)
-
-    pole_position(ampX0,δm0_val)
+    ichannels = interpolated.(channels, cutoff; estep=estep)
+    # 
+    (; g1, g2, channels, ichannels)
 end
 
-# test 
-pole_nominal  = pole_with_g1g2(1,1)
-pole_nominal′ = pole_with_g1g2(2,2)
-@assert abs(1 - 
-        pole_nominal.half_Γ_pole /
-        pole_nominal′.half_Γ_pole) < 1e-2 
-# limiting cases
-pole_Dˣ⁺D⁰ = pole_with_g1g2(1,0)
-pole_Dˣ⁰D⁺ = pole_with_g1g2(0,1)
-
-
 ϕv = range(-π/2,π/2,length=11)
-calv = [pole_with_g1g2(rotate((1,1),ϕ)...) for ϕ in ϕv]
+ichsv = [precalculate_channels_g1g2(rotate((1,1),ϕ)...) for ϕ in ϕv]
+
+import X2DDpi: obj2nt
+obj2nt(nt::NamedTuple{(:g1, :g2, :channels, :ichannels)}) = (;
+    g1=nt.g1, g2=nt.g2,
+    channels=obj2nt.(nt.channels), ichannels=obj2nt.(nt.ichannels))
+
+writejson(joinpath("results","nominal","setofmodelg1g2.json"), Dict(
+        :angles => ϕv,
+        :sermodels => obj2nt.(ichsv))
+    )
+# 
+
+
+#                                      _|  
+#  _|  _|_|    _|_|      _|_|_|    _|_|_|  
+#  _|_|      _|_|_|_|  _|    _|  _|    _|  
+#  _|        _|        _|    _|  _|    _|  
+#  _|          _|_|_|    _|_|_|    _|_|_|  
+
+
+
+setofmodelg1g2 = readjson(joinpath("results","nominal","setofmodelg1g2.json"))
+@unpack angles, sermodels = setofmodelg1g2
+
+
+sermodels[1]
+function dict2model(d::Dict)
+    ichannels = interpolated.(d2nt.(d["ichannels"]))
+    return Amplitude(Tuple(ichannels))
+end
+
+models = [dict2model(m) for m in sermodels]
+
+# takes 20 secs
+polev = [pole_position(m,δm0_val) for m in models]
 
 let
     plot(ylim=(0,70),
         xlab=L"\phi:\,\,[g_1, g_2]^T = R(\phi)[1,-1]^T", ylab=L"\Gamma_{T_{cc}^+}\,\,[\mathrm{keV}]")
-    plot!(ϕv, -2e3 .* getproperty.(calv, :half_Γ_pole), lab="")
+    plot!(ϕv, -2e3 .* getproperty.(polev, :half_Γ_pole), lab="")
     vline!([0.0], lab="", lc=:red,
         ann=(0,10, text(L"\mathrm{nominal}:\,\,\,\,I=1",10,rotation=90,:left,:bottom)))
     # 
