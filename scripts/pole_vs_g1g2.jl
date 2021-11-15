@@ -31,9 +31,9 @@ end
 
 function pole_with_g1g2(g1,g2)
     channels = [
-        πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,c=g1), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,c=g1)),
-        πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,c=g1), BW_norm(m=mDˣ⁰,Γ=ΓDˣ⁰,c=g2)),
-        γDD((m1=mγ, m2=mD⁺,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,c=g1), BW_norm(m=mDˣ⁰,Γ=ΓDˣ⁰,c=g2))]
+        πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1)),
+        πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1), BW_norm(m=mDˣ⁰,Γ=ΓDˣ⁰,n=g2)),
+        γDD((m1=mγ, m2=mD⁺,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1), BW_norm(m=mDˣ⁰,Γ=ΓDˣ⁰,n=g2))]
     #
     ichannels = interpolated.(channels, cutoff; estep=estep) # cutoff
     #

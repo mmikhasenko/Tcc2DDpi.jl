@@ -8,6 +8,7 @@ using ThreeBodyDecay
 using Measurements
 using JSON
 using Parameters
+using RecipesBase
 
 
 export mγ

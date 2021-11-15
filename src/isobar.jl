@@ -35,10 +35,10 @@ J_II(σ, pars::BW_Swave) = 1 / (pars.m^2 - σ + 1im*pars.g^2*sqrt(λ(σ,pars.ma^
 @with_kw struct BW_norm <: AbstractLinesShape
     m::Float64
     Γ::Float64
-	c::Float64
+	n::Float64
 end
-J_I( σ, pars::BW_norm) = pars.c / (pars.m^2 - σ - 1im*pars.m*pars.Γ)
-J_II(σ, pars::BW_norm) = pars.c / (pars.m^2 - σ + 1im*pars.m*pars.Γ)
+J_I( σ, pars::BW_norm) = pars.n / (pars.m^2 - σ - 1im*pars.m*pars.Γ)
+J_II(σ, pars::BW_norm) = pars.n / (pars.m^2 - σ + 1im*pars.m*pars.Γ)
 
 
 function obj2nt(amp::AbstractLinesShape)
