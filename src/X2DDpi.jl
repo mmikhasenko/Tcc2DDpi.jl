@@ -4,7 +4,7 @@ using QuadGK
 using Cuba
 using Interpolations
 using Optim
-# using ThreeBodyDecay
+using ThreeBodyDecay
 using Measurements
 using JSON
 using Parameters
@@ -60,6 +60,11 @@ include("denominator.jl")
 export DˣD
 include("singlechannel.jl")
 
+export projecttocos23
+export projectto1, projectto3
+include("projections.jl")
+
+
 export writejson, readjson
 export writetoml, readtoml
 export transformdictrecursively!
@@ -67,6 +72,10 @@ export ifstringgivemeasurement
 export ifmeasurementgivestring
 export d2nt
 include("io.jl")
+
+
+export dalitz
+include("plotrecipes.jl")
 
 
 end

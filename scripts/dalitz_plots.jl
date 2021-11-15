@@ -39,17 +39,6 @@ const ms = ThreeBodyMasses(ch1.ms...;m0)
 
 ###################################################################
 
-@userplot Dalitz
-@recipe function f(hp::Dalitz; what2apply=real)
-    model, = hp.args
-    iσx := 2
-    iσy := 3
-    density = σs->what2apply(X2DDpi.decay_matrix_element_squared(model,s0,σs.σ3,σs.σ2))
-    (ms, density)
-end
-
-###################################################################
-
 import X2DDpi: decay_matrix_element_squared
 import X2DDpi: AbstractxDD
 
@@ -99,9 +88,9 @@ let σs = randomPoint(ms)
     decay_matrix_element_squared(hel,s0, σs.σ3,σs.σ2)
 end
 
-dalitz(hel; what2apply=real)
-dalitz(hel; what2apply=log ∘ real)
-dalitz(ch1; what2apply=log ∘ real)
+dalitzplot(hel; what2apply=real)
+dalitzplot(hel; what2apply=log ∘ real)
+dalitzplot(ch1; what2apply=log ∘ real)
 
 # interesting_combinations
 interesting_combinations = [
@@ -118,7 +107,7 @@ interesting_combinations = [
 for ic in interesting_combinations
     @unpack j, j0, L, plus = ic
     sign = plus ? '+' : '-'
-    dalitz(πDD_heli(;j0,j,L,plus);
+    dalitzplot(πDD_heli(;j0,j,L,plus);
         title=latexstring("X\\to (D^0\\pi^+)_\\mathrm{P}D^0\\textrm{$(sign)}D^0(\\pi^+D^0)_\\mathrm{P}"))
     annotate!(4.018, 4.038, text(latexstring("j_X=$(j0), L_{D^*D}=$(L)"), :left))
     savefig(joinpath("plots","nominal","dalitz","dalitz_j0=$(j0)_j=$(j)_L=$(L)_signplus=$(plus).pdf"))
@@ -128,7 +117,7 @@ end
 ps = [let
     @unpack j, j0, L, plus = ic
     sign = plus ? '+' : '-'
-    dalitz(πDD_heli(;j0,j,L,plus); ticks=false, xlab="", ylab="",
+    dalitzplot(πDD_heli(;j0,j,L,plus); ticks=false, xlab="", ylab="",
         title=latexstring("X\\to (D^0\\pi^+)_\\mathrm{P}D^0\\textrm{$(sign)}D^0(\\pi^+D^0)_\\mathrm{P}"))
     annotate!(4.018, 4.038, text(latexstring("j_X=$(j0), L_{D^*D}=$(L)"), :left))
 end for ic in interesting_combinations]

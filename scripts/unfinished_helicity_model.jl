@@ -216,9 +216,9 @@ let
     decay_matrix_element_squared(ch1,s0,σs.σ3,σs.σ2)
 end
 
-dalitz(hel; what2apply=real)
-dalitz(hel; what2apply=log ∘ real)
-dalitz(ch1; what2apply=log ∘ real)
+dalitzplot(hel; what2apply=real)
+dalitzplot(hel; what2apply=log ∘ real)
+dalitzplot(ch1; what2apply=log ∘ real)
 
 # interesting_combinations
 interesting_combinations = [
@@ -235,7 +235,7 @@ interesting_combinations = [
 for ic in interesting_combinations
     @unpack j, j0, L, plus = ic
     sign = plus ? '+' : '-'
-    dalitz(πDD_heli(;j0,j,L,plus);
+    dalitzplot(πDD_heli(;j0,j,L,plus);
         title=latexstring("X\\to (D^0\\pi^+)_\\mathrm{P}D^0\\textrm{$(sign)}D^0(\\pi^+D^0)_\\mathrm{P}"))
     annotate!(4.018, 4.038, text(latexstring("j_X=$(j0), L_{D^*D}=$(L)"), :left))
     savefig(joinpath("plots","nominal","dalitz","dalitz_j0=$(j0)_j=$(j)_L=$(L)_signplus=$(plus).pdf"))
@@ -245,7 +245,7 @@ end
 ps = [let
     @unpack j, j0, L, plus = ic
     sign = plus ? '+' : '-'
-    dalitz(πDD_heli(;j0,j,L,plus); ticks=false, xlab="", ylab="",
+    dalitzplot(πDD_heli(;j0,j,L,plus); ticks=false, xlab="", ylab="",
         title=latexstring("X\\to (D^0\\pi^+)_\\mathrm{P}D^0\\textrm{$(sign)}D^0(\\pi^+D^0)_\\mathrm{P}"))
     annotate!(4.018, 4.038, text(latexstring("j_X=$(j0), L_{D^*D}=$(L)"), :left))
 end for ic in interesting_combinations]

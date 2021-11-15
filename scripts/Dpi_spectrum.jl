@@ -26,145 +26,14 @@ theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
     xlim=(:auto,:auto), ylim=(:auto,:auto), lab="")
 # 
 
-
-###################################################################
-
-@userplot Dalitz
-@recipe function f(hp::Dalitz; what2apply=real)
-    model, = hp.args
-    iσx := 2
-    iσy := 3
-    density = σs->what2apply(X2DDpi.decay_matrix_element_squared(model,e2m(δm0_val)^2,σs.σ3,σs.σ2))
-    (ThreeBodyMasses(m0=e2m(δm0_val), model.ms...), density)
-end
-
-###################################################################
-
-#            _|                  _|              _|                _|  _|  
-#    _|_|_|  _|_|_|    _|  _|_|        _|_|_|  _|_|_|_|    _|_|_|  _|  _|  
-#  _|        _|    _|  _|_|      _|  _|_|        _|      _|    _|  _|  _|  
-#  _|        _|    _|  _|        _|      _|_|    _|      _|    _|  _|  _|  
-#    _|_|_|  _|    _|  _|        _|  _|_|_|        _|_|    _|_|_|  _|  _|  
+include(joinpath("..", "src", "crystallball.jl"))
 
 
-function CrystallBall(x,α,n,xbar,σ) 
-    μ = (x-xbar)/σ
-
-    C = n/α/(n-1)*exp(-α^2/2)
-    D = sqrt(2π)*erf(α/sqrt(2))
-    N = 1/(2C+D)/σ
-    # 
-    abs(μ) < α && return N*exp(-(x-xbar)^2/(2σ^2))
-    A = (n/α)^n * exp(-α^2/2)
-    B = n/α - α
-    return N*A*(B+abs(x-xbar)/σ)^(-n)
-end
-
-
-import AlgebraPDF: AbstractPDF, pars, lims, func, updatevalueorflag
-struct convCrystallBall{T} <: AbstractPDF{1}
-    source::T
-    σ::Float64
-    α::Float64
-    n::Float64
-end
-
-pars(d::convCrystallBall, isfree::Bool) = pars(d.source, isfree)
-lims(d::convCrystallBall) = lims(d.source)
-updatevalueorflag(d::convCrystallBall, s::Symbol, isfree::Bool, v=getproperty(pars(d),s)) = 
-    convCrystallBall(
-        AlgebraPDF.ispar(d.source,s) ? updatevalueorflag(d.source,s,isfree,v) : d.source,
-        d.σ, d.α, d.n)
-
-function func(d::convCrystallBall, x::NumberOrTuple; p=pars(d))
-    σ = func(d.σ, x; p)
-    g(z) = CrystallBall(z,d.α,d.n,0,d.σ)
-    f(z) = func(d.source, z; p)
-    return quadgk(y->f(x-y) * g(y), -7*σ, +7*σ)[1]
-end
-
-# # tests
-# t = Normalized(FunctionWithParameters((x;p)->x>0,∅), (-1,1))
-# tc = convGauss(t,207.6e-3)
-# tb = convCrystallBall(t,207.6e-3,1.33,4.58)
-
-# plot(t)
-# plot!(tc)
-# plot!(tb)
-
-
-#                                              _|_|                                
-#  _|_|_|    _|  _|_|    _|_|    _|_|_|      _|      _|    _|  _|_|_|      _|_|_|  
-#  _|    _|  _|_|      _|_|_|_|  _|    _|  _|_|_|_|  _|    _|  _|    _|  _|        
-#  _|    _|  _|        _|        _|    _|    _|      _|    _|  _|    _|  _|        
-#  _|_|_|    _|          _|_|_|  _|_|_|      _|        _|_|_|  _|    _|    _|_|_|  
-#  _|                            _|                                                
-#  _|                            _|                                                
-
-using ThreeBodyDecay
-
-function project_cos23(d, s, cos23)
-    !(-1 < cos23 < 1) && return 0.0
-    
-    σ1_0, σ1_e = (d.ms[2]+d.ms[3])^2, (√s-d.ms[1])^2
-        
-    M²of1(σ1) = real(
-        X2DDpi.decay_matrix_element_squared(d,s,
-            X2DDpi.σ3of1(σ1, cos23, d.ms^2, s),
-            X2DDpi.σ2of1(σ1, cos23, d.ms^2, s))
-        ) *
-        sqrt(λ(σ1,d.ms[2]^2,d.ms[3]^2)*λ(s,σ1,d.ms[1]^2)) / σ1
-    return quadgk(M²of1, σ1_0, σ1_e)[1] / (2π*s)
-end
-
-function projectto1(d, s, σ1)
-
-    σ1_0, σ1_e = (d.ms[2]+d.ms[3])^2, (√s-d.ms[1])^2
-    !(σ1_0 < σ1 < σ1_e) && return 0.0
-    # 
-	σ3_0, σ3_e = X2DDpi.σ3of1_pm(σ1, d.ms^2, s)
-    
-    M²of3(σ3) = real(
-        X2DDpi.decay_matrix_element_squared(d,s,
-            σ3,sum(d.ms^2)+s-σ3-σ1))
-    return quadgk(M²of3, σ3_0, σ3_e)[1] / (2π*s)
-end
-
-
-function projectto3(d, s, σ3)
-
-    σ3_0, σ3_e = (d.ms[1]+d.ms[2])^2, (√s-d.ms[3])^2
-    !(σ3_0 < σ3 < σ3_e) && return 0.0
-    # 
-	σ2_0, σ2_e = X2DDpi.σ2of3_pm(σ3, d.ms^2, s)
-    
-    M²of2(σ2) = real(X2DDpi.decay_matrix_element_squared(d,s,σ3,σ2))
-    return quadgk(M²of2, σ2_0, σ2_e)[1] / (2π*s)
-end
-# 
 function bw_e(s,e0,Γ)
     m = e2m(e0)
     return sqrt(m*(Γ*1e-3) / π) / (m^2-s-1im*m*(Γ*1e-3))
 end
 # 
-function projectto3(d, σ3, lineshape, smin, smax)
-    σ3_0 = (d.ms[1]+d.ms[2])^2
-    σ3 < σ3_0 && return 0.0
-    # 
-    M²of2(s, σ2) = real(X2DDpi.decay_matrix_element_squared(d,s,σ3,σ2)) * abs2(lineshape(s))
-    function M²of2(x)
-        s = smin + x[1]*(smax-smin)
-        # 
-        σ3_e = (√s-d.ms[3])^2
-        σ3 > σ3_e && return 0.0
-        # 
-        σ2_0, σ2_e = X2DDpi.σ2of3_pm(σ3, d.ms^2, s)
-        σ2 = σ2_0 + x[2]*(σ2_e-σ2_0)
-        M²of2(s, σ2)*(σ2_e-σ2_0)*(smax-smin) / (2π*s)
-    end 
-    return cuhre((x,f)->(f[1]=M²of2(x)), 2, 1)[1][1]
-end
-
 # @time projectto3(π⁺D⁰D⁰, e2m(δm0_val)^2, 2.007^2)
 # @time projectto3(π⁺D⁰D⁰, 2.007^2)
 
@@ -175,7 +44,6 @@ end
 #     plot!(e3->projectto3(d, e3^2)*1.19,
 #         2.004, 2.011, lab="")
 # end
-
 
 polyakovfactor(m) = max(0, tanh((mDˣ⁺ - m ) / 350e-6))
 
@@ -381,7 +249,7 @@ end
 
 π⁺D⁰D⁰_DD = πDD_DD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), resonance_DD)
 
-dalitz(π⁺D⁰D⁰_DD, color=:lajolla)
+dalitzplot(π⁺D⁰D⁰_DD, color=:lajolla)
 
 # convolve
 c3_DD = project_convolv(π⁺D⁰D⁰_DD, δm0_val; lims=lims_fig3)
@@ -488,7 +356,7 @@ p2 = let scale = 1e3
     # 
     xv = range(-1+1e-5, 1-1e-5, length=300) # e2m(δm0_val)-mπ⁺
     # 
-    proj(z) = project_cos23(d, e2m(δm0_val)^2, z)
+    proj(z) = projecttocos23(d, e2m(δm0_val)^2, z)
     # 
     d = π⁺D⁰D⁰
     yv = proj.(xv)
@@ -498,7 +366,7 @@ p2 = let scale = 1e3
     plot!(xv, yv .* N_nominal, lab="", l=(:black,1))
     # 
     d = π⁺D⁰D⁰_DD
-    proj(z) = project_cos23(d, e2m(δm0_val)^2, z)
+    proj(z) = projecttocos23(d, e2m(δm0_val)^2, z)
     # 
     yv = proj.(xv)
     N_DD = 1/sum(yv) * scale
@@ -510,8 +378,8 @@ savefig(joinpath("plots", "costhetaDD_DDresonance.pdf"))
 
 
 plot(
-    dalitz(π⁺D⁰D⁰, color=:lajolla, title=L"\mathrm{nominal}"),
-    dalitz(π⁺D⁰D⁰_DD, color=:lajolla, title=L"DD\,\,\mathrm{resonance}"),
+    dalitzplot(π⁺D⁰D⁰, color=:lajolla, title=L"\mathrm{nominal}"),
+    dalitzplot(π⁺D⁰D⁰_DD, color=:lajolla, title=L"DD\,\,\mathrm{resonance}"),
     size=(800,400), bottom_margin=5Plots.PlotMeasures.mm)
 savefig(joinpath("plots", "dalitz_DDresonance.pdf"))
 

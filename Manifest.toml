@@ -306,9 +306,9 @@ version = "0.4.3"
 
 [[GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pkg", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll"]
-git-tree-sha1 = "dba1e8614e98949abfa60480b13653813d8f0157"
+git-tree-sha1 = "0c603255764a1fa0b61752d2bec14cfbd18f7fe8"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
-version = "3.3.5+0"
+version = "3.3.5+1"
 
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]
@@ -714,6 +714,11 @@ git-tree-sha1 = "9d8c00ef7a8d110787ff6f170579846f776133a9"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "2.0.4"
 
+[[PartialWaveFunctions]]
+git-tree-sha1 = "9e94fb961f02c4eaeb8e83268cb34245395030dd"
+uuid = "793d2195-304b-438e-bbb1-bc33c872ac39"
+version = "0.2.0"
+
 [[Pidfile]]
 deps = ["FileWatching", "Test"]
 git-tree-sha1 = "1be8660b2064893cd2dae4bd004b589278e4440d"
@@ -962,6 +967,14 @@ uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 [[Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[[ThreeBodyDecay]]
+deps = ["Cuba", "Parameters", "PartialWaveFunctions", "QuadGK", "RecipesBase", "StaticArrays"]
+git-tree-sha1 = "19289f6eee6bae222a94eb0267723f088bb7e8ed"
+repo-rev = "master"
+repo-url = "https://github.com/mmikhasenko/ThreeBodyDecay.jl"
+uuid = "e6563dab-9ca1-5843-bde3-2ccf38d63843"
+version = "0.4.4"
 
 [[URIParser]]
 deps = ["Unicode"]
