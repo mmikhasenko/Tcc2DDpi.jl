@@ -1,49 +1,55 @@
 {
     "channels": [
         {
-            "type": "πDD{Tuple{Float64, Float64, Float64}, (:m, :Γ), (:m, :Γ)}",
+            "type": "πDD{Tuple{Float64, Float64, Float64}, BW, BW}",
             "ms": {
                 "m1": 0.13957039,
                 "m2": 1.86483,
                 "m3": 1.86483
             },
             "R12": {
+                "type": "BW",
                 "m": 2.0102558,
                 "Γ": 8.34e-5
             },
             "R13": {
+                "type": "BW",
                 "m": 2.0102558,
                 "Γ": 8.34e-5
             }
         },
         {
-            "type": "πDD{Tuple{Float64, Float64, Float64}, (:m, :Γ), (:m, :Γ)}",
+            "type": "πDD{Tuple{Float64, Float64, Float64}, BW, BW}",
             "ms": {
                 "m1": 0.1349768,
                 "m2": 1.86965,
                 "m3": 1.86483
             },
             "R12": {
+                "type": "BW",
                 "m": 2.0102558,
                 "Γ": 8.34e-5
             },
             "R13": {
+                "type": "BW",
                 "m": 2.00685,
                 "Γ": 5.52e-5
             }
         },
         {
-            "type": "γDD{Tuple{Float64, Float64, Float64}, (:m, :Γ), (:m, :Γ)}",
+            "type": "γDD{Tuple{Float64, Float64, Float64}, BW, BW}",
             "ms": {
                 "m1": 0.0,
                 "m2": 1.86965,
                 "m3": 1.86483
             },
             "R12": {
+                "type": "BW",
                 "m": 2.0102558,
                 "Γ": 8.34e-5
             },
             "R13": {
+                "type": "BW",
                 "m": 2.00685,
                 "Γ": 5.52e-5
             }
@@ -52,17 +58,19 @@
     "ichannels": [
         {
             "channel": {
-                "type": "πDD{Tuple{Float64, Float64, Float64}, (:m, :Γ), (:m, :Γ)}",
+                "type": "πDD{Tuple{Float64, Float64, Float64}, BW, BW}",
                 "ms": {
                     "m1": 0.13957039,
                     "m2": 1.86483,
                     "m3": 1.86483
                 },
                 "R12": {
+                    "type": "BW",
                     "m": 2.0102558,
                     "Γ": 8.34e-5
                 },
                 "R13": {
+                    "type": "BW",
                     "m": 2.0102558,
                     "Γ": 8.34e-5
                 }
@@ -2052,17 +2060,19 @@
         },
         {
             "channel": {
-                "type": "πDD{Tuple{Float64, Float64, Float64}, (:m, :Γ), (:m, :Γ)}",
+                "type": "πDD{Tuple{Float64, Float64, Float64}, BW, BW}",
                 "ms": {
                     "m1": 0.1349768,
                     "m2": 1.86965,
                     "m3": 1.86483
                 },
                 "R12": {
+                    "type": "BW",
                     "m": 2.0102558,
                     "Γ": 8.34e-5
                 },
                 "R13": {
+                    "type": "BW",
                     "m": 2.00685,
                     "Γ": 5.52e-5
                 }
@@ -4006,17 +4016,19 @@
         },
         {
             "channel": {
-                "type": "γDD{Tuple{Float64, Float64, Float64}, (:m, :Γ), (:m, :Γ)}",
+                "type": "γDD{Tuple{Float64, Float64, Float64}, BW, BW}",
                 "ms": {
                     "m1": 0.0,
                     "m2": 1.86965,
                     "m3": 1.86483
                 },
                 "R12": {
+                    "type": "BW",
                     "m": 2.0102558,
                     "Γ": 8.34e-5
                 },
                 "R13": {
+                    "type": "BW",
                     "m": 2.00685,
                     "Γ": 5.52e-5
                 }
