@@ -37,6 +37,9 @@ function projectto1(d, σ1, lineshape, smin, smax)
     function M²of3(x) # x = [xs, xσ3]
         s = smin + x[1]*(smax-smin)
         # 
+        σ1_e = (√s-d.ms[1])^2
+        σ1 > σ1_e && return 0.0
+        # 
         σ3_0, σ3_e = X2DDpi.σ3of1_pm(σ1, d.ms^2, s)
         σ3 = σ3_0 + x[2]*(σ3_e-σ3_0)
         M²of3(s, σ3)*(σ3_e-σ3_0)*(smax-smin) / (2π*s)
