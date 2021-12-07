@@ -1,6 +1,6 @@
 struct DˣD{T1,T2} <: AbstractxDD
     ms::NamedTuple{(:m1,:m2,:m3),T1}
-    R::NamedTuple{T2}
+    R::T2
 end
 
 function decay_matrix_element_squared(d::DˣD,s,σ3,σ2)

@@ -23,6 +23,8 @@ end
 J_I( σ, pars::BW) = 1.0 / (pars.m^2 - σ - 1im*pars.m*pars.Γ)
 J_II(σ, pars::BW) = 1.0 / (pars.m^2 - σ + 1im*pars.m*pars.Γ)
 
+pole_position(R::BW) = R.m^2-1im*R.m*R.Γ
+
 @with_kw struct BW_Swave <: AbstractLinesShape
     m::Float64
     g::Float64
