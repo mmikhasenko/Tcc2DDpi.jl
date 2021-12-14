@@ -26,7 +26,7 @@ const μ₊ = 1.0
 e2m(e) = (mD⁰+mDˣ⁺)+e*1e-3
 m2e(m) = (m-mD⁰-mDˣ⁺)*1e3
 
-
-const ΔNLL_90CL = 1.352
-const ΔNLL_95CL = 1.921
-const ΔNLL_68CL = 0.5
+# Δllh = Δ² / 2σ²
+const ΔNLL_90CL = 1.352 # 90% → Δ=1.644σ; 
+const ΔNLL_95CL = 1.921 # 95% → Δ=1.959σ
+const ΔNLL_68CL = 0.5   # 68% → Δ=1σ
