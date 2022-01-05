@@ -46,3 +46,18 @@ decay_matrix_element_squared(d::TestCh,s,σ3,σ2) = 1.0
 
 	@test abs(ρ_2dim-ρ_1dim)/ρ_1dim < 1e-4
 end
+
+
+
+
+@testset "Cauchy integrals" begin
+    @test cauchy(x->x, 1.0, 0.1) ≈ 1.0 + 0.0im
+    @test cauchy′(x->x, 0, 0.1) ≈ 1.0 + 0.0im
+    @test cauchy′′(x->x^2, 0, 0.1) ≈ 2.0 + 0.0im
+end
+# 
+@testset "Circular integrals" begin
+    @test circleintegral(x->x^2, 0.1) + 1 ≈ 1.0 + 0.0im
+    @test circleintegral(x->1/x, 0.1) ≈ 1.0 + 0.0im
+    @test circleintegral(x->1/x, 0.1) ≈ circleintegral(x->1/x, 0.01)
+end

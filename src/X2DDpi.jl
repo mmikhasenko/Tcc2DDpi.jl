@@ -82,4 +82,8 @@ export dzdzpipspectum
 include("plotrecipes.jl")
 
 
+export circleintegral
+export cauchy, cauchy′, cauchy′′
+include("cauchyintegrals.jl")
+
 end
