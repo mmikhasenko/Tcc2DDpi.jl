@@ -9,47 +9,36 @@ function decay_matrix_element_squared(d::DˣD,s,σ3,σ2)
 end
 
 function integrand_mapped_thr(d::DˣD,s,x)
-	# 	
-	σ3_0, σ3_e = (d.ms[1]+d.ms[2])^2, (√s-d.ms[3])^2
+	#
+	sqrt_σ3_0, sqrt_σ3_e = (d.ms[1]+d.ms[2]), (√s-d.ms[3])
     # 
     # cut straight
-    σ3 = σ3_0 + x[1]*(σ3_e-σ3_0) # straight path
-	jac = (σ3_e-σ3_0)
-    # 
-    # cut down
-    # σ3_i = real((√s-d.ms[3])^2)+sign(imag(s))*1e-6im
-    # σ3 = x[1] < 0.5 ? 
-    #         σ3_0 + ( x[1]     / 0.5)*(σ3_i-σ3_0) : # straight path
-	#         σ3_i + ((x[1]-0.5)/ 0.5)*(σ3_e-σ3_i) # straight path
-	# #
-	# jac = x[1] < 0.5 ?
-    #         (σ3_e-σ3_0) / 0.5 :
-    #         (σ3_e-σ3_i) / 0.5
+    # sqrt_σ3 = sqrt_σ3_0 + x[1]*(sqrt_σ3_e-sqrt_σ3_0) # straight path
+	# jac = (sqrt_σ3_e-sqrt_σ3_0)
     #
+    # cut down
+    sqrt_σ3_i = real(sqrt_σ3_e)+sign(imag(s))*nextfloat(0.0)
+    sqrt_σ3 = x[1] < 0.5 ? 
+            sqrt_σ3_0 + ( x[1]     / 0.5)*(sqrt_σ3_i-sqrt_σ3_0) : # straight path
+	        sqrt_σ3_i + ((x[1]-0.5)/ 0.5)*(sqrt_σ3_e-sqrt_σ3_i) # straight path
+	#
+	jac = x[1] < 0.5 ?
+            (sqrt_σ3_i-sqrt_σ3_0) / 0.5 :
+            (sqrt_σ3_e-sqrt_σ3_i) / 0.5
+	# 
+	jac *= 2sqrt_σ3 # since the integration is in √σ
+    #
+	σ3 = sqrt_σ3^2
     σ2 = 0.0
-	othervar = 
-		sqrt((sqrt(s)-d.ms[3])^2-σ3) *
-		sqrt((sqrt(s)+d.ms[3])^2-σ3) *
-		sqrt(σ3-(d.ms[1]-d.ms[2])^2) *
-		sqrt(σ3-(d.ms[1]+d.ms[2])^2) / σ3
-	decay_matrix_element_squared(d,s,σ3,σ2) / (2π*s) * jac * othervar * 2
-end
-
-function discontinuity(d::DˣD,s)
-	# 	
-	σ3 = pole_position(d.R)
+	@show σ3
 	# 
 	othervar = 
 		sqrt((sqrt(s)-d.ms[3])^2-σ3) *
 		sqrt((sqrt(s)+d.ms[3])^2-σ3) *
-		sqrt(σ3-(d.ms[1]-d.ms[2])^2) *
+		sqrt(σ3-(d.ms[1]-d.ms[2])^2) * # the most important one
 		sqrt(σ3-(d.ms[1]+d.ms[2])^2) / σ3
-
-	A = λ(σ3,d.ms[1]^2,d.ms[2]^2)/(4*σ3)
-	dme = J_I(σ3,d.R) * J_II_x_pole(σ3,d.R) * f²/3/4 * A
-	dme / (2π*s) * othervar * 2
+	decay_matrix_element_squared(d,s,σ3,σ2) / (2π*s) * jac * othervar * 2
 end
-
 
 function ρ_thr(d::DˣD, e::Complex)
 	integrand(x) = integrand_mapped_thr(d,e2m(e)^2,[x])
@@ -69,3 +58,27 @@ function ρ_tb(d::DˣD, e::Real)
 	sqrts < M+m ? 0.0 :
     	sqrt(λ(e2m(e)^2,M^2,m^2))/e2m(e)^2
 end	
+
+
+
+#                                                          _|  
+#  _|    _|  _|_|_|    _|    _|    _|_|_|    _|_|      _|_|_|  
+#  _|    _|  _|    _|  _|    _|  _|_|      _|_|_|_|  _|    _|  
+#  _|    _|  _|    _|  _|    _|      _|_|  _|        _|    _|  
+#    _|_|_|  _|    _|    _|_|_|  _|_|_|      _|_|_|    _|_|_|  
+
+
+function discontinuity(d::DˣD,s)
+	# 	
+	σ3 = pole_position(d.R)
+	# 
+	othervar = 
+		sqrt((sqrt(s)-d.ms[3])^2-σ3) *
+		sqrt((sqrt(s)+d.ms[3])^2-σ3) *
+		sqrt(σ3-(d.ms[1]-d.ms[2])^2) *
+		sqrt(σ3-(d.ms[1]+d.ms[2])^2) / σ3
+
+	A = λ(σ3,d.ms[1]^2,d.ms[2]^2)/(4*σ3)
+	dme = J_I(σ3,d.R) * J_II_x_pole(σ3,d.R) * f²/3/4 * A
+	dme / (2π*s) * othervar * 2
+end

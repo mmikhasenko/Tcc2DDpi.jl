@@ -38,70 +38,56 @@ let
         xticks=(pv,[latexstring("10^{$(3i)}\\Gamma_{D^*}") for i in pv]))
 end
 
-const Eᵦ =branch_position(ΓDˣ⁺)
-const approx_Eᵦ = Eᵦ-1e-7
+const Eᵦ = branch_position(ΓDˣ⁺)
+# const approx_Eᵦ = Eᵦ-1e-7
 
-function k3b(e; ϕ=-π)
+function k3b(e)
     m = e2m(e)
     M = sqrt(mDˣ⁺^2-1im*mDˣ⁺*ΓDˣ⁺)
-    p = cis(-ϕ/2)*sqrt((m-(M+mD⁰))*cis(ϕ))*
+    p = cis(π/4)*sqrt((m-(M+mD⁰))*cis(-π/2))*
         sqrt(m+(M+mD⁰))*sqrt(m-(M-mD⁰))*sqrt(m+(M-mD⁰))/(2*m)
     return p
 end
+
 # simplified
-function k(e; ϕ=-π)
+function k(e)
     μ = mD⁰*mDˣ⁰ / (mD⁰+mDˣ⁰)
     Eᵦ = branch_position(ΓDˣ⁺)
-    p = cis(-ϕ/2)*sqrt(2μ*(e-Eᵦ)/1e3*cis(ϕ))
+    p = cis(π/4)*sqrt(2μ*(e-Eᵦ)/1e3*cis(-π/2))
     return p
 end
-k3b(-1e-5im)
-k(-1e-5im)
 
 heatmap(-1:0.1:1, -1:0.1:1, (x,y)->imag(k3b(Eᵦ+(1e3*ΓDˣ⁰)*(x+1im*y))))
-# heatmap(-1:0.1:1, -1:0.1:1, (x,y)->imag(k(Eᵦ+(1e3*ΓDˣ⁰)*(x+1im*y))))
+heatmap(-1:0.1:1, -1:0.1:1, (x,y)->imag(k(Eᵦ+(1e3*ΓDˣ⁰)*(x+1im*y))))
+
+
+decay_matrix_element_squared(channel(ΓDˣ⁺),e2m(branch_position(ΓDˣ⁺))^2,σ3,0.0)
+
+ρ_thr(channel(ΓDˣ⁺), 0.01-0.01im)
+ρ_thr(channel(ΓDˣ⁺), 0.01-0.01im)
+ρ_thr(channel(ΓDˣ⁺), 0.01-0.01im)
+
+heatmap(-1:0.09:1, -1:0.09:1, (x,y)->real(ρ_thr(channel(ΓDˣ⁺), (0.0+(1e3*ΓDˣ⁰)*(x+1im*y)))))
 
 
 
-let f(e) = ρ_thr(channel(ΓDˣ⁺), e)
-    # 
-    ϕv = range(-7.4e-3, -6.9e-3, length=50)
-    ev = Eᵦ .+ 0.001*(ΓDˣ⁺ * 1e3).*cis.(ϕv)
-    # 
-    calv = f.(ev)
-    plot(1e3ϕv, [real.(calv) imag.(calv)], layout=grid(2,1))
-    plot!(sp=1, title="rho3")
+function Δk3b(r=1e-3,ϵ=1e-3)
+    ev = Eᵦ .+ r*(1e3ΓDˣ⁺) .* cis.(-π/2 .+ ϵ.*[-1, 1])
+    return diff(k3b.(ev))[1]
 end
-let f(e) = k3b(e; ϕ=-0.99774π)
-    # 
-    ϕv = range(-7.4e-3, -6.9e-3, length=30)
-    ev = Eᵦ .+ 0.001*(ΓDˣ⁺ * 1e3).*cis.(ϕv)
-    # 
-    calv = f.(ev)
-    plot(1e3ϕv, [real.(calv) imag.(calv)], layout=grid(2,1))
-    plot!(sp=1, title="k3")
-end
-
-const ϕjump = -0.99774π
-
-
-function Δk3b(r=1e-3,ϕ₀=-π-ϕjump,ϵ=1e-3)
-    ev = Eᵦ .+ r*(1e3ΓDˣ⁺) .* cis.(ϕ₀ .+ ϵ.*[-1, 1])
-    f(e) = k3b(e;ϕ=ϕjump)
-    return diff(f.(ev))[1]
-end
-function Δρ_thr(r=1e-3,ϕ₀=-π-ϕjump,ϵ=1e-3)
-    ev = Eᵦ .+ r*(1e3ΓDˣ⁺) .* cis.(ϕ₀ .+ ϵ.*[-1, 1])
+function Δρ_thr(r=1e-3,ϵ=1e-3)
+    ev = Eᵦ .+ r*(1e3ΓDˣ⁺) .* cis.(-π/2 .+ ϵ.*[-1, 1])
     f(e) = ρ_thr(channel(ΓDˣ⁺), e)
     return diff(f.(ev))[1]
 end
 
 N = Δρ_thr(1e-4)/Δk3b(1e-4)
-Σsum(e) = -1im*ρ_thr(channel(ΓDˣ⁺), e) + 1im*N*k3b(e;ϕ=ϕjump)
+Σsum(e) = -1im*ρ_thr(channel(ΓDˣ⁺), e) + 1im*N*k3b(e)
+
 
 
 # check if the path is continues
-ϕv = range(-π/2, 3π/2, length=600)
+ϕv = range(-π, π, length=600)
 ev = Eᵦ .+ 0.1*(ΓDˣ⁺ * 1e3).*cis.(ϕv)
 
 let f = Σsum
@@ -112,12 +98,41 @@ let f = Σsum
 end
 
 
+ρ_thr(1e-4)
+
+ρ_thr(channel(ΓDˣ⁺), Eᵦ)
 
 
-Σ′ = FiniteDiff.finite_difference_derivative(
-    e->ρ_thr(channel(ΓDˣ⁺), e),
-    approx_Eᵦ)
-# 
-k3b′ = FiniteDiff.finite_difference_derivative(k3b, approx_Eᵦ)
-# 
-k′ = FiniteDiff.finite_difference_derivative(k, approx_Eᵦ)
+ρ_thr.(Ref(channel(ΓDˣ⁺)), Eᵦ + abs(imag(Eᵦ))/2 * cis.(-π/2)-1e-12)
+
+ρ_thr.(Ref(channel(ΓDˣ⁺)), Eᵦ .+ abs(imag(Eᵦ))/2 .* cis.(-π:0.1:π))
+
+c1 = cauchy(e->ρ_thr(channel(ΓDˣ⁺), e), Eᵦ, abs(imag(Eᵦ))/2000)
+c2 = cauchy(k3b, Eᵦ, abs(imag(Eᵦ))/2000)
+
+c1/c2
+N
+
+ρ_thr(channel(ΓDˣ⁺), Eᵦ-0.1im)
+ρ_thr(channel(ΓDˣ⁺), Eᵦ-0.01im)
+
+let 
+    d = channel(ΓDˣ⁺)
+    s = e2m(Eᵦ-0.1im)^2
+    # 
+    intgr(x) = X2DDpi.integrand_mapped_thr(d,s,x)
+    # quadgk(intgr, 0, 1)
+    # intgr(0.6471418489543712)
+    xF = range(0.6471418489543694, 0.647141848954373, length=10)[3]
+    # intgr(xF)
+    # 
+    σ3 = 4.04112838143364 - 0.00016765533372im
+    # X2DDpi.decay_matrix_element_squared(d,s,σ3,1.0)
+    J_I(σ3,d.R)
+end
+
+1/(0.0)
+1im/(0.0)
+1/(0.0+0.0im)
+
+Inf + Inf*im
