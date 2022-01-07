@@ -13,8 +13,7 @@ const ΓDˣ⁰ = 55.2e-6
 const mγ = 0.0
 # 
 const μDˣ⁺D⁰ = mDˣ⁺*mD⁰ / (mDˣ⁺+mD⁰)
-
-const fm_times_mev = 197.3269804
+const Eᵦˣ⁺ = m2e(sqrt(mDˣ⁺^2 - 1im * mDˣ⁺ * ΓDˣ⁺) + mD⁰)
 
 # coupling constants
 const h² = 20.13e-3
@@ -32,8 +31,37 @@ const ΔNLL_95CL = 1.921 # 95% → Δ=1.959σ
 const ΔNLL_68CL = 0.5   # 68% → Δ=1σ
 
 
+const fm_times_mev = 197.3269804
+# 
 function tophysicsunits(p::NamedTuple{(:a⁻¹, :r)})
     a_fm = 1e-3*fm_times_mev / real(p.a⁻¹)
     r_fm = 1e-3*fm_times_mev * p.r
     (; a_fm, r_fm)
+end
+
+
+"""
+    kNR(e)
+
+Full elativistic expression for Dˣ⁺D⁰ break-up momentum
+"""
+function k3b(e)
+    m = e2m(e)
+    M = sqrt(mDˣ⁺^2-1im*mDˣ⁺*ΓDˣ⁺) # taken at the Dˣ⁺ pole
+    p = cis(π/4)*sqrt((m-(M+mD⁰))*cis(-π/2))*
+        sqrt(m+(M+mD⁰))*sqrt(m-(M-mD⁰))*sqrt(m+(M-mD⁰))/(2*m)  # branch cut down
+    return p
+end
+
+"""
+    kNR(e)
+
+Non-relativistic expression for Dˣ⁺D⁰ break-up momentum
+"""
+function kNR(e)
+    μ = μDˣ⁺D⁰
+    Eᵦ = Eᵦˣ⁺
+    # 
+    p = cis(π/4)*sqrt(2μ*(e-Eᵦ)/1e3*cis(-π/2)) # branch cut down
+    return p
 end

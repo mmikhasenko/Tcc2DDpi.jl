@@ -49,6 +49,36 @@ end
 
 
 
+@testset "Break up momentum of Dˣ⁺D⁰" begin
+
+	Eᵦ = X2DDpi.Eᵦˣ⁺
+	# 
+	@test kNR(Eᵦ) + 1 ≈ 1.0 + 0.0im
+	@test k3b(Eᵦ) + 1 ≈ 1.0 + 0.0im
+
+	@test let
+		a,b = kNR.((Eᵦ - 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
+		abs(1-b/a) > 1.0
+	end
+	@test let
+		a,b = kNR.((Eᵦ + 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
+		abs(1-b/a) < 1e-4
+	end
+	@test let
+		a,b = k3b.((Eᵦ - 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
+		abs(1-b/a) > 1.0
+	end
+	@test let
+		a,b = k3b.((Eᵦ + 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
+		abs(1-b/a) < 1e-4
+	end
+end
+
+
+
+
+
+
 
 @testset "Cauchy integrals" begin
     @test cauchy(x->x, 1.0, 0.1) ≈ 1.0 + 0.0im

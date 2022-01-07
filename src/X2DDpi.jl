@@ -26,6 +26,8 @@ export fm_times_mev
 export ΔNLL_90CL, ΔNLL_95CL, ΔNLL_68CL
 # 
 export tophysicsunits
+# 
+export k3b, kNR
 include("constants.jl")
 
 
