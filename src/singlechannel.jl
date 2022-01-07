@@ -30,7 +30,6 @@ function integrand_mapped_thr(d::DˣD,s,x)
     #
 	σ3 = sqrt_σ3^2
     σ2 = 0.0
-	@show σ3
 	# 
 	othervar = 
 		sqrt((sqrt(s)-d.ms[3])^2-σ3) *
@@ -58,27 +57,3 @@ function ρ_tb(d::DˣD, e::Real)
 	sqrts < M+m ? 0.0 :
     	sqrt(λ(e2m(e)^2,M^2,m^2))/e2m(e)^2
 end	
-
-
-
-#                                                          _|  
-#  _|    _|  _|_|_|    _|    _|    _|_|_|    _|_|      _|_|_|  
-#  _|    _|  _|    _|  _|    _|  _|_|      _|_|_|_|  _|    _|  
-#  _|    _|  _|    _|  _|    _|      _|_|  _|        _|    _|  
-#    _|_|_|  _|    _|    _|_|_|  _|_|_|      _|_|_|    _|_|_|  
-
-
-function discontinuity(d::DˣD,s)
-	# 	
-	σ3 = pole_position(d.R)
-	# 
-	othervar = 
-		sqrt((sqrt(s)-d.ms[3])^2-σ3) *
-		sqrt((sqrt(s)+d.ms[3])^2-σ3) *
-		sqrt(σ3-(d.ms[1]-d.ms[2])^2) *
-		sqrt(σ3-(d.ms[1]+d.ms[2])^2) / σ3
-
-	A = λ(σ3,d.ms[1]^2,d.ms[2]^2)/(4*σ3)
-	dme = J_I(σ3,d.R) * J_II_x_pole(σ3,d.R) * f²/3/4 * A
-	dme / (2π*s) * othervar * 2
-end
