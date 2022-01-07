@@ -88,6 +88,7 @@ include("plotrecipes.jl")
 
 export circleintegral
 export cauchy, cauchy′, cauchy′′
+export effectiverangeexpansion
 include("cauchyintegrals.jl")
 
 end

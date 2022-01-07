@@ -1,6 +1,7 @@
 using X2DDpi
 using Test
 using QuadGK
+using Parameters
 
 @testset "scalar production" begin
 	s,s12,s13,msq = 1,2,3,(2,3,5)

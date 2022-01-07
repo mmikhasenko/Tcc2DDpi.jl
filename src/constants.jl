@@ -12,6 +12,11 @@ const ΓDˣ⁺ = 83.4e-6
 const ΓDˣ⁰ = 55.2e-6
 const mγ = 0.0
 # 
+# conversion functinos
+e2m(e) = (mD⁰+mDˣ⁺)+e*1e-3
+m2e(m) = (m-mD⁰-mDˣ⁺)*1e3
+
+# NR quantities
 const μDˣ⁺D⁰ = mDˣ⁺*mD⁰ / (mDˣ⁺+mD⁰)
 const Eᵦˣ⁺ = m2e(sqrt(mDˣ⁺^2 - 1im * mDˣ⁺ * ΓDˣ⁺) + mD⁰)
 
@@ -21,16 +26,12 @@ const f² = 282.42
 const μ₀ = -3.77
 const μ₊ = 1.0
 
-# conversion functinos
-e2m(e) = (mD⁰+mDˣ⁺)+e*1e-3
-m2e(m) = (m-mD⁰-mDˣ⁺)*1e3
-
 # Δllh = Δ² / 2σ²
 const ΔNLL_90CL = 1.352 # 90% → Δ=1.644σ; 
 const ΔNLL_95CL = 1.921 # 95% → Δ=1.959σ
 const ΔNLL_68CL = 0.5   # 68% → Δ=1σ
 
-
+# units conversion
 const fm_times_mev = 197.3269804
 # 
 function tophysicsunits(p::NamedTuple{(:a⁻¹, :r)})

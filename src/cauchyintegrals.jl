@@ -3,6 +3,7 @@ circleintegral(f,r) = quadgk(ϕ->f(r*cis(ϕ))*r*cis(ϕ), -π, π)[1]/(2π) # can
 
 cauchy(F,x₀,r) = circleintegral(x′->F(x′+x₀)/x′, r)
 cauchy′(F,x₀,r) = circleintegral(x′->F(x′+x₀)/x′^2, r)
+cauchy′′(F,x₀,r) = circleintegral(x′->2F(x′+x₀)/x′^3, r)
 
 """
     f(s) / N = a⁻¹ + r k(s)^2 / 2 - i k(s)
