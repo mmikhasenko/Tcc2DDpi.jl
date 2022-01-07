@@ -24,6 +24,8 @@ export e2m, m2e
 export fm_times_mev
 # 
 export ΔNLL_90CL, ΔNLL_95CL, ΔNLL_68CL
+# 
+export tophysicsunits
 include("constants.jl")
 
 

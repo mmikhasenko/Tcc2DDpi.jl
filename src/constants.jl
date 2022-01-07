@@ -30,3 +30,10 @@ m2e(m) = (m-mD⁰-mDˣ⁺)*1e3
 const ΔNLL_90CL = 1.352 # 90% → Δ=1.644σ; 
 const ΔNLL_95CL = 1.921 # 95% → Δ=1.959σ
 const ΔNLL_68CL = 0.5   # 68% → Δ=1σ
+
+
+function tophysicsunits(p::NamedTuple{(:a⁻¹, :r)})
+    a_fm = 1e-3*fm_times_mev / real(p.a⁻¹)
+    r_fm = 1e-3*fm_times_mev * p.r
+    (; a_fm, r_fm)
+end
