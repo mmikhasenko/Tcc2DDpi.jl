@@ -91,3 +91,28 @@ end
     @test circleintegral(x->1/x, 0.1) ≈ 1.0 + 0.0im
     @test circleintegral(x->1/x, 0.1) ≈ circleintegral(x->1/x, 0.01)
 end
+
+@testset "Effective range Expansion" begin
+    a₀_fm = -7.0 # fm
+    r₀_fm =  3.0 # fm
+    # 
+    a⁻¹ = 1 / (a₀_fm / (1e-3*fm_times_mev))
+    r = r₀_fm / (1e-3*fm_times_mev)
+    #
+    k = k3b
+    D(e) = a⁻¹ + r/2*k(e)^2-1im*k(e)
+    #
+    # expansion is at 
+    Eᵦ = m2e(sqrt(mDˣ⁺^2 - 1im * mDˣ⁺ * ΓDˣ⁺) + mD⁰)
+    # 
+    effrangepars = 
+        effectiverangeexpansion(
+            Δe->D(Δe+Eᵦ),
+            Δe->k(Eᵦ+Δe),
+            abs(imag(Eᵦ))/20)
+    # 
+    @unpack a_fm, r_fm = tophysicsunits(effrangepars)
+    # 
+    @test a_fm ≈ a₀_fm
+    @test real(r_fm) ≈ r₀_fm
+end

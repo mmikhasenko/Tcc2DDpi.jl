@@ -20,8 +20,8 @@ abstract type AbstractLinesShape end
     m::Float64
     Γ::Float64
 end
-J_I( σ, pars::BW) = 1.0 / (pars.m^2 - σ - 1im*pars.m*pars.Γ)
-J_II(σ, pars::BW) = 1.0 / (pars.m^2 - σ + 1im*pars.m*pars.Γ)
+J_I( σ, pars::BW) = σ == pars.m^2-1im*pars.m*pars.Γ ? 0.0 : 1.0 / (pars.m^2 - σ - 1im*pars.m*pars.Γ)
+J_II(σ, pars::BW) = σ == pars.m^2-1im*pars.m*pars.Γ ? 0.0 : 1.0 / (pars.m^2 - σ + 1im*pars.m*pars.Γ)
 
 pole_position(R::BW) = R.m^2-1im*R.m*R.Γ
 
