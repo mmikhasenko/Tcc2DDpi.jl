@@ -9,10 +9,11 @@ const δm0_val = δm0.val
 
 
 ch = DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
-ich = interpolated(channel(ΓDˣ⁺), cutoff; estep=estep)
+ich = interpolated(ch, cutoff; estep=estep)
 const A₀ = Amplitude(ich)
 
 
+const Eᵦ = X2DDpi.Eᵦˣ⁺
 effrangepars = 
     effectiverangeexpansion(
         # Δe->-1im*ρ_thr(channel(ΓDˣ⁺), Eᵦ+Δe),

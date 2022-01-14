@@ -40,15 +40,20 @@ export BW, BW_norm, BW_Swave
 export J_I, J_II
 include("isobar.jl")
 
+export σ2of3_pm, σ3of1_pm, σ3of2_pm
+export σ3of1, σ2of1
+export LinearDalitzMapping, HookSqrtDalitzMapping
+export mapdalitz
+include("integrationpaths.jl")
+
 export πDD, γDD
 export branch_points
 export constructchannel
+export ρ_thr, ρ_tb
 include("abstractxdd.jl")
 
-export obj2nt
-
-export ρ_thr, ρ_tb
-include("dalitz_integral.jl")
+export DˣD
+include("singlechannel.jl")
 
 export interpolated
 include("intepolate_merge.jl")
@@ -63,14 +68,14 @@ export denominator_I, denominator_II
 export NonRelBW
 include("denominator.jl")
 
-export DˣD
-include("singlechannel.jl")
-
 export projecttocos23
 export projectto1, projectto3
 include("projections.jl")
 
 
+# serilization
+export obj2nt
+# 
 export writejson, readjson
 export writetoml, readtoml
 export transformdictrecursively!
