@@ -122,20 +122,12 @@ end
 	m = e2m(1.1)
 	# 
 	ms = (m1=mπ⁺,m2=mD⁰,m3=mD⁰)
-	σ1_x(x) = (ms.m2+ms.m3)^2 + x*((m-ms.m1)^2-(ms.m2+ms.m3)^2)
+	σ1 = (ms.m2+ms.m3)^2 + rand()*((m-ms.m1)^2-(ms.m2+ms.m3)^2)
 	#
 	zm1,z1 = σ3of1_pm(σ1,ms^2,m^2)
 	@test zm1 ≈ σ3of1(σ1, -1, ms^2, m^2)
 	@test z1 ≈ σ3of1(σ1, +1, ms^2, m^2)
 	#
-	σ2of3_pm(σ1_x(),ms^2,s)
-end
-
-
-let 
-	m = e2m(1.1)
-	# 
-	ms = (m1=mπ⁺,m2=mD⁰,m3=mD⁰)
 	σ1_x(x) = (ms.m2+ms.m3)^2 + x*((m-ms.m1)^2-(ms.m2+ms.m3)^2)
 	#
 	x = rand(); @show x
@@ -143,12 +135,7 @@ let
 		(ms.m1+ms.m2)^2 .≤ 
 			σ3of1_pm(σ1_x(x),ms^2,m^2) .≤
 			(m-ms.m3)^2)
-end
-	
-let 
-	m = e2m(1.1)
-	# 
-	ms = (m1=mπ⁺,m2=mD⁰,m3=mD⁰)
+	#
 	σ3_x(x) = (ms.m1+ms.m2)^2 + x*((m-ms.m3)^2-(ms.m1+ms.m2)^2)
 	#
 	x = rand(); @show x
