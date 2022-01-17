@@ -1,11 +1,48 @@
 abstract type AbstractxDD end
-#
-function ρ_tb(d::AbstractxDD, e::Real)
-	M,m = d.R13.m, d.ms.m2
-	sqrts = e2m(e)
-	sqrts < M+m ? 0.0 :
-    	sqrt(λ(e2m(e)^2,M^2,m^2))/e2m(e)^2
-end	
+# 
+# methods with general implementation:
+#  - decay_matrix_element_squared
+#  - integrand_mapped_thr
+#  - mapdalitzmethod
+#  - ρ_thr
+#  - masses
+# 
+#  no general implementation:
+#  - ρ_tb
+#  - obj2nt
+#  - branch_points
+
+
+mapdalitzmethod(d::AbstractxDD) = HookSqrtDalitzMapping()
+masses(d::AbstractxDD) = d.ms
+
+#  _|              _|                                                _|      _|                      
+#      _|_|_|    _|_|_|_|    _|_|      _|_|_|  _|  _|_|    _|_|_|  _|_|_|_|        _|_|    _|_|_|    
+#  _|  _|    _|    _|      _|_|_|_|  _|    _|  _|_|      _|    _|    _|      _|  _|    _|  _|    _|  
+#  _|  _|    _|    _|      _|        _|    _|  _|        _|    _|    _|      _|  _|    _|  _|    _|  
+#  _|  _|    _|      _|_|    _|_|_|    _|_|_|  _|          _|_|_|      _|_|  _|    _|_|    _|    _|  
+#                                          _|                                                        
+#                                      _|_|                                                          
+
+function integrand_mapped_thr(d::AbstractxDD,s,x)
+	method = mapdalitzmethod(d)
+	(σ3,σ2), jac = mapdalitz(method, x, masses(d), s)
+	return decay_matrix_element_squared(d,s,σ3,σ2) / (2π*s) * jac
+end
+
+function ρ_thr(d::AbstractxDD, e::Complex)
+	integrand(x,f) = f[1:2] .= reim(integrand_mapped_thr(d,e2m(e)^2,x))
+	v = cuhre(integrand, 2, 2)[1]
+	complex(v...) / (8π)^2
+end
+
+function ρ_thr(d::AbstractxDD, e::Real)
+	integrand(x,f) = f[1] = real(integrand_mapped_thr(d,e2m(e)^2,x))
+	v = cuhre(integrand, 2, 1)[1]
+	v[1] / (8π)^2
+end
+
+
 
 # πDD
 struct πDD{T1,T2,T3} <: AbstractxDD
@@ -55,37 +92,19 @@ function decay_matrix_element_squared(d::γDD,s,σ3,σ2)
 	h²*frakM/3
 end
 
-branch_points(d::AbstractxDD) = (
+branch_points(d::Union{πDD,γDD}) = (
 	m2e(d.ms[3] + sqrt(pole_position(d.R12))),
 	m2e(d.ms[2] + sqrt(pole_position(d.R13))))
 # 
 
+function ρ_tb(d::Union{πDD,γDD}, e::Real)
+	M,m = d.R13.m, d.ms.m2
+	sqrts = e2m(e)
+	sqrts < M+m ? 0.0 :
+    	sqrt(λ(e2m(e)^2,M^2,m^2))/e2m(e)^2
+end	
 
-#  _|              _|                                                _|      _|                      
-#      _|_|_|    _|_|_|_|    _|_|      _|_|_|  _|  _|_|    _|_|_|  _|_|_|_|        _|_|    _|_|_|    
-#  _|  _|    _|    _|      _|_|_|_|  _|    _|  _|_|      _|    _|    _|      _|  _|    _|  _|    _|  
-#  _|  _|    _|    _|      _|        _|    _|  _|        _|    _|    _|      _|  _|    _|  _|    _|  
-#  _|  _|    _|      _|_|    _|_|_|    _|_|_|  _|          _|_|_|      _|_|  _|    _|_|    _|    _|  
-#                                          _|                                                        
-#                                      _|_|                                                          
 
-function integrand_mapped_thr(d::AbstractxDD,s,x)
-	method = HookSqrtDalitzMapping()
-	(σ3,σ2), jac = mapdalitz(method, x, d.ms, s)
-	return decay_matrix_element_squared(d,s,σ3,σ2) / (2π*s) * jac
-end
-
-function ρ_thr(d::AbstractxDD, e::Complex)
-	integrand(x,f) = f[1:2] .= reim(integrand_mapped_thr(d,e2m(e)^2,x))
-	v = cuhre(integrand, 2, 2)[1]
-	complex(v...) / (8π)^2
-end
-
-function ρ_thr(d::AbstractxDD, e::Real)
-	integrand(x,f) = f[1] = real(integrand_mapped_thr(d,e2m(e)^2,x))
-	v = cuhre(integrand, 2, 1)[1]
-	v[1] / (8π)^2
-end
 
 
 #                                _|  _|  _|                        _|      _|                      
@@ -95,8 +114,8 @@ end
 #  _|_|_|      _|_|_|  _|        _|  _|  _|  _|_|_|_|    _|_|_|      _|_|  _|    _|_|    _|    _|  
 
 
-# serilization
-obj2nt(ch::AbstractxDD) =
+#
+obj2nt(ch::Union{πDD,γDD}) =
     (type=string(typeof(ch)),
         ms=ch.ms,
 		R12=obj2nt(ch.R12), R13=obj2nt(ch.R13))

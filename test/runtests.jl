@@ -26,28 +26,6 @@ end
 
 
 
-struct TestCh{T} <: X2DDpi.AbstractxDD
-	ms::T
-end
-import X2DDpi:decay_matrix_element_squared
-decay_matrix_element_squared(d::TestCh,s,σ3,σ2) = 1.0
-
-@testset "implementation of the phase-space integral" begin
-
-	e_test = 0.0
-	ms_test = (m1=mπ⁺,m2=mD⁰,m3=mD⁰)
-
-	t = TestCh(ms_test)
-	ρ_2dim = ρ_thr(t,e_test)
-
-	s = e2m(e_test)^2
-	ms = ms_test
-	ρ_1dim = quadgk(σ1->sqrt(X2DDpi.λ(s,ms.m1^2,σ1)*X2DDpi.λ(σ1,ms.m2^2,ms.m3^2))/σ1,
-		(ms.m2+ms.m3)^2, (sqrt(s)-ms.m1)^2)[1]  / (8π)^2 / (2π*s)
-
-	@test abs(ρ_2dim-ρ_1dim)/ρ_1dim < 1e-4
-end
-
 
 
 @testset "Break up momentum of Dˣ⁺D⁰" begin
@@ -77,9 +55,87 @@ end
 
 
 
+# mapping and integrating Dalitz
+
+# real integal
+struct TestCh{T} <: X2DDpi.AbstractxDD
+	ms::T
+end
+import X2DDpi:decay_matrix_element_squared
+decay_matrix_element_squared(d::TestCh,s,σ3,σ2) = 1.0
+
+@testset "implementation of the phase-space integral" begin
+
+	e_test = 0.0
+	ms_test = (m1=mπ⁺,m2=mD⁰,m3=mD⁰)
+
+	t = TestCh(ms_test)
+	ρ_2dim = ρ_thr(t,e_test)
+
+	s = e2m(e_test)^2
+	ms = ms_test
+	ρ_1dim = quadgk(σ1->sqrt(X2DDpi.λ(s,ms.m1^2,σ1)*X2DDpi.λ(σ1,ms.m2^2,ms.m3^2))/σ1,
+		(ms.m2+ms.m3)^2, (sqrt(s)-ms.m1)^2)[1]  / (8π)^2 / (2π*s)
+
+	@test abs(ρ_2dim-ρ_1dim)/ρ_1dim < 1e-4
+end
 
 
+# complex integal
+@testset "σ3of1_pm and σ3of1" begin
+	m = e2m(1.1)
+	# 
+	ms = (m1=mπ⁺,m2=mD⁰,m3=mD⁰)
+	σ1 = (ms.m2+ms.m3)^2 + rand()*((m-ms.m1)^2-(ms.m2+ms.m3)^2)
+	#
+	zm1,z1 = σ3of1_pm(σ1,ms^2,m^2)
+	@test zm1 ≈ σ3of1(σ1, -1, ms^2, m^2)
+	@test z1 ≈ σ3of1(σ1, +1, ms^2, m^2)
+	#
+	σ1_x(x) = (ms.m2+ms.m3)^2 + x*((m-ms.m1)^2-(ms.m2+ms.m3)^2)
+	#
+	x = rand(); @show x
+	@test prod(
+		(ms.m1+ms.m2)^2 .≤ 
+			σ3of1_pm(σ1_x(x),ms^2,m^2) .≤
+			(m-ms.m3)^2)
+	#
+	σ3_x(x) = (ms.m1+ms.m2)^2 + x*((m-ms.m3)^2-(ms.m1+ms.m2)^2)
+	#
+	x = rand(); @show x
+	@test prod(
+		(ms.m3+ms.m1)^2 .≤ 
+			σ2of3_pm(σ3_x(x),ms^2,m^2) .≤
+			(m-ms.m2)^2)
+end
 
+struct ChannelWithIntegrationMethod{T <: X2DDpi.AbstractxDD} <: X2DDpi.AbstractxDD
+	channel::T
+	mapdalitzmethod::X2DDpi.AbstractDalitzMapping
+end
+X2DDpi.mapdalitzmethod(set::ChannelWithIntegrationMethod) = set.mapdalitzmethod
+X2DDpi.decay_matrix_element_squared(d::ChannelWithIntegrationMethod,s,σ3,σ2) =
+	X2DDpi.decay_matrix_element_squared(d.channel,s,σ3,σ2)
+X2DDpi.masses(set::ChannelWithIntegrationMethod) = X2DDpi.masses(set.channel)
+
+
+@testset "Dalitz Mappings" begin
+	e = -0.1-0.1im
+	ch = DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
+	#
+	method1 = HookSqrtDalitzMapping()
+	set1 = ChannelWithIntegrationMethod(ch, method1)
+	value1 = ρ_thr(set1, e)
+	# 
+	method2 = LinearDalitzMapping()
+	set2 = ChannelWithIntegrationMethod(ch, method1)
+	value2 = ρ_thr(set2, e)
+	# 
+	@test value1 ≈ value2
+end
+
+
+# Effective range Expansion
 
 @testset "Cauchy integrals" begin
     @test cauchy(x->x, 1.0, 0.1) ≈ 1.0 + 0.0im
@@ -118,39 +174,4 @@ end
     @test real(r_fm) ≈ r₀_fm
 end
 
-@testset "σ3of1_pm and σ3of1" begin
-	m = e2m(1.1)
-	# 
-	ms = (m1=mπ⁺,m2=mD⁰,m3=mD⁰)
-	σ1 = (ms.m2+ms.m3)^2 + rand()*((m-ms.m1)^2-(ms.m2+ms.m3)^2)
-	#
-	zm1,z1 = σ3of1_pm(σ1,ms^2,m^2)
-	@test zm1 ≈ σ3of1(σ1, -1, ms^2, m^2)
-	@test z1 ≈ σ3of1(σ1, +1, ms^2, m^2)
-	#
-	σ1_x(x) = (ms.m2+ms.m3)^2 + x*((m-ms.m1)^2-(ms.m2+ms.m3)^2)
-	#
-	x = rand(); @show x
-	@test prod(
-		(ms.m1+ms.m2)^2 .≤ 
-			σ3of1_pm(σ1_x(x),ms^2,m^2) .≤
-			(m-ms.m3)^2)
-	#
-	σ3_x(x) = (ms.m1+ms.m2)^2 + x*((m-ms.m3)^2-(ms.m1+ms.m2)^2)
-	#
-	x = rand(); @show x
-	@test prod(
-		(ms.m3+ms.m1)^2 .≤ 
-			σ2of3_pm(σ3_x(x),ms^2,m^2) .≤
-			(m-ms.m2)^2)
-end
 
-let
-	ch = DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
-	ρ_thr(ch, -1.1)
-end
-
-let
-	ch = DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
-	ρ_thr(ch, -1.1)
-end

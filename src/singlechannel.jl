@@ -9,8 +9,7 @@ function decay_matrix_element_squared(d::DˣD,s,σ3,σ2)
 end
 
 function integrand_mapped_thr(d::DˣD,s,x)
-	method = HookSqrtDalitzMapping()
-	# method = LinearDalitzMapping()
+	method = mapdalitzmethod(d)
 	(σ3,σ2), jac = mapdalitz(method, (x,0.0), d.ms, s)
 	return decay_matrix_element_squared(d,s,σ3,σ2) / (2π*s) * jac
 end
@@ -18,7 +17,7 @@ end
 function ρ_thr(d::DˣD, e::Complex)
 	integrand(x) = integrand_mapped_thr(d,e2m(e)^2,x)
 	v = quadgk(integrand, 0, 1)[1]
-	complex(v...) / (8π)^2
+	v / (8π)^2
 end
 
 function ρ_thr(d::DˣD, e::Real)
@@ -27,10 +26,11 @@ function ρ_thr(d::DˣD, e::Real)
 	v[1] / (8π)^2
 end
 
-
 function ρ_tb(d::DˣD, e::Real)
 	M,m = d.R.m, d.ms.m3
 	sqrts = e2m(e)
 	sqrts < M+m ? 0.0 :
     	sqrt(λ(e2m(e)^2,M^2,m^2))/e2m(e)^2
 end	
+
+
