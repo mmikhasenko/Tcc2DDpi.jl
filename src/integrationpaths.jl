@@ -92,7 +92,7 @@ function mapdalitz(method::HookSqrtDalitzMapping{3}, x, ms, s)
 	#
 	sqrt_σ3_0, sqrt_σ3_e = (ms[1]+ms[2]), (√s-ms[3])
     # 
-    sqrt_σ3_i = real(sqrt_σ3_e)+sign(imag(s))*nextfloat(0.0)
+    sqrt_σ3_i = real(sqrt_σ3_e) #+sign(imag(s))*nextfloat(0.0)
     sqrt_σ3 = x[1] < 0.5 ? 
             sqrt_σ3_0 + ( x[1]     / 0.5)*(sqrt_σ3_i-sqrt_σ3_0) : # straight path
 	        sqrt_σ3_i + ((x[1]-0.5)/ 0.5)*(sqrt_σ3_e-sqrt_σ3_i) # straight path
