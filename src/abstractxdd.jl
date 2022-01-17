@@ -13,7 +13,7 @@ abstract type AbstractxDD end
 #  - branch_points
 
 
-mapdalitzmethod(d::AbstractxDD) = HookSqrtDalitzMapping()
+mapdalitzmethod(d::AbstractxDD) = HookSqrtDalitzMapping{3}()
 masses(d::AbstractxDD) = d.ms
 
 #  _|              _|                                                _|      _|                      

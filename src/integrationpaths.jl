@@ -71,7 +71,7 @@ end
 
 abstract type AbstractDalitzMapping end 
 struct LinearDalitzMapping <: AbstractDalitzMapping end
-struct HookSqrtDalitzMapping <: AbstractDalitzMapping end
+struct HookSqrtDalitzMapping{K} <: AbstractDalitzMapping end
 
 function mapdalitz(method::LinearDalitzMapping, x, ms, s)
 	# 	
@@ -88,7 +88,32 @@ function mapdalitz(method::LinearDalitzMapping, x, ms, s)
 	return (σ3,σ2), jacobian
 end
 
-function mapdalitz(method::HookSqrtDalitzMapping, x, ms, s)
+function mapdalitz(method::HookSqrtDalitzMapping{3}, x, ms, s)
+	#
+	sqrt_σ3_0, sqrt_σ3_e = (ms[1]+ms[2]), (√s-ms[3])
+    # 
+    sqrt_σ3_i = real(sqrt_σ3_e)+sign(imag(s))*nextfloat(0.0)
+    sqrt_σ3 = x[1] < 0.5 ? 
+            sqrt_σ3_0 + ( x[1]     / 0.5)*(sqrt_σ3_i-sqrt_σ3_0) : # straight path
+	        sqrt_σ3_i + ((x[1]-0.5)/ 0.5)*(sqrt_σ3_e-sqrt_σ3_i) # straight path
+	#
+	jacobian = x[1] < 0.5 ?
+            (sqrt_σ3_i-sqrt_σ3_0) / 0.5 :
+            (sqrt_σ3_e-sqrt_σ3_i) / 0.5
+	# 
+	jacobian *= 2sqrt_σ3 # since the integration is in √σ
+    #
+	σ3 = sqrt_σ3^2
+	# 
+	σ2_0, σ2_e = σ2of3_pm(σ3, ms^2, s)
+	σ2 = σ2_0 + x[2]*(σ2_e-σ2_0) # straight path
+	#
+	jacobian *= (σ2_e-σ2_0)
+	# 
+	return (σ3,σ2), jacobian
+end
+
+function mapdalitz(method::HookSqrtDalitzMapping{2}, x, ms, s)
 	#
 	sqrt_σ3_0, sqrt_σ3_e = (ms[1]+ms[2]), (√s-ms[3])
     # 

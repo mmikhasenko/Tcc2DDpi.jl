@@ -12,40 +12,70 @@ struct γDD{T1,T2,T3} <: AbstractxDD
     R12::T2
     R13::T3
 end
+# 
 
 
-function decay_matrix_element_squared(d::πDD,s,σ3,σ2)
-	msq = d.ms^2
+
+
+
+function covertapply(𝔐²,d::AbstractxDD,s,σ3,σ2)
+	msq = masses(d)^2
 	v = (;s,s12=σ3,s13=σ2,msq)
 # 	
-	J12_I, J12_II = J_I(σ3,d.R12), J_II(σ3,d.R12)
-	J13_I, J13_II = J_I(σ2,d.R13), J_II(σ2,d.R13)
+	J₁₂ᴵ, J₁₂ᴵᴵ = Jᴵ(σ3,d.R12), Jᴵᴵ(σ3,d.R12)
+	J₁₃ᴵ, J₁₃ᴵᴵ = Jᴵ(σ2,d.R13), Jᴵᴵ(σ2,d.R13)
 # 	
-	frakM = A(v) * J12_I * J12_II +
-			B(v) * J13_I * J13_II +
-			C(v) * (J13_I * J12_II +  J12_I * J13_II)
-	f²*frakM/3/4
+	return 𝔐²(v, (J₁₂ᴵ, J₁₂ᴵᴵ), (J₁₃ᴵ, J₁₃ᴵᴵ))
 end
 
 
-function decay_matrix_element_squared(d::γDD,s,σ3,σ2)
-	msq = d.ms^2
-	v = (;s,s12=σ3,s13=σ2,msq)
-# 	
-	J12_I, J12_II = J_I(σ3,d.R12), J_II(σ3,d.R12)
-	J13_I, J13_II = J_I(σ2,d.R13), J_II(σ2,d.R13)
-# 	
+# πDD
+
+function πDD_𝔐²_nonana3(v, (J₁₂ᴵ, J₁₂ᴵᴵ), (J₁₃ᴵ, J₁₃ᴵᴵ))
+	𝔐² = A(v) * J₁₂ᴵ * J₁₂ᴵᴵ +
+             C(v) * J₁₃ᴵ * J₁₂ᴵᴵ
+	return f² * 𝔐²/3/4
+end
+
+function πDD_𝔐²_nonana2(v, (J₁₂ᴵ, J₁₂ᴵᴵ), (J₁₃ᴵ, J₁₃ᴵᴵ))
+	𝔐² = B(v) * J₁₃ᴵ * J₁₃ᴵᴵ +
+             C(v) * J₁₂ᴵ * J₁₃ᴵᴵ
+	return f² * 𝔐²/3/4
+end
+
+decay_matrix_element_squared(d::πDD,s,σ3,σ2) = covertapply(
+		(v,J₁₂,J₁₃)->πDD_𝔐²_nonana3(v,J₁₂,J₁₃)+
+		             πDD_𝔐²_nonana2(v,J₁₂,J₁₃),
+	    d, s,σ3,σ2)
+
+# γDD
+
+function γDD_𝔐²_nonana3(v, (J₁₂ᴵ, J₁₂ᴵᴵ), (J₁₃ᴵ, J₁₃ᴵᴵ))
 	_p1_p2 = p1_p2(v)
 	_p1_p3 = p1_p3(v)
 	_G = G(v)
 # 	
-	frakM = μ₊^2 * (_p1_p2^2+_G) * J12_I * J12_II +
-			μ₀^2 * (_p1_p3^2+_G) * J13_I * J13_II -
-			μ₊*μ₀ * (_p1_p2*_p1_p3 - _G) *
-		(J13_I * J12_II +  J12_I * J13_II)
+	𝔐² = μ₊^2 * (_p1_p2^2+_G) * J₁₂ᴵ * J₁₂ᴵᴵ +
+			μ₊*μ₀ * (_p1_p2*_p1_p3 - _G) * J₁₃ᴵ * J₁₂ᴵᴵ
 # 	
-	h²*frakM/3
+	return h² * 𝔐²/3
 end
+
+function γDD_𝔐²_nonana2(v, (J₁₂ᴵ, J₁₂ᴵᴵ), (J₁₃ᴵ, J₁₃ᴵᴵ))
+	_p1_p2 = p1_p2(v)
+	_p1_p3 = p1_p3(v)
+	_G = G(v)
+# 
+	𝔐² = μ₀^2 * (_p1_p3^2+_G) * J₁₃ᴵ * J₁₃ᴵᴵ -
+			μ₊*μ₀ * (_p1_p2*_p1_p3 - _G) * J₁₂ᴵ * J₁₃ᴵᴵ
+# 
+	return f² * 𝔐²/3/4
+end
+
+decay_matrix_element_squared(d::γDD,s,σ3,σ2) = covertapply(
+		(v,J₁₂,J₁₃)->γDD_𝔐²_nonana3(v,J₁₂,J₁₃)+
+		             γDD_𝔐²_nonana2(v,J₁₂,J₁₃),
+	    d, s,σ3,σ2)
 
 branch_points(d::Union{πDD,γDD}) = (
 	m2e(d.ms[3] + sqrt(pole_position(d.R12))),

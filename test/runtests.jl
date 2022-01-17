@@ -109,21 +109,11 @@ end
 			(m-ms.m2)^2)
 end
 
-struct ChannelWithIntegrationMethod{T <: X2DDpi.AbstractxDD} <: X2DDpi.AbstractxDD
-	channel::T
-	mapdalitzmethod::X2DDpi.AbstractDalitzMapping
-end
-X2DDpi.mapdalitzmethod(set::ChannelWithIntegrationMethod) = set.mapdalitzmethod
-X2DDpi.decay_matrix_element_squared(d::ChannelWithIntegrationMethod,s,σ3,σ2) =
-	X2DDpi.decay_matrix_element_squared(d.channel,s,σ3,σ2)
-X2DDpi.masses(set::ChannelWithIntegrationMethod) = X2DDpi.masses(set.channel)
-
-
 @testset "Dalitz Mappings" begin
 	e = -0.1-0.1im
 	ch = DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
 	#
-	method1 = HookSqrtDalitzMapping()
+	method1 = HookSqrtDalitzMapping{3}()
 	set1 = ChannelWithIntegrationMethod(ch, method1)
 	value1 = ρ_thr(set1, e)
 	# 
@@ -174,4 +164,20 @@ end
     @test real(r_fm) ≈ r₀_fm
 end
 
+
+@testset "Channel With Integration Method" begin
+    e = -0.1
+
+    ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
+    full = ρ_thr(ch1, e)
+    
+    set3 = ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}())
+    set2 = ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}())
+    
+    @test set3 isa ChannelWithIntegrationMethod{T,HookSqrtDalitzMapping{3}} where T<:πDD
+    @test set2 isa ChannelWithIntegrationMethod{T,HookSqrtDalitzMapping{2}} where T<:πDD
+    
+	sum23 = ρ_thr(set3, e) + ρ_thr(set2, e)
+    @test abs(full - sum23)/full < 1e-4
+end
 

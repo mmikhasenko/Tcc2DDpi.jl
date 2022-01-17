@@ -37,7 +37,7 @@ import Base.^
 include("covariant_exptessions.jl")
 
 export BW, BW_norm, BW_Swave
-export J_I, J_II
+export Jᴵ, Jᴵᴵ
 include("isobar.jl")
 
 export σ2of3_pm, σ3of1_pm, σ3of2_pm
@@ -57,6 +57,9 @@ include("mainmodel.jl")
 
 export DˣD
 include("singlechannel.jl")
+
+export ChannelWithIntegrationMethod
+include("leftrightmodel.jl")
 
 export interpolated
 include("intepolate_merge.jl")
