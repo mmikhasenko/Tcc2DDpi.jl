@@ -46,11 +46,14 @@ export LinearDalitzMapping, HookSqrtDalitzMapping
 export mapdalitz
 include("integrationpaths.jl")
 
+export constructchannel
+export ρ_thr
+include("abstractxdd.jl")
+
+export ρ_tb
 export πDD, γDD
 export branch_points
-export constructchannel
-export ρ_thr, ρ_tb
-include("abstractxdd.jl")
+include("mainmodel.jl")
 
 export DˣD
 include("singlechannel.jl")
