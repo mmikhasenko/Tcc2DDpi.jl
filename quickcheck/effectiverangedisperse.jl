@@ -14,7 +14,7 @@ const A₀ = Amplitude(ich)
 
 
 const Eᵦ = X2DDpi.Eᵦˣ⁺
-effrangepars = 
+@time effrangepars = # 12s
     effectiverangeexpansion(
         # Δe->-1im*ρ_thr(channel(ΓDˣ⁺), Eᵦ+Δe),
         Δe->denominator_II(A₀, Eᵦ+Δe, δm0_val),
