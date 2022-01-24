@@ -17,8 +17,8 @@ ichannels = interpolated.(channels, cutoff; estep=estep) # cutoff
 
 # save
 writejson(joinpath("results","nominal","model.json"), Dict(
-        :channels => obj2nt.(channels),
-        :ichannels => obj2nt.(ichannels)
+        :channels => X2DDpi.obj2nt.(channels),
+        :ichannels => X2DDpi.obj2nt.(ichannels)
         )
     )
 #
