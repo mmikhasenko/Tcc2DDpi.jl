@@ -166,10 +166,11 @@ end
 
 
 @testset "Channel With Integration Method" begin
-    e = -0.1
+
+    e_safe = X2DDpi.Eᵦˣ⁺-0.1
+    e_pole = X2DDpi.Eᵦˣ⁺+0.1
 
     ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
-    full = ρ_thr(ch1, e)
     
     set3 = ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}())
     set2 = ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}())
@@ -177,9 +178,15 @@ end
     @test set3 isa ChannelWithIntegrationMethod{T,HookSqrtDalitzMapping{3}} where T<:πDD
     @test set2 isa ChannelWithIntegrationMethod{T,HookSqrtDalitzMapping{2}} where T<:πDD
     
-	ρ3 = ρ_thr(set3, e)
-	ρ2 = ρ_thr(set2, e)
-	sum23 = ρ2+ρ3
+    full_safe = ρ_thr(ch1, e_safe)
+	ρ3_safe = ρ_thr(set3, e_safe)
+	ρ2_safe = ρ_thr(set2, e_safe)
+	sum23_safe = ρ2_safe + ρ3_safe
+    @test abs((full_safe - sum23_safe)/full_safe) < 1e-4
 
-    @test abs(full - sum23)/full < 1e-4
+    full_pole = ρ_thr(ch1, e_pole)
+	ρ3_pole = ρ_thr(set3, e_pole)
+	ρ2_pole = ρ_thr(set2, e_pole)
+	sum23_pole = ρ2_pole + ρ3_pole
+    @test abs((full_pole - sum23_pole)/full_pole) > 1e-4
 end
