@@ -42,17 +42,20 @@ include("isobar.jl")
 
 export σ2of3_pm, σ3of1_pm, σ3of2_pm
 export σ3of1, σ2of1
+export AbstractDalitzMapping
 export LinearDalitzMapping, HookSqrtDalitzMapping
 export mapdalitz
 include("integrationpaths.jl")
 
-export constructchannel
 export ρ_thr
+export masses
+export decay_matrix_element_squared
 include("abstractxdd.jl")
 
 export ρ_tb
 export πDD, γDD
 export branch_points
+export constructchannel
 include("mainmodel.jl")
 
 export DˣD
