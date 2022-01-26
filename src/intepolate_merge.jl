@@ -5,7 +5,7 @@ struct interpolated{T<:AbstractxDD,F1<:Real,F2<:Real,V}
     itr::V
 end
 function interpolated(channel::AbstractxDD, cutoff::Real; estep=0.01)
-    eth = m2e(sum(channel.ms))
+    eth = m2e(sum(masses(channel)))
     ev = eth:estep:(cutoff+2*estep)
     calv = ρ_thr.(Ref(channel),ev)
     itr = interpolate((ev,), calv, Gridded(Linear()))
@@ -14,7 +14,7 @@ function interpolated(channel::AbstractxDD, cutoff::Real; estep=0.01)
 end
 # 
 function ρ_thr(d::interpolated, e::Real)
-    e < m2e(sum(d.channel.ms)) && return 0.0
+    e < m2e(sum(masses(d.channel))) && return 0.0
     e < d.cutoff ?
         d.itr(e) :
     ρ_tb( d.channel, e) * d.cutoffratio
