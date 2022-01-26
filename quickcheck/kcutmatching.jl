@@ -2,7 +2,7 @@ using X2DDpi
 using Parameters
 
 
-const Eᵦ = X2DDpi.Eᵦˣ⁺
+const Eᵦ = Eᵦˣ⁺
 
 # matching discontinuity
 function Δk3b(r=1e-3,ϵ=1e-3)

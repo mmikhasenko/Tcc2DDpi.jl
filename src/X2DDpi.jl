@@ -18,7 +18,7 @@ export mD⁰, mD⁺
 export mDˣ⁺, ΓDˣ⁺
 export mDˣ⁰, ΓDˣ⁰
 # 
-export μDˣ⁺D⁰
+export μDˣ⁺D⁰, Eᵦˣ⁺
 # 
 export e2m, m2e
 export fm_times_mev

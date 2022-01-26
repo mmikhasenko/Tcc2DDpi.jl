@@ -28,9 +28,9 @@ let
         ylab=L"\mathrm{Im}\,e / \Gamma^{*+}",
         xlab=L"\mathrm{Re}\,e / \Gamma^{*+}",
         colorbar=false)
-    heatmap!(sp=1, -1:0.1:1, -1:0.1:1,   (x,y)->real(k3b(X2DDpi.Eᵦˣ⁺ +(1e3*ΓDˣ⁰)*(x+1im*y))))
-    heatmap!(sp=2, -1:0.1:1, -1:0.1:1,   (x,y)->real(kNR(X2DDpi.Eᵦˣ⁺ +(1e3*ΓDˣ⁰)*(x+1im*y))))
-    heatmap!(sp=3, -1:0.09:1, -1:0.09:1, (x,y)->real(ρ₀( X2DDpi.Eᵦˣ⁺ +(1e3*ΓDˣ⁰)*(x+1im*y))))
+    heatmap!(sp=1, -1:0.1:1, -1:0.1:1,   (x,y)->real(k3b(Eᵦˣ⁺ +(1e3*ΓDˣ⁰)*(x+1im*y))))
+    heatmap!(sp=2, -1:0.1:1, -1:0.1:1,   (x,y)->real(kNR(Eᵦˣ⁺ +(1e3*ΓDˣ⁰)*(x+1im*y))))
+    heatmap!(sp=3, -1:0.09:1, -1:0.09:1, (x,y)->real(ρ₀( Eᵦˣ⁺ +(1e3*ΓDˣ⁰)*(x+1im*y))))
 end
     
 

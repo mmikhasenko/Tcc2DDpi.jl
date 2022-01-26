@@ -30,25 +30,23 @@ end
 
 @testset "Break up momentum of Dˣ⁺D⁰" begin
 
-	Eᵦ = X2DDpi.Eᵦˣ⁺
-	# 
-	@test kNR(Eᵦ) + 1 ≈ 1.0 + 0.0im
-	@test k3b(Eᵦ) + 1 ≈ 1.0 + 0.0im
+	@test kNR(Eᵦˣ⁺) + 1 ≈ 1.0 + 0.0im
+	@test k3b(Eᵦˣ⁺) + 1 ≈ 1.0 + 0.0im
 
 	@test let
-		a,b = kNR.((Eᵦ - 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
+		a,b = kNR.((Eᵦˣ⁺ - 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
 		abs(1-b/a) > 1.0
 	end
 	@test let
-		a,b = kNR.((Eᵦ + 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
+		a,b = kNR.((Eᵦˣ⁺ + 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
 		abs(1-b/a) < 1e-4
 	end
 	@test let
-		a,b = k3b.((Eᵦ - 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
+		a,b = k3b.((Eᵦˣ⁺ - 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
 		abs(1-b/a) > 1.0
 	end
 	@test let
-		a,b = k3b.((Eᵦ + 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
+		a,b = k3b.((Eᵦˣ⁺ + 1e3im*ΓDˣ⁺/4) .+ [-1,1].*1e-6)
 		abs(1-b/a) < 1e-4
 	end
 end
@@ -180,8 +178,8 @@ end
 
 @testset "Channel With Integration Method" begin
 
-    e_safe = X2DDpi.Eᵦˣ⁺-0.1
-    e_pole = X2DDpi.Eᵦˣ⁺+0.1
+    e_safe = Eᵦˣ⁺-0.1
+    e_pole = Eᵦˣ⁺+0.1
 
     ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
     
