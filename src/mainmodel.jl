@@ -30,13 +30,24 @@ end
 
 
 # πDD
+"""
+	πDD_𝔐²_nonana3(v, J₁₂, J₁₃ᴵ)
 
+The function has the both poles in σ₃,
+	and only the top pole in σ₂
+"""
 function πDD_𝔐²_nonana3(v, (J₁₂ᴵ, J₁₂ᴵᴵ), (J₁₃ᴵ, J₁₃ᴵᴵ))
 	𝔐² = A(v) * J₁₂ᴵ * J₁₂ᴵᴵ +
              C(v) * J₁₃ᴵ * J₁₂ᴵᴵ
 	return f² * 𝔐²/3/4
 end
 
+"""
+	πDD_𝔐²_nonana2(v, J₁₂, J₁₃ᴵ)
+
+The function has the both poles in σ₂,
+	and only the top pole in σ₃
+"""
 function πDD_𝔐²_nonana2(v, (J₁₂ᴵ, J₁₂ᴵᴵ), (J₁₃ᴵ, J₁₃ᴵᴵ))
 	𝔐² = B(v) * J₁₃ᴵ * J₁₃ᴵᴵ +
              C(v) * J₁₂ᴵ * J₁₃ᴵᴵ
