@@ -5,12 +5,13 @@ function σ2of3_pm(σ3,msq,s)
 	# 
 	sqrt_σ3 = sqrt(σ3)
 	ms = sqrt.(msq)
+	sqrt_s = sqrt(s)
 	# 
 	irregularpart = # sqrt(λλ)/σ
-		sqrt((sqrt(s)-ms[3])-sqrt_σ3) *  # upper end
-		sqrt((sqrt(s)-ms[3])+sqrt_σ3) *
-		sqrt((sqrt(s)+ms[3])-sqrt_σ3) *
-		sqrt((sqrt(s)+ms[3])+sqrt_σ3) *
+		sqrt((sqrt_s-ms[3])-sqrt_σ3) *  # upper end
+		sqrt((sqrt_s-ms[3])+sqrt_σ3) *
+		sqrt((sqrt_s+ms[3])-sqrt_σ3) *
+		sqrt((sqrt_s+ms[3])+sqrt_σ3) *
 		sqrt(sqrt_σ3-(ms[1]-ms[2])) *
 		sqrt(sqrt_σ3+(ms[1]-ms[2])) *
 		sqrt(sqrt_σ3-(ms[1]+ms[2])) * # lower end
@@ -26,12 +27,13 @@ function σ3of1_pm(σ1,msq,s)
 	# 
 	sqrt_σ1 = sqrt(σ1)
 	ms = sqrt.(msq)
+	sqrt_s = sqrt(s)
 	# 
 	irregularpart = # sqrt(λλ)/σ
-		sqrt((sqrt(s)-ms[1])-sqrt_σ1) *  # upper end
-		sqrt((sqrt(s)-ms[1])+sqrt_σ1) *
-		sqrt((sqrt(s)+ms[1])-sqrt_σ1) *
-		sqrt((sqrt(s)+ms[1])+sqrt_σ1) *
+		sqrt((sqrt_s-ms[1])-sqrt_σ1) *  # upper end
+		sqrt((sqrt_s-ms[1])+sqrt_σ1) *
+		sqrt((sqrt_s+ms[1])-sqrt_σ1) *
+		sqrt((sqrt_s+ms[1])+sqrt_σ1) *
 		sqrt(sqrt_σ1-(ms[2]-ms[3])) *
 		sqrt(sqrt_σ1+(ms[2]-ms[3])) *
 		sqrt(sqrt_σ1-(ms[2]+ms[3])) * # lower end
@@ -47,12 +49,13 @@ function σ3of2_pm(σ2,msq,s)
 	# 
 	sqrt_σ2 = sqrt(σ2)
 	ms = sqrt.(msq)
+	sqrt_s = sqrt(s)
 	# 
 	irregularpart = # sqrt(λλ)/σ
-		sqrt((sqrt(s)-ms[2])-sqrt_σ2) *  # upper end
-		sqrt((sqrt(s)-ms[2])+sqrt_σ2) *
-		sqrt((sqrt(s)+ms[2])-sqrt_σ2) *
-		sqrt((sqrt(s)+ms[2])+sqrt_σ2) *
+		sqrt((sqrt_s-ms[2])-sqrt_σ2) *  # upper end
+		sqrt((sqrt_s-ms[2])+sqrt_σ2) *
+		sqrt((sqrt_s+ms[2])-sqrt_σ2) *
+		sqrt((sqrt_s+ms[2])+sqrt_σ2) *
 		sqrt(sqrt_σ2-(ms[3]-ms[1])) *
 		sqrt(sqrt_σ2+(ms[3]-ms[1])) *
 		sqrt(sqrt_σ2-(ms[3]+ms[1])) * # lower end
