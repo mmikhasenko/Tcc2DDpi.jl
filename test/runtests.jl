@@ -177,7 +177,9 @@ end
     @test set3 isa ChannelWithIntegrationMethod{T,HookSqrtDalitzMapping{3}} where T<:πDD
     @test set2 isa ChannelWithIntegrationMethod{T,HookSqrtDalitzMapping{2}} where T<:πDD
     
-	sum23 = ρ_thr(set3, e) + ρ_thr(set2, e)
+	ρ3 = ρ_thr(set3, e)
+	ρ2 = ρ_thr(set2, e)
+	sum23 = ρ2+ρ3
+
     @test abs(full - sum23)/full < 1e-4
 end
-

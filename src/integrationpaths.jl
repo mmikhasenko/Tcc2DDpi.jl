@@ -46,6 +46,7 @@ function σ3of2_pm(σ2,msq,s)
 		(σ2+msq[1]-msq[3])*(s-σ2-msq[2])/(2*σ2))
 	# 
 	sqrt_σ2 = sqrt(σ2)
+	ms = sqrt.(msq)
 	# 
 	irregularpart = # sqrt(λλ)/σ
 		sqrt((sqrt(s)-ms[2])-sqrt_σ2) *  # upper end
@@ -57,7 +58,7 @@ function σ3of2_pm(σ2,msq,s)
 		sqrt(sqrt_σ2-(ms[3]+ms[1])) * # lower end
 		sqrt(sqrt_σ2+(ms[3]+ms[1])) / σ2
 	# 
-	return regularpart .- [-1,1] .* (irregularpart / 2)
+	return regularpart .+ [-1,1] .* (irregularpart / 2)
 end
 # 
 σ3of1(σ1, cos23, msq, s) = msq[1]+msq[2]+
@@ -115,25 +116,25 @@ end
 
 function mapdalitz(method::HookSqrtDalitzMapping{2}, x, ms, s)
 	#
-	sqrt_σ3_0, sqrt_σ3_e = (ms[1]+ms[2]), (√s-ms[3])
+	sqrt_σ2_0, sqrt_σ2_e = (ms[1]+ms[3]), (√s-ms[2])
     # 
-    sqrt_σ3_i = real(sqrt_σ3_e)+sign(imag(s))*nextfloat(0.0)
-    sqrt_σ3 = x[1] < 0.5 ? 
-            sqrt_σ3_0 + ( x[1]     / 0.5)*(sqrt_σ3_i-sqrt_σ3_0) : # straight path
-	        sqrt_σ3_i + ((x[1]-0.5)/ 0.5)*(sqrt_σ3_e-sqrt_σ3_i) # straight path
+    sqrt_σ2_i = real(sqrt_σ2_e)+sign(imag(s))*nextfloat(0.0)
+    sqrt_σ2 = x[1] < 0.5 ? 
+            sqrt_σ2_0 + ( x[1]     / 0.5)*(sqrt_σ2_i-sqrt_σ2_0) : # straight path
+	        sqrt_σ2_i + ((x[1]-0.5)/ 0.5)*(sqrt_σ2_e-sqrt_σ2_i) # straight path
 	#
 	jacobian = x[1] < 0.5 ?
-            (sqrt_σ3_i-sqrt_σ3_0) / 0.5 :
-            (sqrt_σ3_e-sqrt_σ3_i) / 0.5
+            (sqrt_σ2_i-sqrt_σ2_0) / 0.5 :
+            (sqrt_σ2_e-sqrt_σ2_i) / 0.5
 	# 
-	jacobian *= 2sqrt_σ3 # since the integration is in √σ
+	jacobian *= 2sqrt_σ2 # since the integration is in √σ
     #
-	σ3 = sqrt_σ3^2
+	σ2 = sqrt_σ2^2
 	# 
-	σ2_0, σ2_e = σ2of3_pm(σ3, ms^2, s)
-	σ2 = σ2_0 + x[2]*(σ2_e-σ2_0) # straight path
+	σ3_0, σ3_e = σ3of2_pm(σ2, ms^2, s)
+	σ3 = σ3_0 + x[2]*(σ3_e-σ3_0) # straight path
 	#
-	jacobian *= (σ2_e-σ2_0)
+	jacobian *= (σ3_e-σ3_0)
 	# 
 	return (σ3,σ2), jacobian
 end
