@@ -126,18 +126,31 @@ end
 
 
 # Effective range Expansion
-
-@testset "Cauchy integrals" begin
-    @test cauchy(x->x, 1.0, 0.1) ≈ 1.0 + 0.0im
-    @test cauchy′(x->x, 0, 0.1) ≈ 1.0 + 0.0im
-    @test cauchy′′(x->x^2, 0, 0.1) ≈ 2.0 + 0.0im
+@testset "Circular integrals" begin
+    @test circleintegral(x->x^2, 0, 0.1) + 1 ≈ 1.0 + 0.0im
+    @test circleintegral(x->1/x, 0, 0.1) ≈ 1.0 + 0.0im
+    @test circleintegral(x->1/x, 0, 0.1) ≈ circleintegral(x->1/x, 0, 0.01)
 end
 # 
-@testset "Circular integrals" begin
-    @test circleintegral(x->x^2, 0.1) + 1 ≈ 1.0 + 0.0im
-    @test circleintegral(x->1/x, 0.1) ≈ 1.0 + 0.0im
-    @test circleintegral(x->1/x, 0.1) ≈ circleintegral(x->1/x, 0.01)
+@testset "Cauchy integrals" begin
+    @test cauchyintegral(x->x, 1, 0.1) ≈ 1.0 + 0.0im
+    @test cauchyintegral′(x->x, 0, 0.1) ≈ 1.0 + 0.0im
+    @test cauchyintegral′′(x->x^2, 0, 0.1) ≈ 2.0 + 0.0im
 end
+
+
+@testset "Cauchy sums" begin
+	v0 = X2DDpi.cauchyintegral(x->x^10, 2.0, 0.1)
+	v1 = X2DDpi.cauchyintegral(x->x^10, 2.0, CircularIntegral(0.1))
+	v2 = X2DDpi.cauchyintegral(x->x^10, 2.0, CircularSum(0.1, 250))	
+	v3 = X2DDpi.cauchyintegral(x->x^10, 2.0, CircularSum(0.1, 6))
+	# 
+	@test v0 == v1
+	@test v1 ≈ v2
+	@test !(v3 ≈ v2)
+end
+
+circleintegral(x->x^2, 2.0, 0.1, 1000) 
 
 @testset "Effective range Expansion" begin
     a₀_fm = -7.0 # fm

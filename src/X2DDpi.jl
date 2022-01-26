@@ -101,8 +101,10 @@ include("plotrecipes.jl")
 
 
 export circleintegral
-export cauchy, cauchy′, cauchy′′
+export cauchyintegral, cauchyintegral′, cauchyintegral′′
 export effectiverangeexpansion
+export ComplexBranchPointExpansion
+export CircularIntegral, CircularSum
 include("cauchyintegrals.jl")
 
 end
