@@ -1,0 +1,317 @@
+using Pkg
+cd(joinpath(@__DIR__,".."))
+Pkg.activate(".")
+# 
+using X2DDpi
+using Parameters
+using Measurements
+using Interpolations
+using Statistics
+
+using Plots
+
+
+@with_kw struct ZeroBW <: X2DDpi.AbstractLinesShape
+    m::Float64
+    Γ::Float64
+end
+
+X2DDpi.Jᴵ(σ::Number,pars::ZeroBW) = 0.0
+X2DDpi.Jᴵᴵ(σ::Number,pars::ZeroBW) = 0.0
+
+#        _|              _|                
+#    _|_|_|    _|_|_|  _|_|_|_|    _|_|_|  
+#  _|    _|  _|    _|    _|      _|    _|  
+#  _|    _|  _|    _|    _|      _|    _|  
+#    _|_|_|    _|_|_|      _|_|    _|_|_|  
+
+settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
+#
+@unpack δm0 = settings["fitresults"]
+const δm0_val = δm0.val
+@unpack cutoff, estep = settings["phspmatching"]
+
+
+#                            _|            
+#    _|_|_|    _|_|      _|_|_|    _|_|    
+#  _|        _|    _|  _|    _|  _|_|_|_|  
+#  _|        _|    _|  _|    _|  _|        
+#    _|_|_|    _|_|      _|_|_|    _|_|_|  
+
+
+# πDD + πDD + γDD: Dˣ⁺ + Dˣ⁺ + Dˣ⁰
+@time const A₀_full = let 
+    ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
+    ch2 = πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁰,Γ=ΓDˣ⁰))
+    ch3 = γDD((m1=mγ, m2=mD⁺,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁰,Γ=ΓDˣ⁰))
+    # 
+    iπDD2 = interpolated(
+        ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
+        cutoff; estep=estep)
+    iπDD3 = interpolated(
+        ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
+        cutoff; estep=estep)
+    # 
+    iπDD2′ = interpolated(
+        ChannelWithIntegrationMethod(ch2, HookSqrtDalitzMapping{2}()),
+        cutoff; estep=estep)
+    iπDD3′ = interpolated(
+        ChannelWithIntegrationMethod(ch2, HookSqrtDalitzMapping{3}()),
+        cutoff; estep=estep)
+    # 
+    iγDD2 = interpolated(
+        ChannelWithIntegrationMethod(ch3, HookSqrtDalitzMapping{2}()),
+        cutoff; estep=estep)
+    iγDD3 = interpolated(
+        ChannelWithIntegrationMethod(ch3, HookSqrtDalitzMapping{3}()),
+        cutoff; estep=estep)
+    # 
+    Amplitude((iπDD2,iπDD3,iπDD2′,iπDD3′,iγDD2,iγDD3))
+end
+
+
+# πDD + πDD + γDD: Dˣ⁺
+@time const A₀_full_DˣD = let 
+    # ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
+    ch2 = πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), ZeroBW(m=mDˣ⁰,Γ=ΓDˣ⁰))
+    ch3 = γDD((m1=mγ, m2=mD⁺,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), ZeroBW(m=mDˣ⁰,Γ=ΓDˣ⁰))
+    # 
+    # iπDD2 = interpolated(
+    #     ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
+    #     cutoff; estep=estep)
+    # iπDD3 = interpolated(
+    #     ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
+    #     cutoff; estep=estep)
+    iπDD2, iπDD3 = A₀_full.ik[1], A₀_full.ik[2]
+    # 
+    iπDD3′ = interpolated(
+        ChannelWithIntegrationMethod(ch2, HookSqrtDalitzMapping{3}()),
+        cutoff; estep=estep)
+    # 
+    iγDD3 = interpolated(
+        ChannelWithIntegrationMethod(ch3, HookSqrtDalitzMapping{3}()),
+        cutoff; estep=estep)
+    # 
+    Amplitude((iπDD2,iπDD3,iπDD3′,iγDD3))
+end
+
+# πDD: Dˣ⁺ + Dˣ⁺
+const A₀_π⁺D⁰D⁰ = let
+    # ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
+    iπDD2, iπDD3 = A₀_full.ik[1], A₀_full.ik[2]
+    # 
+    # set3 = ChannelWithIntegrationMethod(ch, HookSqrtDalitzMapping{3}())
+    # ich3 = interpolated(set3, cutoff; estep=estep)
+    # 
+    Amplitude((iπDD2,iπDD3))
+end
+
+# πDD: Dˣ⁺
+const A₀_DˣD = let
+    ch = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), ZeroBW(m=mDˣ⁺,Γ=ΓDˣ⁺))
+    # 
+    set3 = ChannelWithIntegrationMethod(ch, HookSqrtDalitzMapping{3}())
+    ich3 = interpolated(set3, cutoff; estep=estep)
+    # 
+    Amplitude((ich3,))
+end
+
+# πDD: Dˣ⁺
+const A₀′_DˣD = Amplitude(
+    interpolated(
+        DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺)),
+        cutoff; estep=estep))
+# 
+# 
+modelnames = [:A₀_full, :A₀_full_DˣD, :A₀_π⁺D⁰D⁰, :A₀_DˣD, :A₀′_DˣD]
+const Nm = length(modelnames)
+
+
+
+
+using DataFrames
+df = DataFrame(; modelnames)
+df.model = eval.(df.modelnames)
+
+let
+    @time effrangepars = # 12s
+        effectiverangeexpansion(
+            Δe->denominator_II(A₀_full, Eᵦˣ⁺+Δe, δm0_val),
+            Δe->k3b(Eᵦˣ⁺+Δe),
+            ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺))/20, 50)))
+    # 
+    (; tophysicsunits(effrangepars)..., effrangepars...)
+end
+
+df.a_fm = ones(Nm)
+df.r_fm = ones(Nm).*1im
+df.a⁻¹ = ones(Nm).*1im
+df.r = ones(Nm).*1im
+df.N = ones(Nm).*1im
+
+let Nappr = 150, Rexp = abs(imag(Eᵦˣ⁺))/20
+    # 
+    for i in 1:Nm
+        𝒜 = df.model[i]
+        @time effrangepars = # 12s
+            effectiverangeexpansion(
+                Δe->denominator_II(𝒜, Eᵦˣ⁺+Δe, δm0_val),
+                Δe->k3b(Eᵦˣ⁺+Δe),
+                ComplexBranchPointExpansion(CircularSum(Rexp, Nappr)))
+        # 
+        efrpars = (; tophysicsunits(effrangepars)..., effrangepars...)
+        # 
+        df.a_fm[i] = efrpars.a_fm
+        df.r_fm[i] = efrpars.r_fm
+        df.a⁻¹[i] = efrpars.a⁻¹
+        df.r[i] = efrpars.r
+        df.N[i] = efrpars.N
+    end
+end
+
+# test
+print(select(df[[4,5],:], [:modelnames, :a_fm, :r_fm, :N]))
+# modelnames  a_fm      r_fm                  N
+#─────────────────────────────────────────────────────────────────────
+# A₀_DˣD      -7.55077  0.159869-0.0238077im  0.00347571-3.76763e-5im
+# A₀′_DˣD     -7.55237  0.165517-0.0216824im   0.0034758-3.76788e-5im
+
+# interference term
+print(select(df[[3,4],:], [:modelnames, :a_fm, :r_fm, :N]))
+# modelnames  a_fm      r_fm                   N
+#───────────────────────────────────────────────────────────────────────
+# A₀_π⁺D⁰D⁰   -7.31763  -0.779907+0.260606im   0.00702464+0.000589854im
+# A₀_DˣD      -7.55077   0.159869-0.0238077im  0.00347571-3.76763e-5im
+
+# higher threshold
+print(select(df[[1,2],:], [:modelnames, :a_fm, :r_fm, :N]))
+# modelnames  a_fm      r_fm                   N
+#──────────────────────────────────────────────────────────────────────
+# A₀_full      -5.95934   -4.36196+0.4608im    0.0103207+0.000671301im
+# A₀_full_DˣD  -7.32118  -0.626768+0.159036im   0.010316+0.000554445im
+
+
+
+
+writejson(joinpath("results","nominal","effectiverangecauchy.json"),
+        Dict(
+            :allmodelcomputation => [
+                Symbol(df.modelnames[i]) => Dict{Symbol,Any}(
+                    :a_fm => df.a_fm[i],
+                    :r_fm => df.r_fm[i],
+                    :inv_a => df.a⁻¹[i],
+                    :r => df.r[i],
+                    :N => df.N[i]
+                ) for i in 1:size(df,1)],
+# 
+            :investigationsummary => Dict(
+                :inv_scatt_length_MeV => round(df.a⁻¹[1]*1e3, digits=2),
+                :effective_range_fm => round(df.r_fm[1], digits=2),
+                :effective_range_disp_fm => round(df.r_fm[2], digits=2),
+                :effective_range_high_fm => round(df.r_fm[1]-df.r_fm[2], digits=2),
+            ),
+# 
+            :compositeness => Dict(
+                :Z_hanhart_90 => Z_hanhart_90,
+                :Z_hanhart_95 => Z_hanhart_95,
+                :Z_polosa_90 => Z_polosa_90,
+                :Z_polosa_95 => Z_polosa_95
+            )
+    ))
+#
+
+
+
+
+Xc(r::Real,a⁻¹::Real) = 1/sqrt(1+2r*a⁻¹/X2DDpi.fm_times_mev)
+Xc(r::Complex,a⁻¹::Complex) = Xc(real(r),real(a⁻¹))
+# 
+Z_polosa_90 = map(r->Xc(r, df.a⁻¹[1]*1e3), (-11.9,0) .+ df.r_fm[1])
+Z_polosa_95 = map(r->Xc(r, df.a⁻¹[1]*1e3), (-16.9,0) .+ df.r_fm[1])
+# 
+Z_hanhart_90 = map(r->Xc(r, df.a⁻¹[1]*1e3), (-11.9,0) .+ df.r_fm[2])
+Z_hanhart_95 = map(r->Xc(r, df.a⁻¹[1]*1e3), (-16.9,0) .+ df.r_fm[2])
+
+
+
+let
+    plot(size=(500,120), yaxis=false, yticks=false, frame=:origin, xlim=(0,1), ylim=(-0.6,0.6),
+        ann=(1,0.1,text(L"X",12,:bottom,:right)))
+    plot!([Z_polosa_90...], 0.5 .* [1, 1], fill=0, c=2, α=0.2, lab="")
+    plot!([Z_polosa_95...], 0.5 .* [0.8, 0.8], fill=0, c=2, α=0.2, lab="")
+    annotate!([
+        (Z_polosa_90[1], 0.5, text(string(round(Z_polosa_90[1],digits=2)),:bottom, 8)),
+        (Z_polosa_90[2], 0.5, text(string(round(Z_polosa_90[2],digits=2)),:bottom, 8)),
+        (Z_polosa_95[1], 0.4, text(string(round(Z_polosa_95[1],digits=2)),:bottom, 8)),
+        ])
+    plot!([Z_hanhart_90...], 0.5 .* [-1, -1], fill=0, c=3, α=0.2, lab="")
+    plot!([Z_hanhart_95...], 0.5 .* [-0.8, -0.8], fill=0, c=3, α=0.2, lab="")
+    annotate!([
+        (Z_hanhart_90[1], -0.5, text(string(round(Z_hanhart_90[1],digits=2)),:top, 8)),
+        (Z_hanhart_90[2], -0.5, text(string(round(Z_hanhart_90[2],digits=2)),:top, 8)),
+        (Z_hanhart_95[1], -0.4, text(string(round(Z_hanhart_95[1],digits=2)),:top, 8)),
+        ])
+end
+savefig(joinpath("plots", "compositeness.pdf"))
+
+
+
+
+
+struct ERA
+    a⁻¹::Complex{Float64}
+    r::Complex{Float64}
+    N::Complex{Float64}
+end
+# 
+struct EFRMatching
+    𝒜::Amplitude
+    era::ERA
+end
+EFRMatching(𝒜, nt) = EFRMatching(𝒜, ERA(nt.a⁻¹, nt.r, nt.N))
+
+function X2DDpi.denominator_II(era::ERA,e)
+    @unpack a⁻¹, r, N = era
+    return N*(a⁻¹ + r/2*k3b(e)^2-1im*k3b(e))
+end
+
+using RecipesBase
+@recipe function f(m::EFRMatching)
+    Δev = range(-0.01, 0.0251, length=30)
+    @series begin
+        calv = [denominator_II(m.era, Eᵦˣ⁺+Δe) for Δe in Δev]
+        label := "effective range"
+        (Δev, real(calv)) 
+    end
+    calv = [denominator_II(m.𝒜, Eᵦˣ⁺+Δe, δm0_val) for Δe in Δev]
+    (Δev, real(calv))
+end
+
+let
+    plot(size=(200*5,150), layout=grid(1,5), yaxis=false, yticks=false)
+    plot!(sp=1,EFRMatching(df.model[1], df[1,:]), lab=string(df.modelnames[1]))
+    plot!(sp=2,EFRMatching(df.model[2], df[2,:]), lab=string(df.modelnames[2]))
+    plot!(sp=3,EFRMatching(df.model[3], df[3,:]), lab=string(df.modelnames[3]))
+    plot!(sp=4,EFRMatching(df.model[4], df[4,:]), lab=string(df.modelnames[4]))
+    plot!(sp=5,EFRMatching(df.model[5], df[5,:]), lab=string(df.modelnames[5]))
+end
+savefig(joinpath("plots", "testmatchefr.pdf"))
+
+# let
+#     plot()
+#     plot!(Δe->imag(denominator_II(df.model[3], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[3]))
+#     plot!(Δe->imag(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
+# end
+
+# let
+#     plot()
+#     plot!(Δe->imag(denominator_II(df.model[3], Δe, δm0_val)),-0.1, 1, lab=string(df.modelnames[3]))
+#     plot!(Δe->imag(2*denominator_II(df.model[4], Δe, δm0_val)),-0.1, 1, lab=string(df.modelnames[4]))
+# end
+
+
+# let
+#     plot()
+#     plot!(Δe->real(denominator_II(df.model[3], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[3]))
+#     plot!(Δe->real(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
+# end
