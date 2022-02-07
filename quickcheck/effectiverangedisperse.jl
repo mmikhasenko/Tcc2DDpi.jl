@@ -33,7 +33,7 @@ let
             Δe->k3b(Eᵦˣ⁺+Δe),
             ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺))/20, 50)))
     # 
-    tophysicsunits(effrangepars)
+    (; tophysicsunits(effrangepars)..., effrangepars...)
 end
 
 # exact:
@@ -75,9 +75,9 @@ let
         effectiverangeexpansion(
             Δe->denominator_II(A₀_πDD, Eᵦˣ⁺+Δe, δm0_val),
             Δe->k3b(Eᵦˣ⁺+Δe),
-            ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺))/20, 250)))
+            ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺))/20, 150)))
     # 
-    tophysicsunits(effrangepars)
+    (; tophysicsunits(effrangepars)..., effrangepars...)
 end
 
 # N = 250
@@ -151,7 +151,7 @@ let
             Δe->k3b(Eᵦˣ⁺+Δe),
             ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺))/20, 50)))
     # 
-    tophysicsunits(effrangepars)
+    (; tophysicsunits(effrangepars)..., effrangepars...)
 end
 
 # N = 50
