@@ -133,7 +133,7 @@ using DataFrames
 df = DataFrame(; modelnames)
 df.model = eval.(df.modelnames)
 
-let
+let 
     @time effrangepars = # 12s
         effectiverangeexpansion(
             Δe->denominator_II(A₀_full, Eᵦˣ⁺+Δe, δm0_val),
@@ -148,6 +148,7 @@ df.r_fm = ones(Nm).*1im
 df.a⁻¹ = ones(Nm).*1im
 df.r = ones(Nm).*1im
 df.N = ones(Nm).*1im
+
 
 let Nappr = 150, Rexp = abs(imag(Eᵦˣ⁺))/20
     # 
@@ -168,6 +169,60 @@ let Nappr = 150, Rexp = abs(imag(Eᵦˣ⁺))/20
         df.N[i] = efrpars.N
     end
 end
+
+
+# uncertainties
+df.a_fm⁺ᵟ = ones(Nm)
+df.r_fm⁺ᵟ = ones(Nm).*1im
+df.a⁻¹⁺ᵟ = ones(Nm).*1im
+df.r⁺ᵟ = ones(Nm).*1im
+df.N⁺ᵟ = ones(Nm).*1im
+df.a_fm⁻ᵟ = ones(Nm)
+df.r_fm⁻ᵟ = ones(Nm).*1im
+df.a⁻¹⁻ᵟ = ones(Nm).*1im
+df.r⁻ᵟ = ones(Nm).*1im
+df.N⁻ᵟ = ones(Nm).*1im
+
+let Nappr = 150, Rexp = abs(imag(Eᵦˣ⁺))/20
+    # 
+    for i in 1:Nm
+        𝒜 = df.model[i]
+        # 
+        # dm0+δdm0
+        @time effrangepars⁺ᵟ = # 12s
+            effectiverangeexpansion(
+                Δe->denominator_II(𝒜, Eᵦˣ⁺+Δe, δm0_val+δm0.err),
+                Δe->k3b(Eᵦˣ⁺+Δe),
+                ComplexBranchPointExpansion(CircularSum(Rexp, Nappr)))
+        # 
+        efrpars⁺ᵟ = (; tophysicsunits(effrangepars⁺ᵟ)..., effrangepars⁺ᵟ...)
+        # 
+        df.a_fm⁺ᵟ[i] = efrpars⁺ᵟ.a_fm
+        df.r_fm⁺ᵟ[i] = efrpars⁺ᵟ.r_fm
+        df.a⁻¹⁺ᵟ[i] = efrpars⁺ᵟ.a⁻¹
+        df.r⁺ᵟ[i] = efrpars⁺ᵟ.r
+        df.N⁺ᵟ[i] = efrpars⁺ᵟ.N
+        #
+        # dm0-δdm0
+        @time effrangepars⁻ᵟ = # 12s
+            effectiverangeexpansion(
+                Δe->denominator_II(𝒜, Eᵦˣ⁺+Δe, δm0_val-δm0.err),
+                Δe->k3b(Eᵦˣ⁺+Δe),
+                ComplexBranchPointExpansion(CircularSum(Rexp, Nappr)))
+        # 
+        efrpars⁻ᵟ = (; tophysicsunits(effrangepars⁻ᵟ)..., effrangepars⁻ᵟ...)
+        # 
+        df.a_fm⁻ᵟ[i] = efrpars⁻ᵟ.a_fm
+        df.r_fm⁻ᵟ[i] = efrpars⁻ᵟ.r_fm
+        df.a⁻¹⁻ᵟ[i] = efrpars⁻ᵟ.a⁻¹
+        df.r⁻ᵟ[i] = efrpars⁻ᵟ.r
+        df.N⁻ᵟ[i] = efrpars⁻ᵟ.N
+    end
+end
+
+
+
+ps((a,b,c)) = "$(a)^{+$(b)}_{-$(c)}"
 
 # test
 print(select(df[[4,5],:], [:modelnames, :a_fm, :r_fm, :N]))
@@ -191,6 +246,17 @@ print(select(df[[1,2],:], [:modelnames, :a_fm, :r_fm, :N]))
 # A₀_full_DˣD  -7.32118  -0.626768+0.159036im   0.010316+0.000554445im
 
 
+function printuncertainty(nt, s, processing=identity)
+    v = nt[s]
+    v⁺ᵟ = nt[Symbol(s,"⁺ᵟ")]
+    v⁻ᵟ = nt[Symbol(s,"⁻ᵟ")]
+    Δv⁺ = v⁺ᵟ-v
+    Δv⁻ = v-v⁻ᵟ
+    # 
+    abc = [v,Δv⁺,Δv⁻]
+    return ps(processing(x) for x in abc)
+end
+
 
 
 Xc(r::Real,a⁻¹::Real) = 1/sqrt(1+2r*a⁻¹/X2DDpi.fm_times_mev)
@@ -201,6 +267,7 @@ Z_polosa_95 = map(r->Xc(r, df.a⁻¹[1]*1e3), (-16.9,0) .+ df.r_fm[1])
 # 
 Z_hanhart_90 = map(r->Xc(r, df.a⁻¹[1]*1e3), (-11.9,0) .+ df.r_fm[2])
 Z_hanhart_95 = map(r->Xc(r, df.a⁻¹[1]*1e3), (-16.9,0) .+ df.r_fm[2])
+
 
 
 
@@ -222,6 +289,15 @@ writejson(joinpath("results","nominal","effectiverangecauchy.json"),
                 :effective_range_high_fm => round(df.r_fm[1]-df.r_fm[2], digits=2),
             ),
 # 
+            :withuncertainties => Dict(
+                :inv_scatt_length_MeV_Re => printuncertainty(df[1,:], :a⁻¹, x->round(real(1e3*x),digits=2)),
+                :inv_scatt_length_MeV_Im => printuncertainty(df[1,:], :a⁻¹, x->round(imag(1e3*x),digits=2)),
+                :effective_range_fm_Re => printuncertainty(df[1,:], :r_fm, x->round(real(x),digits=2)),
+                :effective_range_fm_Im => printuncertainty(df[1,:], :r_fm, x->round(imag(x),digits=2)),
+                :effective_range_disp_fm_Re => printuncertainty(df[2,:], :r_fm, x->round(real(x),digits=2)),
+                :effective_range_high_fm_Im => printuncertainty(df[2,:], :r_fm, x->round(real(x),digits=2))
+            ),
+# 
             :compositeness => Dict(
                 :Z_hanhart_90 => Z_hanhart_90,
                 :Z_hanhart_95 => Z_hanhart_95,
@@ -230,7 +306,6 @@ writejson(joinpath("results","nominal","effectiverangecauchy.json"),
             )
     ))
 #
-
 
 
 struct ERA

@@ -106,6 +106,14 @@
             }
         }
     ],
+    "withuncertainties": {
+        "effective_range_disp_fm_Re": "-0.63^{+0.0}_{--0.0}",
+        "inv_scatt_length_MeV_Re": "-33.11^{+2.2}_{-2.11}",
+        "effective_range_high_fm_Im": "-0.63^{+0.0}_{--0.0}",
+        "effective_range_fm_Im": "0.46^{+0.0}_{--0.0}",
+        "effective_range_fm_Re": "-4.36^{+-0.0}_{--0.0}",
+        "inv_scatt_length_MeV_Im": "2.1^{+-0.14}_{--0.14}"
+    },
     "compositeness": {
         "Z_hanhart_95": [
             0.38118765746570893,
