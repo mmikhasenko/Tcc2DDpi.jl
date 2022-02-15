@@ -41,6 +41,9 @@ let
         (Z_hanhart_95[1], -0.4, text(string(round(Z_hanhart_95[1],digits=2)),:top, 8)),
         ])
     plot!([0,0], [-0.06,0.06], c=:black, lab="", ann=(0.01,-0.06,text("0.0",:top,8)))
+    annotate!([
+        (0, -0.15, text(latexstring("[D^{*0}D^+\\mathrm{removed}]") ,:top,    :left, 11))])#,
+        # (0,  0.15, text(latexstring("[\\mathrm{experimental}\\,\\,r,a^{-1}]") ,:bottom, :left, 11))])
 end
 savefig(joinpath("plots", "compositeness.pdf"))
 
