@@ -47,7 +47,7 @@ end
 phsps = let 
     ev = caldata.xv
     yvs = [map(e->ρ_thr(ich,e), ev) for ich in ichannels]
-    (;xv = ev, yvs, labs=["π⁺D⁰D⁰","π⁰D⁺D⁰","γD⁺D⁰","10⁴ × π⁻D⁺D⁺"])
+    (;xv = ev, yvs, labs=["π⁺D⁰D⁰","π⁰D⁺D⁰","γD⁺D⁰","10³ × π⁻D⁺D⁺"])
 end
 
 let
@@ -57,9 +57,14 @@ let
     plot!(phsps.xv, caldata.yv .* phsps.yvs[3], lab=phsps.labs[3], yscale=:log10)
     # 
     m = phsps.xv .> m2e(sum(channels[4].ms))
-    plot!(phsps.xv[m], 1e4 .* caldata.yv[m] .* phsps.yvs[4][m], lab=phsps.labs[4], yscale=:log10)
+    plot!(phsps.xv[m], 1e3 .* caldata.yv[m] .* phsps.yvs[4][m], lab=phsps.labs[4], yscale=:log10)
     # 
-    vline!([0 m2e(mDˣ⁰+mD⁺)], lc=[:lightgreen :magenta], ls=:dash, lw=1.5, lab="")
+    vline!([0 m2e(mDˣ⁰+mD⁺) m2e(mπ⁺+2mD⁺)], lc=[:lightgreen :magenta], ls=:dash, lw=1.5, lab="")
+    annotate!([
+        (0, 2, text("Dˣ⁺D⁰",10, :left, :bottom, rotation=90)),
+        (m2e(mDˣ⁰+mD⁺), 2, text("Dˣ⁰D⁺",10, :left, :bottom, rotation=90)),
+        (m2e(mπ⁺+2mD⁺), 2, text("π⁺D⁻D⁺",10, :left, :bottom, rotation=90))
+    ])
     plot!(ylim=(1e0,:auto))
 end
 savefig(joinpath("plots","nominal","intensityspectra.pdf"))
