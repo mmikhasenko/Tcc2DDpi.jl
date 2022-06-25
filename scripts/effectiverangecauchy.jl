@@ -7,9 +7,14 @@ using Parameters
 using Measurements
 using Interpolations
 using Statistics
+using LaTeXStrings
 
 using Plots
-
+theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
+    guidefontvalign=:top, guidefonthalign=:right,
+    foreground_color_legend = nothing,
+    legendfontsize=9, legend =:topright,
+    xlim=(:auto,:auto), ylim=(:auto,:auto))
 
 @with_kw struct ZeroBW <: X2DDpi.AbstractLinesShape
     m::Float64
@@ -347,21 +352,20 @@ let
 end
 savefig(joinpath("plots", "testmatchefr.pdf"))
 
-# let
-#     plot()
-#     plot!(Δe->imag(denominator_II(df.model[3], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[3]))
-#     plot!(Δe->imag(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
-# end
 
-# let
-#     plot()
-#     plot!(Δe->imag(denominator_II(df.model[3], Δe, δm0_val)),-0.1, 1, lab=string(df.modelnames[3]))
-#     plot!(Δe->imag(2*denominator_II(df.model[4], Δe, δm0_val)),-0.1, 1, lab=string(df.modelnames[4]))
-# end
-
-
-# let
-#     plot()
-#     plot!(Δe->real(denominator_II(df.model[3], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[3]))
-#     plot!(Δe->real(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
-# end
+let i = 1
+    plot(xlab=L"\delta' m\,\,(\mathrm{MeV})", ylab=L"\mathrm{Re}\,\mathcal{A}^{-1},\,\,\mathrm{Im}\,\mathcal{A}^{-1}")
+    plot!(Δe->real(-denominator_II(df.model[i], Δe, δm0_val)), -1, 3, lab="LHCb Model", lc=:black)
+    plot!(Δe->imag(-denominator_II(df.model[i], Δe, δm0_val)), -1, 3, lab="", lc=:red)
+    # 
+    @unpack a⁻¹, r, N = df[i,:]
+    era = ERA( a⁻¹, r, N)
+    plot!(Δe->real(-denominator_II(era, Δe)), -1, 3, lab="Eff.-range exp.", ls=:dash, lc=:black)
+    plot!(Δe->imag(-denominator_II(era, Δe)), -1, 3, lab="", ls=:dash, lc=:red)
+    # plot!(Δe->imag(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
+    scatter!([0.0], [real(-denominator_II(era, 0))], ms=5, mc=:black, lab="exp. point")
+    scatter!([0.0], [imag(-denominator_II(era, 0))], ms=5, mc=:red, lab="")
+    # 
+    plot!(leg=:topleft)
+end
+savefig(joinpath("plots", "effectiverangecauchy.pdf"))
