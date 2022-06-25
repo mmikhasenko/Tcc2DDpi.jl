@@ -352,20 +352,25 @@ let
 end
 savefig(joinpath("plots", "testmatchefr.pdf"))
 
-
+# 
+@unpack w_matching, rho_inf =
+    readjson(joinpath("results", "nominal", "effective_range.json"))["effective_range_parameters"]["technical"]
+# 
+N′ = 1 / (w_matching * rho_inf)
 let i = 1
-    plot(xlab=L"\delta' m\,\,(\mathrm{MeV})", ylab=L"\mathrm{Re}\,\mathcal{A}^{-1},\,\,\mathrm{Im}\,\mathcal{A}^{-1}")
-    plot!(Δe->real(-denominator_II(df.model[i], Δe, δm0_val)), -1, 3, lab="LHCb Model", lc=:black)
-    plot!(Δe->imag(-denominator_II(df.model[i], Δe, δm0_val)), -1, 3, lab="", lc=:red)
+    plot(xlab=L"\delta' m\,\,(\mathrm{MeV})", ylab=L"\mathrm{Re}\,\mathcal{A}^{-1}(black),\,\,\mathrm{Im}\,\mathcal{A}^{-1}(red)")
+    plot!(Δe->N′*real(denominator_II(df.model[i], Δe, δm0_val)), -1, 3, lab="LHCb Model", lc=:black)
+    plot!(Δe->N′*imag(denominator_II(df.model[i], Δe, δm0_val)), -1, 3, lab="", lc=:red)
     # 
     @unpack a⁻¹, r, N = df[i,:]
     era = ERA( a⁻¹, r, N)
-    plot!(Δe->real(-denominator_II(era, Δe)), -1, 3, lab="Eff.-range exp.", ls=:dash, lc=:black)
-    plot!(Δe->imag(-denominator_II(era, Δe)), -1, 3, lab="", ls=:dash, lc=:red)
+    plot!(Δe->N′*real(denominator_II(era, Δe)), -1, 3, lab="Eff.-range exp.", ls=:dash, lc=:black)
+    plot!(Δe->N′*imag(denominator_II(era, Δe)), -1, 3, lab="", ls=:dash, lc=:red)
     # plot!(Δe->imag(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
-    scatter!([0.0], [real(-denominator_II(era, 0))], ms=5, mc=:black, lab="exp. point")
-    scatter!([0.0], [imag(-denominator_II(era, 0))], ms=5, mc=:red, lab="")
-    # 
-    plot!(leg=:topleft)
+    vline!([0], lab="", c=:green, lw=1)
+    # scatter!([0.0], [N′*real(denominator_II(era, 0))], ms=5, mc=:black, lab="exp. point")
+    # scatter!([0.0], [N′*imag(denominator_II(era, 0))], ms=5, mc=:red, lab="")
 end
-savefig(joinpath("plots", "effectiverangecauchy.pdf"))
+savefig(joinpath("plots","nominal", "effectiverangecauchy.pdf"))
+
+
