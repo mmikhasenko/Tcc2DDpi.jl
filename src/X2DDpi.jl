@@ -36,7 +36,7 @@ import Base.^
 
 include("covariant_exptessions.jl")
 
-export BW, BW_norm, BW_Swave
+export BW, BW_norm, BW_Swave, ZeroBW
 export Jᴵ, Jᴵᴵ
 include("isobar.jl")
 

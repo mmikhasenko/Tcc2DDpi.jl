@@ -16,13 +16,6 @@ theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
     legendfontsize=9, legend =:topright,
     xlim=(:auto,:auto), ylim=(:auto,:auto))
 
-@with_kw struct ZeroBW <: X2DDpi.AbstractLinesShape
-    m::Float64
-    Γ::Float64
-end
-
-X2DDpi.Jᴵ(σ::Number,pars::ZeroBW) = 0.0
-X2DDpi.Jᴵᴵ(σ::Number,pars::ZeroBW) = 0.0
 
 #        _|              _|                
 #    _|_|_|    _|_|_|  _|_|_|_|    _|_|_|  
