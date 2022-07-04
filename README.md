@@ -70,17 +70,17 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
 
    - `pole_vs_g1g2.jl`
 
-4. Plotting complex plane in with `plotlyjs` for [EP news](https://ep-news.web.cern.ch/content/lhcb-discovers-double-charm-tetraquark)
+4. **Complex plane** for [EP news](https://ep-news.web.cern.ch/content/lhcb-discovers-double-charm-tetraquark)
 
    - `complexplaneongrid.jl` Compute the values on the complex grid using the default model
    - `DxD_model_without_interference.jl` Compute the values on the complex grid using a simplified model
    - `plotcomplexplane_3d_plotlyjs.jl` Visualize the values
 
-5. Effective range computation using the cauchy integrals
+5. **Scattering parameters using the cauchy integrals**
 
    - `effectiverangecauchy.jl`
    - `plotcompositeness.jl`
 
-6. Additional plots for talks
+6. **Additional plots for talks**
    - `howwidthismade.jl` contributions to the width
    - `xxx.jl` DDpi momentum spectrum
