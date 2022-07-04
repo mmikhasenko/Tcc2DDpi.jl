@@ -82,5 +82,6 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
    - `plotcompositeness.jl`
 
 6. **Additional plots for talks**
+
    - `howwidthismade.jl` contributions to the width
-   - `xxx.jl` DDpi momentum spectrum
+   - `xxx.jl` DDpi momentum spectrum. Femtoscopy
