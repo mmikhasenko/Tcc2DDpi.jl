@@ -61,7 +61,7 @@ function amplitude(ch::πDD, j0, L, λ)
 	sqrt(Sym(2L+1))*sum(
 		F2*wignerd(j0,λ,τ,ζ23_for1)*
 			wignerd(j,τ,0,θ31)*clgd(L,0,S,τ,j0,τ) + # chain-2
-		(-1)^j * # H_{Dπ} vs H_{πD}
+		(-1)^j * # H_{Dπ} vs H_{πD} in helicity basis
 			F3*wignerd(j0,λ,τ,0)*wignerd(j,τ,0,θ12)*clgd(L,0,S,τ,j0,τ) # chain-3
 		for τ in -j:j)
 end
@@ -98,7 +98,7 @@ function amplitude(ch::γDD, j0, L, λ, ρ)
 			wignerd(jγ,ρ′,ρ,ζ23_for1) - # isospin minus
 		# 
 		# chain-3: (γD₂)D₃
-		(-1)^j * # H_{Dγ} vs H_{γD}
+		(-1)^(lγ+sγ-jγ) * # H_{Dγ} vs H_{γD} in ls basis. Martin-Spearman (5.57)
 			F3*wignerd(j0,λ,τ,0)*
 		clgd(L,0,S,τ,j0,τ)*wignerd(j,τ,ρ,θ12)*clgd(lγ,0,sγ,ρ′,j,ρ′) * 
 			wignerd(jγ,ρ′,ρ,0)
