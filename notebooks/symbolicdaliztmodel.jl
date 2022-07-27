@@ -110,6 +110,23 @@ end
  intensity(ch::πDD, j0, L) = sum(abs2, amplitude(ch, j0, L, λ) for λ in -j0:j0)
 
 # ╔═╡ 81b43385-047a-4d33-83ce-f72beed5b87e
+"""
+	intensity(ch::γDD, j0, L)
+
+The amplitude is squared and summed over the Tcc and γ helicity states.
+The summation is implemented including all states,
+```
+for λ in -j0:j0, ρ in -1:1
+```
+howereve, ρ=0 should be excluded.
+It is excluded effectively by the Dˣ to D γ decay Clebch-Gardan coefficient,
+```
+clgd(lγ,0,sγ,ρ′,j,ρ′) = 0 for ρ′=0
+```
+The Kroniker delta for ρ′ and ρ′ is given by
+ - `wignerd(jγ,ρ′,ρ,0)` for the chain 3,
+ - `wignerd(jγ,ρ′,ρ,ζ23_for1)` for the chain 2 since `ζ23_for1 = 0 or pi` for the zero mass particle.
+"""
 intensity(ch::γDD, j0, L) = sum(abs2, amplitude(ch, j0, L, λ, ρ)
 	for λ in -j0:j0, ρ in -1:1)
 
