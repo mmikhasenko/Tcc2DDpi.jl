@@ -12,7 +12,8 @@ begin
 			Pkg.PackageSpec("LaTeXStrings"),
 			Pkg.PackageSpec("SymPy"),
 			Pkg.PackageSpec("Parameters"),
-			Pkg.PackageSpec("PyCall")
+			Pkg.PackageSpec("PyCall"),
+			Pkg.PackageSpec("JSON")
 		])
 
 	using SymPy
@@ -24,6 +25,7 @@ begin
 	#
 	using Parameters
 	using LaTeXStrings
+	using JSON
 end
 
 # ╔═╡ 04808f8e-25bf-4c6c-9794-5a9d59b197e8
@@ -186,7 +188,7 @@ Markdown.parse(
 """
 The unpolarized decay rate to πDD reads:
 ```math
-\\small
+\\tiny
 \\begin{align}
 """*
 prod("""
@@ -202,7 +204,7 @@ Markdown.parse(
 """
 The unpolarized decay rate into γDD reads:
 ```math
-\\small
+\\tiny
 \\begin{align}
 """*
 prod("""
@@ -212,6 +214,59 @@ $(sympy.latex(k)) &= $(niceprint(IγDD[k], _γDD.F2, _γDD.F3))) \\\\\\\\\\\\
 \\end{align}
 ```
 """)
+
+# ╔═╡ 88c62736-4631-4521-ba50-85d20b549475
+md"""
+### Convert sympy to c code
+"""
+
+# ╔═╡ 0aa313ea-17f7-4ed3-85a1-cdebeb77b4f1
+function expr2ccode(exp, extrasubs)
+	exp′ = exp.subs(extrasubs)
+	exp′′ = exp′.subs(
+			Dict(
+				θ12=>Sym("theta12"),
+				θ31=>Sym("theta31"),
+				ζ23_for1=>Sym("zeta23_for1"),
+				ζ23_for0=>Sym("zeta23_for0")))
+	exp′′′ = exp′′.subs(Dict(
+			Sym("F2")^2 => Sym("F2abs2"),
+			Sym("F3")^2 => Sym("F3abs2"),
+			Sym("F2")*Sym("F3")=>Sym("ReF2F3x")))
+	sympy.ccode(exp′′′)
+end
+
+# ╔═╡ 97c44e67-e3c6-498b-9275-2c68aecb5fb3
+begin
+	codes = Dict()
+	for k in keys(IγDD)
+		extrasubs = Dict(
+				_γDD.F2=>Sym("F2"),
+				_γDD.F3=>Sym("F3"))
+		codes[k] = expr2ccode(IγDD[k], extrasubs)
+	end
+	for k in keys(IπDD)
+		extrasubs = Dict(
+				_πDD.F2=>Sym("F2"),
+				_πDD.F3=>Sym("F3"))
+		codes[k] = expr2ccode(IπDD[k], extrasubs)
+	end
+end
+
+# ╔═╡ 9057b18c-40c7-4d99-81a2-50f1af668f59
+md"""
+### Write to json
+"""
+
+# ╔═╡ 9dcd8295-46cb-4916-9ca5-f7f1706154cf
+function writejson(path, obj)
+    open(path, "w") do io
+        JSON.print(io, obj, 4)
+    end
+end
+
+# ╔═╡ a3ad21c1-e02b-4eed-9f70-10a8d0c7cb58
+writejson("code_gDD.json", codes)
 
 # ╔═╡ Cell order:
 # ╠═5ac3c9c0-0ce8-11ed-102b-03e4d63d6c1b
@@ -235,3 +290,9 @@ $(sympy.latex(k)) &= $(niceprint(IγDD[k], _γDD.F2, _γDD.F3))) \\\\\\\\\\\\
 # ╠═574d4a03-03cd-4a83-a30e-4fc97c6aeb50
 # ╟─69d847b4-c0c6-4f71-ab28-b444bb049602
 # ╟─c8bb2ebb-913d-42f3-b5b0-b5d1a81dd6f3
+# ╠═88c62736-4631-4521-ba50-85d20b549475
+# ╠═0aa313ea-17f7-4ed3-85a1-cdebeb77b4f1
+# ╠═97c44e67-e3c6-498b-9275-2c68aecb5fb3
+# ╟─9057b18c-40c7-4d99-81a2-50f1af668f59
+# ╠═9dcd8295-46cb-4916-9ca5-f7f1706154cf
+# ╠═a3ad21c1-e02b-4eed-9f70-10a8d0c7cb58
