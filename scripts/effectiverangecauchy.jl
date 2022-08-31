@@ -7,17 +7,15 @@ using Parameters
 using Measurements
 using Interpolations
 using Statistics
+using LaTeXStrings
 
 using Plots
+theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
+    guidefontvalign=:top, guidefonthalign=:right,
+    foreground_color_legend = nothing,
+    legendfontsize=9, legend =:topright,
+    xlim=(:auto,:auto), ylim=(:auto,:auto))
 
-
-@with_kw struct ZeroBW <: X2DDpi.AbstractLinesShape
-    m::Float64
-    Γ::Float64
-end
-
-X2DDpi.Jᴵ(σ::Number,pars::ZeroBW) = 0.0
-X2DDpi.Jᴵᴵ(σ::Number,pars::ZeroBW) = 0.0
 
 #        _|              _|                
 #    _|_|_|    _|_|_|  _|_|_|_|    _|_|_|  
@@ -347,21 +345,25 @@ let
 end
 savefig(joinpath("plots", "testmatchefr.pdf"))
 
-# let
-#     plot()
-#     plot!(Δe->imag(denominator_II(df.model[3], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[3]))
-#     plot!(Δe->imag(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
-# end
+# 
+@unpack w_matching, rho_inf =
+    readjson(joinpath("results", "nominal", "effective_range.json"))["effective_range_parameters"]["technical"]
+# 
+N′ = 1 / (w_matching * rho_inf)
+let i = 1
+    plot(xlab=L"\delta' m\,\,(\mathrm{MeV})", ylab=L"\mathrm{Re}\,\mathcal{A}^{-1}(black),\,\,\mathrm{Im}\,\mathcal{A}^{-1}(red)")
+    plot!(Δe->N′*real(denominator_II(df.model[i], Δe, δm0_val)), -1, 3, lab="LHCb Model", lc=:black)
+    plot!(Δe->N′*imag(denominator_II(df.model[i], Δe, δm0_val)), -1, 3, lab="", lc=:red)
+    # 
+    @unpack a⁻¹, r, N = df[i,:]
+    era = ERA( a⁻¹, r, N)
+    plot!(Δe->N′*real(denominator_II(era, Δe)), -1, 3, lab="Eff.-range exp.", ls=:dash, lc=:black)
+    plot!(Δe->N′*imag(denominator_II(era, Δe)), -1, 3, lab="", ls=:dash, lc=:red)
+    # plot!(Δe->imag(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
+    vline!([0], lab="", c=:green, lw=1)
+    # scatter!([0.0], [N′*real(denominator_II(era, 0))], ms=5, mc=:black, lab="exp. point")
+    # scatter!([0.0], [N′*imag(denominator_II(era, 0))], ms=5, mc=:red, lab="")
+end
+savefig(joinpath("plots","nominal", "effectiverangecauchy.pdf"))
 
-# let
-#     plot()
-#     plot!(Δe->imag(denominator_II(df.model[3], Δe, δm0_val)),-0.1, 1, lab=string(df.modelnames[3]))
-#     plot!(Δe->imag(2*denominator_II(df.model[4], Δe, δm0_val)),-0.1, 1, lab=string(df.modelnames[4]))
-# end
 
-
-# let
-#     plot()
-#     plot!(Δe->real(denominator_II(df.model[3], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[3]))
-#     plot!(Δe->real(2*denominator_II(df.model[4], Eᵦˣ⁺+Δe, δm0_val)),-0.01, 0.1, lab=string(df.modelnames[4]))
-# end

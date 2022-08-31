@@ -42,6 +42,13 @@ end
 Jᴵ( σ, pars::BW_norm) = pars.n / (pars.m^2 - σ + 1im*pars.m*pars.Γ)
 Jᴵᴵ(σ, pars::BW_norm) = pars.n / (pars.m^2 - σ - 1im*pars.m*pars.Γ)
 
+@with_kw struct ZeroBW <: AbstractLinesShape
+    m::Float64
+    Γ::Float64
+end
+Jᴵ(σ::Number,pars::ZeroBW) = 0.0
+Jᴵᴵ(σ::Number,pars::ZeroBW) = 0.0
+
 
 function obj2nt(amp::AbstractLinesShape)
 	type = typeof(amp)
