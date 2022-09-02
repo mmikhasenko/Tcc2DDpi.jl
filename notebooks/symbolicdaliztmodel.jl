@@ -1,11 +1,10 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.14.9
 
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 5ac3c9c0-0ce8-11ed-102b-03e4d63d6c1b
-# ╠═╡ show_logs = false
+# ╔═╡ 3dbb29a8-1f37-407f-8907-698c80f2bd00
 begin
 	import Pkg
 		Pkg.add([
@@ -68,120 +67,92 @@ function amplitude(ch::πDD, j0, L, λ)
 		for τ in -j:j)
 end
 
-# ╔═╡ 912c2553-6197-4296-b429-429712beadb2
-md"""
-### Amplitude $\gamma DD$
-"""
-
-# ╔═╡ 2b07445f-0710-45b7-9127-6582ea86f2b5
-struct γDD{T}
-	F2::T
-	F3::T
-end
-
-# ╔═╡ 2af36530-be75-41ec-8c86-0e86abeb441c
-function amplitude(ch::γDD, j0, L, λ, ρ)
+# ╔═╡ bb7eecb0-450a-4f66-b781-7df2a75f5359
+function amplitude_withNR(ch::πDD, λ, F_NR12, F_NR13, F_NR23)
 	@unpack F2, F3 = ch
-	# Tcc → Dˣ D
-	j = 1 # Dˣ
-	S = 1 # Dˣ⊗D
-	# 
-	# Dˣ → Dπ P-wave
-	jγ = 1 
-	lγ = 1
-	sγ = 1 # γ⊗D
-	# 
+	j0 = 1 # JP of X are 1+
+	L = 0 # X->D D* wave if JP of X are 1+
+	j = 1 # J of D*
+	S = 1 # S of DD*
+	j_NR = 0 # of Dpi
+	S_NR = 0 # of DDpi then
+	L_NR = 1 # X->D {Dpi} wave if JP of X are 1+
+	τ_Dpi = 0
+	τ_DD = 0
 	sqrt(Sym(2L+1))*sum(
-		# 
-		# chain-2: (D₃γ)D₂
-			F2*wignerd(j0,λ,τ,ζ23_for0) *
-		(-1)^(jγ-ρ′) * # particle-2 phase
-		clgd(L,0,S,τ,j0,τ)*wignerd(j,τ,-ρ′,θ31)*clgd(lγ,0,sγ,-ρ′,j,-ρ′) *
-			wignerd(jγ,ρ′,ρ,ζ23_for1) - # isospin minus
-		# 
-		# chain-3: (γD₂)D₃
-		(-1)^(lγ+sγ-jγ) * # H_{Dγ} vs H_{γD} in ls basis. Martin-Spearman (5.57)
-			F3*wignerd(j0,λ,τ,0)*
-		clgd(L,0,S,τ,j0,τ)*wignerd(j,τ,ρ,θ12)*clgd(lγ,0,sγ,ρ′,j,ρ′) * 
-			wignerd(jγ,ρ′,ρ,0)
-		# 
-		for τ in -j:j, ρ′ in -jγ:jγ)
+		(
+			F2*wignerd(j0,λ,τ,ζ23_for0)*
+			wignerd(j,τ,0,θ31)*clgd(L,0,S,τ,j0,τ) + # chain-2
+		(-1)^j * # H_{Dπ} vs H_{πD} in helicity basis
+			F3*wignerd(j0,λ,τ,0)*wignerd(j,τ,0,θ12)
+		)
+		*clgd(L,0,S,τ,j0,τ)
+		# now adding non-resonant component, S-wave in Dpi
+		+ (F_NR13/3*
+			wignerd(j0,λ,τ_Dpi,ζ23_for0)*wignerd(j_NR,τ_Dpi,0,θ31)
+			+ F_NR12/3*wignerd(j0,λ,τ_Dpi,0)*wignerd(j_NR,τ_Dpi,0,θ12)
+		)*clgd(L_NR,0,S_NR,τ_Dpi,j0,τ_Dpi)
+		# now S-wave in DD
+		+ F_NR23/3
+		* wignerd(j0,λ,τ_DD,ζ13_for0)*wignerd(j_NR,τ_DD,0,θ23)
+		* clgd(L_NR,0,S_NR,τ_DD,j0,τ_DD) 
+		# chain-3
+		for τ in -j:j)
 end
 
-# ╔═╡ b1c195bf-de94-45b1-9646-533b47edb7b4
- intensity(ch::πDD, j0, L) = sum(abs2, amplitude(ch, j0, L, λ) for λ in -j0:j0)
+# ╔═╡ 7065b936-6ede-4cd7-9290-8e453d903f48
+intensity(ch::πDD, j0, L) = sum(abs2, amplitude(ch, j0, L, λ) for λ in -j0:j0)
 
-# ╔═╡ 81b43385-047a-4d33-83ce-f72beed5b87e
-"""
-	intensity(ch::γDD, j0, L)
+# ╔═╡ c2d22258-0654-4ec5-b9f0-6922c597ee37
+intensity_withNR(ch::πDD, F_NR12, F_NR13, F_NR23) = sum(abs2, amplitude_withNR(ch, λ, F_NR12, F_NR13, F_NR23) for λ in -1:1)
 
-The amplitude is squared and summed over the Tcc and γ helicity states.
-The summation is implemented including all states,
-```
-for λ in -j0:j0, ρ in -1:1
-```
-howereve, ρ=0 should be excluded.
-It is excluded effectively by the Dˣ to D γ decay Clebch-Gardan coefficient,
-```
-clgd(lγ,0,sγ,ρ′,j,ρ′) = 0 for ρ′=0
-```
-The Kroniker delta for ρ′ and ρ′ is given by
- - `wignerd(jγ,ρ′,ρ,0)` for the chain 3,
- - `wignerd(jγ,ρ′,ρ,ζ23_for1)` for the chain 2 since `ζ23_for1 = 0 or pi` for the zero mass particle.
-"""
-intensity(ch::γDD, j0, L) = sum(abs2, amplitude(ch, j0, L, λ, ρ)
-	for λ in -j0:j0, ρ in -1:1)
+# ╔═╡ cf359cc5-28f3-4585-ae29-aa1e81efdd91
+F_NR12, F_NR13, F_NR23 = Sym("F^{NR}_{12}"), Sym("F^{NR}_{13}"), Sym("F^{NR}_{23}")
 
-# ╔═╡ e1b3df12-2085-491e-ab7e-9a015178757e
-md"""
-## Symbolic computation
-"""
-
-# ╔═╡ 6b7787e2-d751-422b-b6cd-a5d4532a3b31
+# ╔═╡ 783fc548-adc6-4550-9a52-abe4195bffe9
 const tested_j0L = ((1,0), (0,1), (1,1), (2,1), (2,2))
 
-# ╔═╡ 01c3d283-8e67-4590-9b15-687685b80394
+# ╔═╡ 5e7042ca-de8e-4347-93bc-9125fe9562b0
 _πDD = πDD(
 	SymPy.symbols("\\mathcal{F}_2^{D\\pi}", real = true),
 	SymPy.symbols("\\mathcal{F}_3^{D\\pi}", real = true))
 
-# ╔═╡ a3096302-b8e9-4d7b-8ee6-b1059401461e
+# ╔═╡ 359156de-388c-4307-ab50-699821e38834
 begin
 	IπDD = Dict()
 	for (j0,L) in tested_j0L
 		p = iseven(L) ? '+' : '-'
-		Is = Sym("I_{$(j0)^$(p)}^{(\\pi D D)}")
+		Is = Sym("I_{$(j0)^$(p)}^{(\\pi)}")
 		IπDD[Is] = intensity(_πDD, j0, L).doit() |> sympy.trigsimp |> expand
 	end
 end
 
-# ╔═╡ 987d81a4-ccff-476e-9322-a325d1bdf04a
-_γDD = γDD(
-	SymPy.symbols("\\mathcal{F}_2^{D\\gamma}", real = true),
-	SymPy.symbols("\\mathcal{F}_3^{D\\gamma}", real = true))
+# ╔═╡ 905dbfa9-9d6e-4d2b-b048-a72cb75f687e
+intensity(_πDD, 1, 0).doit()|> sympy.trigsimp
 
-# ╔═╡ fb0a7eab-7d6d-441e-b17c-b14810e8e569
-begin
-	IγDD = Dict()
-	for (j0,L) in tested_j0L
-		p = iseven(L) ? '+' : '-'
-		Is = Sym("I_{$(j0)^$(p)}^{(\\gamma D D)}")
-		IγDD[Is] = intensity(_γDD, j0, L).doit() |> sympy.trigsimp |> expand
-	end
-end
+# ╔═╡ fa453dd3-3507-48d3-9c8e-c2f4077f84b8
+intensity_withNR(_πDD, F_NR12, F_NR13, F_NR23).doit() |> sympy.trigsimp |> expand
+
+# ╔═╡ 11a388e8-e959-4f36-ad85-537d1d966eb0
+intensity_withNR(_πDD, 0, 0, F_NR23).doit() |> sympy.trigsimp |> expand
+
+# ╔═╡ 145e0c53-f855-4d5c-b423-9c2c2bcf4a7a
+(intensity_withNR(_πDD, F_NR12, F_NR13, 0) - intensity_withNR(_πDD, 0, 0, 0) ).doit() |> sympy.trigsimp |> expand
 
 # ╔═╡ ecac90d0-1682-4816-94e6-eed9350fbe0b
 binomialcoeff(e, F2, F3) = sympy.Poly(e, F2, F3).coeffs()
 
-# ╔═╡ 574d4a03-03cd-4a83-a30e-4fc97c6aeb50
+# ╔═╡ 0a0dd8c4-b392-4757-90ef-06aadb96ba16
 function niceprint(e, F2, F3)
 	cv = binomialcoeff(e, F2, F3) .|> sympy.trigsimp .|> sympy.simplify
 	"""
 	|$(sympy.latex(F2))|^2 \\left[$(sympy.latex(cv[1]))\\right]+\\\\&\\qquad
-	\\text{Re}($(sympy.latex(F2))\\overline{$(sympy.latex(F3))}) \\left[$(sympy.latex(cv[2]))\\right]+\\\\&\\qquad
+	\\text{Re}($(sympy.latex(F2))\\overline{$(sympy.latex(F3))})
+	\\left[$(sympy.latex(cv[2]))\\right]+\\\\&\\qquad
 	|$(sympy.latex(F3))|^2 \\left[$(sympy.latex(cv[3]))\\right]
 	"""
-end ;
+end;
+
 
 # ╔═╡ 69d847b4-c0c6-4f71-ab28-b444bb049602
 Markdown.parse(
@@ -239,12 +210,6 @@ end
 # ╔═╡ 97c44e67-e3c6-498b-9275-2c68aecb5fb3
 begin
 	codes = Dict()
-	for k in keys(IγDD)
-		extrasubs = Dict(
-				_γDD.F2=>Sym("F2"),
-				_γDD.F3=>Sym("F3"))
-		codes[k] = expr2ccode(IγDD[k], extrasubs)
-	end
 	for k in keys(IπDD)
 		extrasubs = Dict(
 				_πDD.F2=>Sym("F2"),
@@ -269,30 +234,30 @@ end
 writejson("code_gDD.json", codes)
 
 # ╔═╡ Cell order:
-# ╠═5ac3c9c0-0ce8-11ed-102b-03e4d63d6c1b
+# ╠═3dbb29a8-1f37-407f-8907-698c80f2bd00
 # ╠═04808f8e-25bf-4c6c-9794-5a9d59b197e8
 # ╠═f907394e-a7e0-43d0-8394-328c01dcca7c
-# ╟─f9f95dab-babb-4190-82af-f1681ce264b4
+# ╠═f9f95dab-babb-4190-82af-f1681ce264b4
 # ╠═078cad0e-7202-4ec5-b829-1b44f029160e
 # ╠═ca2e840e-df9d-4a27-834d-f6e2f1737378
-# ╠═b1c195bf-de94-45b1-9646-533b47edb7b4
-# ╟─912c2553-6197-4296-b429-429712beadb2
-# ╠═2b07445f-0710-45b7-9127-6582ea86f2b5
-# ╠═2af36530-be75-41ec-8c86-0e86abeb441c
-# ╠═81b43385-047a-4d33-83ce-f72beed5b87e
-# ╟─e1b3df12-2085-491e-ab7e-9a015178757e
-# ╠═6b7787e2-d751-422b-b6cd-a5d4532a3b31
-# ╠═01c3d283-8e67-4590-9b15-687685b80394
-# ╠═a3096302-b8e9-4d7b-8ee6-b1059401461e
-# ╠═987d81a4-ccff-476e-9322-a325d1bdf04a
-# ╠═fb0a7eab-7d6d-441e-b17c-b14810e8e569
+# ╠═bb7eecb0-450a-4f66-b781-7df2a75f5359
+# ╠═7065b936-6ede-4cd7-9290-8e453d903f48
+# ╠═c2d22258-0654-4ec5-b9f0-6922c597ee37
+# ╠═cf359cc5-28f3-4585-ae29-aa1e81efdd91
+# ╠═783fc548-adc6-4550-9a52-abe4195bffe9
+# ╠═5e7042ca-de8e-4347-93bc-9125fe9562b0
+# ╠═359156de-388c-4307-ab50-699821e38834
+# ╠═905dbfa9-9d6e-4d2b-b048-a72cb75f687e
+# ╠═fa453dd3-3507-48d3-9c8e-c2f4077f84b8
+# ╠═11a388e8-e959-4f36-ad85-537d1d966eb0
+# ╠═145e0c53-f855-4d5c-b423-9c2c2bcf4a7a
 # ╠═ecac90d0-1682-4816-94e6-eed9350fbe0b
-# ╠═574d4a03-03cd-4a83-a30e-4fc97c6aeb50
-# ╟─69d847b4-c0c6-4f71-ab28-b444bb049602
-# ╟─c8bb2ebb-913d-42f3-b5b0-b5d1a81dd6f3
+# ╠═0a0dd8c4-b392-4757-90ef-06aadb96ba16
+# ╠═69d847b4-c0c6-4f71-ab28-b444bb049602
+# ╠═c8bb2ebb-913d-42f3-b5b0-b5d1a81dd6f3
 # ╠═88c62736-4631-4521-ba50-85d20b549475
 # ╠═0aa313ea-17f7-4ed3-85a1-cdebeb77b4f1
 # ╠═97c44e67-e3c6-498b-9275-2c68aecb5fb3
-# ╟─9057b18c-40c7-4d99-81a2-50f1af668f59
+# ╠═9057b18c-40c7-4d99-81a2-50f1af668f59
 # ╠═9dcd8295-46cb-4916-9ca5-f7f1706154cf
 # ╠═a3ad21c1-e02b-4eed-9f70-10a8d0c7cb58
