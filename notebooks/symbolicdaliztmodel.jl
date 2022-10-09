@@ -1,19 +1,22 @@
 ### A Pluto.jl notebook ###
-# v0.14.9
+# v0.19.11
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 3dbb29a8-1f37-407f-8907-698c80f2bd00
 begin
+	cd(joinpath(@__DIR__, ".."))
 	import Pkg
-		Pkg.add([
-			Pkg.PackageSpec("LaTeXStrings"),
-			Pkg.PackageSpec("SymPy"),
-			Pkg.PackageSpec("Parameters"),
-			Pkg.PackageSpec("PyCall"),
-			Pkg.PackageSpec("JSON")
-		])
+	Pkg.activate(".")
+	Pkg.instantiate()
+	# 	Pkg.add([
+	# 		Pkg.PackageSpec("LaTeXStrings"),
+	# 		Pkg.PackageSpec("SymPy"),
+	# 		Pkg.PackageSpec("Parameters"),
+	# 		Pkg.PackageSpec("PyCall"),
+	# 		Pkg.PackageSpec("JSON")
+	# 	])
 
 	using SymPy
 	import PyCall
@@ -26,6 +29,9 @@ begin
 	using LaTeXStrings
 	using JSON
 end
+
+# ╔═╡ 71f9928c-42c2-43c2-899e-6fa756f6b683
+abstract type πDD end
 
 # ╔═╡ 04808f8e-25bf-4c6c-9794-5a9d59b197e8
 begin
@@ -40,7 +46,8 @@ begin
 		θ12::nonnegative=>"\\theta_{12}",
 		θ31::nonnegative=>"\\theta_{31}")
 	@syms(
-		ζ23_for0::nonnegative=>"\\zeta^0_{2(3)}", ζ23_for1::nonnegative=>"\\zeta^1_{2(3)}")
+		ζ23_for0::nonnegative=>"\\zeta^0_{2(3)}",
+		ζ23_for1::nonnegative=>"\\zeta^1_{2(3)}")
 end ;
 
 # ╔═╡ f9f95dab-babb-4190-82af-f1681ce264b4
@@ -49,22 +56,57 @@ md"""
 """
 
 # ╔═╡ 078cad0e-7202-4ec5-b829-1b44f029160e
-struct πDD{T}
+struct πDD_2xDˣ_3xB{T} <: πDD
 	F2::T
 	F3::T
+	B1::T # DD S-wave
+	B2::T # Dπ S-wave
+	B3::T # Dπ S-wave
 end
 
 # ╔═╡ ca2e840e-df9d-4a27-834d-f6e2f1737378
-function amplitude(ch::πDD, j0, L, λ)
+function amplitude(ch::πDD_2xDˣ_3xB, j0, L, λ)
 	@unpack F2, F3 = ch
-	j = 1
-	S = 1
-	sqrt(Sym(2L+1))*sum(
-		F2*wignerd(j0,λ,τ,ζ23_for1)*
-			wignerd(j,τ,0,θ31)*clgd(L,0,S,τ,j0,τ) + # chain-2
-		(-1)^j * # H_{Dπ} vs H_{πD} in helicity basis
-			F3*wignerd(j0,λ,τ,0)*wignerd(j,τ,0,θ12)*clgd(L,0,S,τ,j0,τ) # chain-3
+	@unpack B1, B2, B3 = ch
+	A = Sym(0)
+	# 
+	j_F = 1
+	S_F = 1
+	# 
+	ζ33_for0 = 0 # trivial
+	# chain-2
+	A += sqrt(Sym(2L+1)) * F2 * sum(
+		wignerd(j0,λ,τ,ζ23_for0)*
+			wignerd(j_F,τ,0,θ31)*clgd(L,0,S_F,τ,j0,τ)
 		for τ in -j:j)
+	# 
+	# chain-3
+	A += (-1)^j * # H_{Dπ} vs H_{πD} in helicity basis
+		sqrt(Sym(2L+1)) * F3 * sum(
+			wignerd(j0,λ,τ,ζ33_for0)*wignerd(j_F,τ,0,θ12)*clgd(L,0,S_F,τ,j0,τ)
+		for τ in -j:j)
+	#
+	# j_NR = 0 # of Dpi
+	# S_NR = 0 # scalar dimer + pseudoscalar
+	# L_NR = j0 # only correct for unnatural parity of X 0-, 1+, 2-
+	τ_Dpi = 0
+	τ_DD = 0
+	# backgr-1
+	A += B1 *
+		wignerd(j0,λ,τ_DD,ζ13_for0)
+			# wignerd(j_NR,τ_DD,0,θ23)
+			# clgd(L_NR,0,S_NR,τ_DD,j0,τ_DD)
+	# backgr-2
+	A += B2 *
+		wignerd(j0,λ,τ_Dpi,ζ23_for0)
+			# wignerd(j_NR,τ_Dpi,0,θ31)
+			# clgd(L_NR,0,S_NR,τ_Dpi,j0,τ_Dpi)
+	# backgr-3
+	A += B3 *
+		wignerd(j0,λ,τ_Dpi,ζ33_for0)
+			# wignerd(j_NR,τ_Dpi,0,θ12)
+			# clgd(L_NR,0,S_NR,τ_Dpi,j0,τ_Dpi)
+	return A
 end
 
 # ╔═╡ bb7eecb0-450a-4f66-b781-7df2a75f5359
