@@ -55,6 +55,74 @@ md"""
 ### Amplitude $\pi DD$
 """
 
+@with_kw struct Chain{S}
+	j::Int
+	j0::Int
+	L::Int
+	ζ_for0::S
+	θ::S
+	F::S
+end
+
+function amplitude(ch::PPP, λ)
+	@unpack F, j, ζ_for0, θ = ch
+	@unpack j0, L = ch
+	S = j
+	A = sqrt(Sym(2L+1)) * F * sum(
+			wignerd(j0,λ,τ,ζ_for0)*
+				wignerd(j_F,τ,0,θ)*clgd(L,0,S,τ,j0,τ)
+			for τ in -j:j)
+	return A
+end
+
+function amplitude(chains::model, λ)
+	A = Sym(0)
+	for chain in chains
+		A += amplitude(chain, λ)
+	end
+	return A
+end
+
+swaporder(A, from, to; j) = A.subs(from, to*(-1)^j)
+
+
+
+# application
+
+@syms(
+	F2_Dπ::real=>"\\mathcal{F}_2^{D\\pi}",
+	F3_πD::real=>"\\mathcal{F}_3^{\\pi D}",
+	F3_Dπ::real=>"\\mathcal{F}_3^{D\\pi}",
+	# 
+	B2_Dπ::real=>"\\mathcal{B}_3^{D\\pi}",
+	B3_πD::real=>"\\mathcal{B}_3^{\\pi D}",
+	B3_Dπ::real=>"\\mathcal{B}_3^{D\\pi}",
+	# 
+	B1_DD::real=>"\\mathcal{B}_3^{DD}"
+)
+
+model_πDD_2xDˣ_3xB = [
+	PPP(; F=F2_Dπ, j=1, j0, L, ζ=ζ23_for0, θ=θ31),
+	PPP(; F=F3_πD, j=1, j0, L, ζ=ζ33_for0, θ=θ12),
+	PPP(; F=B3_Dπ, j=0, j0, j, ζ=ζ23_for0, θ=θ31),
+	PPP(; F=B2_πD, j=0, j0, L, ζ=ζ23_for0, θ=θ12),
+	PPP(; F=B2_DD, j=0, j0, L, ζ=ζ13_for0, θ=θ23)
+]
+
+let
+	A = amplitude(model_πDD_2xDˣ_3xB, j0, L, λ)
+	A_Freplaced = swaporder(A, F3_πD, F3_Dπ; j=1)
+	A_FBreplaced = swaporder(A_Freplaced, B3_πD, B3_Dπ; j=0)
+	# 
+	A_FBreplaced
+end
+
+
+
+
+
+
+
 # ╔═╡ 078cad0e-7202-4ec5-b829-1b44f029160e
 struct πDD_2xDˣ_3xB{T} <: πDD
 	F2::T
@@ -277,6 +345,7 @@ writejson("code_gDD.json", codes)
 
 # ╔═╡ Cell order:
 # ╠═3dbb29a8-1f37-407f-8907-698c80f2bd00
+# ╠═71f9928c-42c2-43c2-899e-6fa756f6b683
 # ╠═04808f8e-25bf-4c6c-9794-5a9d59b197e8
 # ╠═f907394e-a7e0-43d0-8394-328c01dcca7c
 # ╠═f9f95dab-babb-4190-82af-f1681ce264b4
