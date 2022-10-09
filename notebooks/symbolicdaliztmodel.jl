@@ -7,21 +7,16 @@ using InteractiveUtils
 # ╔═╡ 5ac3c9c0-0ce8-11ed-102b-03e4d63d6c1b
 # ╠═╡ show_logs = false
 begin
+	cd(joinpath(@__DIR__, ".."))
 	import Pkg
-		Pkg.add([
-			Pkg.PackageSpec("LaTeXStrings"),
-			Pkg.PackageSpec("SymPy"),
-			Pkg.PackageSpec("Parameters"),
-			Pkg.PackageSpec("PyCall"),
-			Pkg.PackageSpec("JSON")
-		])
-
+	Pkg.activate(".")
+	Pkg.instantiate()
+	# 
 	using SymPy
 	import PyCall
 	PyCall.pyimport_conda("sympy.physics.quantum.spin", "sympy")
-	import_from(sympy.physics.quantum.spin, (:WignerD, :wignerd), typ=:Any)
-	PyCall.pyimport_conda("sympy.physics.wigner",       "sympy")
-	import_from(sympy.physics.wigner)
+	import_from(sympy.physics.quantum.spin, (:CG, ), typ=:Any)
+	import_from(sympy.physics.quantum.spin.Rotation, (:d,), typ=:Any)
 	#
 	using Parameters
 	using LaTeXStrings
@@ -30,9 +25,8 @@ end
 
 # ╔═╡ 04808f8e-25bf-4c6c-9794-5a9d59b197e8
 begin
-	wignerd(J,λ1,λ2,θ) = WignerD(Sym(J),λ1,λ2,0,θ,0)
-	clgd(j1,λ1,j2,λ2,j,λ) =
-		clebsch_gordan(Sym(j1),Sym(j2),Sym(j),Sym(λ1),Sym(λ2),Sym(λ))
+	wignerd(J,λ1,λ2,θ) = d(Sym(J),λ1,λ2,θ)
+	clgd(j1,λ1,j2,λ2,j,λ) = CG(j1,λ1,j2,λ2,j,λ)
 end
 
 # ╔═╡ f907394e-a7e0-43d0-8394-328c01dcca7c
@@ -41,7 +35,8 @@ begin
 		θ12::nonnegative=>"\\theta_{12}",
 		θ31::nonnegative=>"\\theta_{31}")
 	@syms(
-		ζ23_for0::nonnegative=>"\\zeta^0_{2(3)}", ζ23_for1::nonnegative=>"\\zeta^1_{2(3)}")
+		ζ23_for0::nonnegative=>"\\zeta^0_{2(3)}",
+		ζ23_for1::nonnegative=>"\\zeta^1_{2(3)}")
 end ;
 
 # ╔═╡ f9f95dab-babb-4190-82af-f1681ce264b4
@@ -61,7 +56,7 @@ function amplitude(ch::πDD, j0, L, λ)
 	j = 1
 	S = 1
 	sqrt(Sym(2L+1))*sum(
-		F2*wignerd(j0,λ,τ,ζ23_for1)*
+		F2*wignerd(j0,λ,τ,ζ23_for0)*
 			wignerd(j,τ,0,θ31)*clgd(L,0,S,τ,j0,τ) + # chain-2
 		(-1)^j * # H_{Dπ} vs H_{πD} in helicity basis
 			F3*wignerd(j0,λ,τ,0)*wignerd(j,τ,0,θ12)*clgd(L,0,S,τ,j0,τ) # chain-3
