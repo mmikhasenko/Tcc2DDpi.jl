@@ -55,8 +55,12 @@ jobs:
                     Export_baked_notebookfile=false,
                     Export_baked_state=false,
                     # more parameters can go here
-                  )'
-
+                  )
+                  
+                  # always run index
+                  export_notebook("index.jl";
+                    Export_baked_notebookfile=false,
+                    Export_baked_state=false)'
 
             - name: Deploy to gh-pages
               uses: JamesIves/github-pages-deploy-action@releases/v3
