@@ -59,7 +59,7 @@ jobs:
                   )
                   
                   # always run index
-                  export_notebook("index.jl";
+                  PlutoSliderServer.export_notebook("index.jl";
                     Export_baked_notebookfile=false,
                     Export_baked_state=false)'
 
