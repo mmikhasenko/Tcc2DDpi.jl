@@ -38,6 +38,13 @@ const δm0_val = δm0.val
 
 
 # πDD + πDD + γDD: Dˣ⁺ + Dˣ⁺ + Dˣ⁰
+"""
+The default full model.
+In includes three three-body cuts, π⁺D⁰D⁰ + π⁰D⁰D⁺ + γD⁰D⁺ and all possible resonances:
+ - two Dˣ⁺ in π⁺D⁰D⁰
+ - Dˣ⁺ and Dˣ⁰ in π⁰D⁰D⁺
+ - Dˣ⁺ and Dˣ⁰ in γD⁰D⁺
+"""
 @time const A₀_full = let 
     ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
     ch2 = πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁰,Γ=ΓDˣ⁰))
@@ -69,6 +76,13 @@ end
 
 
 # πDD + πDD + γDD: Dˣ⁺
+"""
+The model with the Dˣ⁺ resonance only.
+However, it includes three three-body cuts, π⁺D⁰D⁰ + π⁰D⁰D⁺ + γD⁰D⁺:
+ - two Dˣ⁺ in π⁺D⁰D⁰
+ - one Dˣ⁺ in π⁰D⁰D⁺
+ - one Dˣ⁺ in γD⁰D⁺
+"""
 @time const A₀_full_DˣD = let 
     # ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
     ch2 = πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), ZeroBW(m=mDˣ⁰,Γ=ΓDˣ⁰))
@@ -94,6 +108,9 @@ end
 end
 
 # πDD: Dˣ⁺ + Dˣ⁺
+"""
+The model with the π⁺D⁰D⁰ system with two Dˣ⁺ resonances.
+"""
 const A₀_π⁺D⁰D⁰ = let
     # ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
     iπDD2, iπDD3 = A₀_full.ik[1], A₀_full.ik[2]
@@ -105,6 +122,9 @@ const A₀_π⁺D⁰D⁰ = let
 end
 
 # πDD: Dˣ⁺
+"""
+The model with the π⁺D⁰D⁰ system with a single, unsymmetrized Dˣ⁺ resonance.
+"""
 const A₀_DˣD = let
     ch = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), ZeroBW(m=mDˣ⁺,Γ=ΓDˣ⁺))
     # 
@@ -242,6 +262,22 @@ print(select(df[[1,2],:], [:modelnames, :a_fm, :r_fm, :N]))
 #──────────────────────────────────────────────────────────────────────
 # A₀_full      -5.95934   -4.36196+0.4608im    0.0103207+0.000671301im
 # A₀_full_DˣD  -7.32118  -0.626768+0.159036im   0.010316+0.000554445im
+
+
+# Discussion of the results:
+# model          a_fm            r_fm
+#─────────────────────────────────────────────
+# A₀_DˣD      -7.55077   0.159869-0.0238077im  
+# A₀_π⁺D⁰D⁰   -7.31763  -0.779907+0.260606im   
+# A₀_full_DˣD  -7.32118  -0.626768+0.159036im  
+# A₀_full      -5.95934   -4.36196+0.4608im    
+# 
+# - The effective range is positive +0.15 fm for the model with one Dˣ⁺ resonance (A₀_DˣD).
+# The positive slope comes from the two-body loop integral. 
+# - Once the OPE is included (A₀_π⁺D⁰D⁰), | Dˣ⁺ + Dˣ⁺ |², the effective range turns negative, -0.78 fm
+# - The next step is to add two other three-body thresholds, D⁰D⁺π⁰ and D⁰D⁺γ, where the Dˣ⁺ can decay, the effective range changes unsignificantly, -0.63 fm
+# - The full model is obtained by adding the Dˣ⁰D⁺ threshold, the value of the effective range is shifted to -4.36 fm
+
 
 
 function printuncertainty(nt, s, processing=identity)
