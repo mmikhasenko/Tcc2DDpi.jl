@@ -1,0 +1,62 @@
+name: Export Pluto notebooks
+on:
+    push:
+        branches:
+            - main
+            - master
+    pull_request:
+        branches:
+    workflow_dispatch:
+
+# When two jobs run in parallel, cancel the older ones, to make sure that the website is generated from the most recent commit.
+concurrency:
+    group: pluto-export
+    cancel-in-progress: true
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        env:
+            PYTHON: ""
+        steps:
+            - name: Checkout this repository
+              uses: actions/checkout@v2
+
+            - name: Install Julia
+              uses: julia-actions/setup-julia@v1
+              with:
+                  version: 1.8
+
+            - name: Cache Julia artifacts & such
+              uses: julia-actions/cache@v1
+              with:
+                cache-registries: "true"
+
+            - name: Run & export Pluto notebooks
+              run: |
+                julia -e 'using Pkg
+                  Pkg.activate(mktempdir())
+                  Pkg.add([
+                    Pkg.PackageSpec(name="PlutoSliderServer", version="0.3.2-0.3"),
+                  ])
+
+                  import PlutoSliderServer
+
+                  PlutoSliderServer.github_action(".";
+                    Export_cache_dir="pluto_state_cache",
+                    Export_baked_notebookfile=false,
+                    Export_baked_state=false,
+                    # more parameters can go here
+                  )
+                  
+                  # always run index
+                  PlutoSliderServer.export_notebook("index.jl";
+                    Export_baked_notebookfile=false,
+                    Export_baked_state=false)'
+
+            - name: Deploy to gh-pages
+              uses: JamesIves/github-pages-deploy-action@releases/v3
+              with:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  BRANCH: gh-pages
+                  FOLDER: .
