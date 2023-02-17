@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.11
+# v0.19.12
 
 using Markdown
 using InteractiveUtils
@@ -113,7 +113,7 @@ intensity(ch::πDD, j0, L) = sum(abs2, amplitude(ch, j0, L, λ) for λ in -j0:j0
 	B2_Dπ::real=>"\\mathcal{B}_2^{D\\pi}",
 	B3_Dπ::real=>"\\mathcal{B}_3^{D\\pi}",
 	# 
-	B1_DD::real=>"\\mathcal{B}_3^{DD}"
+	B1_DD::real=>"\\mathcal{B}_1^{DD}"
 )
 
 # ╔═╡ 444842d4-8b3d-4921-9822-4beb2923fa3f
