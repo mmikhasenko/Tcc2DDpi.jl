@@ -44,44 +44,44 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
 
 1. **Default analysis**
 
-   - `model.jl` build the default model, cache the tables
-   - `computeasymptotics.jl` save ρInf
-   - `effectiverange.jl` value of the scattering parameters using the matching method
-   - `plotinverseamplitude.jl` matching plot for the inverse amplitude
-   - `plotwidthdependance.jl` profile for different values Γ
-   - `DpDz_spectrum.jl` projection to D+D0
-   - `Dpi_spectrum.jl` projection to Dpi
-   - `polesearch.jl` default pole position
-   - `polescang.jl` the width saturation curve
-   - `plotcomplexplane.jl` plot the complex plane for the paper
-   - `interference_matrix.jl` contribution of the decay-chain interference
-   - `pimDpDp.jl` why π⁻D⁺D⁺ is negligible
-   - `loopdiagrams.jl` plot loop diagrams for the supplemental material
-   - `Dxcomplexmass.jl` Tcc parameters in the model with complex D* mass
+   - `S-000-model.jl` build the default model, cache the tables
+   - `S-001-computeasymptotics.jl` save ρInf
+   - `S-002-effectiverange.jl` value of the scattering parameters using the matching method
+   - `S-003-plotinverseamplitude.jl` matching plot for the inverse amplitude
+   - `S-004-plotwidthdependance.jl` profile for different values Γ
+   - `S-005-DpDz_spectrum.jl` projection to D+D0
+   - `S-006-Dpi_spectrum.jl` projection to Dpi
+   - `S-007-polesearch.jl` default pole position
+   - `S-008-polescang.jl` the width saturation curve
+   - `S-009-plotcomplexplane.jl` plot the complex plane for the paper
+   - `S-010-interference_matrix.jl` contribution of the decay-chain interference
+   - `S-011-pimDpDp.jl` why π⁻D⁺D⁺ is negligible
+   - `S-012-loopdiagrams.jl` plot loop diagrams for the supplemental material
+   - `S-013-Dxcomplexmass.jl` Tcc parameters in the model with complex D* mass
 
 2. **Angular dependence**
 
-   - `dalitz_plots.jl` dalitz plot for different quantum numbers
-   - `angular_distribution.jl` anglular distribution (sympy) along the D* band
-   - `profile_peakandtail.jl` fraction of the tail in different models
-   - `DpionL.jl` Sensiticity of the Dpi spectrum on quantum numbers
+   - `S-100-dalitz_plots.jl` dalitz plot for different quantum numbers
+   - `S-101-angular_distribution.jl` anglular distribution (sympy) along the D* band
+   - `S-102-profile_peakandtail.jl` fraction of the tail in different models
+   - `S-103-DpionL.jl` Sensiticity of the Dpi spectrum on quantum numbers
 
 3. **Isospin dependence**
 
-   - `pole_vs_g1g2.jl`
+   - `S-200-pole_vs_g1g2.jl`
 
 4. **Complex plane** for [EP news](https://ep-news.web.cern.ch/content/lhcb-discovers-double-charm-tetraquark)
 
-   - `complexplaneongrid.jl` Compute the values on the complex grid using the default model
-   - `DxD_model_without_interference.jl` Compute the values on the complex grid using a simplified model
-   - `plotcomplexplane_3d_plotlyjs.jl` Visualize the values
+   - `S-300-complexplaneongrid.jl` Compute the values on the complex grid using the default model
+   - `S-301-DxD_model_without_interference.jl` Compute the values on the complex grid using a simplified model
+   - `S-302-plotcomplexplane_3d_plotlyjs.jl` Visualize the values
 
 5. **Scattering parameters using the cauchy integrals**
 
-   - `effectiverangecauchy.jl`
-   - `plotcompositeness.jl`
+   - `S-400-effectiverangecauchy.jl`
+   - `S-401-plotcompositeness.jl`
 
 6. **Additional plots for talks**
 
-   - `howwidthismade.jl` contributions to the width
-   - `xxx.jl` DDpi momentum spectrum. Femtoscopy
+   - `S-900-howwidthismade.jl` contributions to the width
+   - `S-901-xxx.jl` DDpi momentum spectrum. Femtoscopy
