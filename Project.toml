@@ -6,6 +6,7 @@ version = "0.1.0"
 [deps]
 AlgebraPDF = "e09e93a3-870c-4c75-9b71-3eefe58c6e5b"
 Cuba = "8a292aeb-7a57-582c-b821-06e4c11590b1"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 FiniteDiff = "6a86dc24-6348-571c-b903-95158fe2bd41"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
