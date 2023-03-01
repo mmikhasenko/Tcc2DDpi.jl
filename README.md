@@ -80,6 +80,7 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
 
    - [`S-400-effectiverangecauchy.jl`](scripts/S-400-effectiverangecauchy.jl)
    - [`S-401-plotcompositeness.jl`](scripts/S-401-plotcompositeness.jl)
+   - [`S-402-effective_range_with_fit.jl`](scripts/S-402-effective_range_with_fit.jl)
 
 6. **Additional plots for talks**
 
