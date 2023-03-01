@@ -10,17 +10,20 @@ end
 function effectiverangeexpansion(f, k, method::EffectiveRangeFit)
 
     @unpack evaluationrange, start = method
-    dD(x; a⁻¹, r, N) = f(x)-ere(k(x); a⁻¹, r, N)
-    n = sum(abs2, f.(evaluationrange))
+    ev = evaluationrange
+    yv = f.(ev)
+    # 
+    n = sum(abs2, yv)
 
     function mismatch(x)
         a⁻¹, r, N = x[1:3] .+ 1im .* x[4:6]
-        χ² = sum(abs2, dD.(evaluationrange; a⁻¹, r, N))
+        yv′ = ere.(k.(ev); a⁻¹, r, N)
+        χ² = sum(abs2, yv-yv′)
         return χ² / n
     end
 
     p = NamedTuple{(:a⁻¹, :r, :N)}(start)
-    x0 = [real([p...])..., imag.([p...])...]
+    x0 = [real.([p...])..., imag.([p...])...]
     optim_result = Optim.optimize(mismatch, x0, Optim.BFGS())
     
     xmin = optim_result.minimizer

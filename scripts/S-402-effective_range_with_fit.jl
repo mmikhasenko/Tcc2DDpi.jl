@@ -41,7 +41,7 @@ const model = let
     ch = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺), ZeroBW(m=mDˣ⁺, Γ=ΓDˣ⁺))
     # 
     set3 = ChannelWithIntegrationMethod(ch, HookSqrtDalitzMapping{3}())
-    ich3 = interpolated(set3, cutoff; estep=estep)
+    ich3 = interpolated(set3, cutoff; estep=0.3estep)
     # 
     Amplitude((ich3,))
 end
@@ -58,7 +58,7 @@ efe_cauchy = let
 end
 
 efe_fit = let
-    fitmethod = EffectiveRangeFit(range(-1,1,10), efe2)
+    fitmethod = EffectiveRangeFit(range(-1,1,10), efe_cauchy)
     # 
     effrangepars = effectiverangeexpansion(
 	    Δe -> denominator_II(model, Δe, δm0_val),
@@ -98,6 +98,6 @@ let
     plot!(sp=1, real ∘ R1 ∘ shift, -1, 1, c=2, lab="Eff.range(cauchy)")
     plot!(sp=2, imag ∘ R1 ∘ shift, -1, 1, c=2, lab="")
     #
-    plot!(sp=1, real ∘ R2 ∘ shift, -1, 1, c=2, ls=:dash, lab="Eff.range(fit)")
+    plot!(sp=1, real ∘ R2 ∘ shift, -1, 1, c=2, ls=:dash, lab="Eff.range(fit-on-re)")
     plot!(sp=2, imag ∘ R2 ∘ shift, -1, 1, c=2, ls=:dash, lab="")
 end
