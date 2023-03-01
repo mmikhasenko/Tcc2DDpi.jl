@@ -106,5 +106,8 @@ export effectiverangeexpansion
 export ComplexBranchPointExpansion
 export CircularIntegral, CircularSum
 include("cauchyintegrals.jl")
+export ere
+export EffectiveRangeFit
+include("fiteffectiverange.jl")
 
 end
