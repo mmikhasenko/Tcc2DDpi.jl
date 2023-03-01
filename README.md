@@ -85,3 +85,4 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
 
    - [`S-900-howwidthismade.jl`](scripts/S-900-howwidthismade.jl) contributions to the width
    - [`S-901-xxx.jl`](scripts/S-901-xxx.jl) DDpi momentum spectrum. Femtoscopy
+   - [`N-902-triangle_singularity.jl`](notebooks/N-902-triangle_singularity.jl) Position of the traingle singularity in the complex energy plane
