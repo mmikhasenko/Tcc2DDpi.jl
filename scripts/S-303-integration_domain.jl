@@ -1,9 +1,31 @@
+using Markdown
+
+
+md"""
+# Singularities in the integration domain
+
+The path of the phase space integration has to be chosen such that no pole singularites
+enter the integration domian.
+
+The integration domain is σ2 x σ3.
+
+We assume here that the inregrand has a pole singularity in the lower plane of σ3,
+and in the upper plane of σ2.
+
+Hence the `HookSqrtDalitzMapping{3}()` mapping is used.
+It has the square hoop path in the σ3 variable.
+A straight path in σ2 is used to connect end endpoints of the integral, σ3±
+
+Two plotting recipies are defined to ease the plotting.
+"""
+
 using X2DDpi
 # 
 using Plots
 import Plots.PlotMeasures:mm
 using LaTeXStrings
-theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
+
+theme(:vibrant, size=(500,350), minorticks=true, grid=false, frame=:box,
     guidefontvalign=:top, guidefonthalign=:right,
     foreground_color_legend = nothing,
     legendfontsize=9, legend =:topright,
@@ -11,20 +33,22 @@ theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
 # 
 # 
 
+const ch = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
 
 @recipe function f(iσ::Int, e::Number, mapmethod::AbstractDalitzMapping)
  
     @series begin
         seriestype := :scatter
-        markersize --> 5
+        markersize --> 8
+        markerstype --> :d
         markercolor --> :red
-        label --> "D* poles"
+        label := "D* poles"
         # 
-        ([pole_position(ch.R12), pole_position(ch.R12)'],)
+        ([pole_position(ch.R13)'],) #pole_position(ch.R13), 
     end
 
     s = e2m(e)^2
-    xv = range(1e-6,1,length=103)
+    xv = range(1e-6,1,length=703)
     yv = [0, 1]
     calv = integrandpath.(xv', yv, s, Ref(mapmethod))
     calv = getindex.(calv, iσ)
@@ -44,10 +68,6 @@ end
     # (xv,xv, map(x->sign(imag(x))*log10(abs2(x)), calv))
 end
 
-
-
-const ch = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
-
 # 
 integrandpath(x,y, s, mapmethod = HookSqrtDalitzMapping{3}()) =
     mapdalitz(mapmethod, (x,y), masses(ch), s)[1]
@@ -59,8 +79,8 @@ function integrand(x,y, s, mapmethod = HookSqrtDalitzMapping{3}()) #
 end
 
 let e = 0.9-0.1im
-    plot(layout=grid(1,2), size=(1000,600),
-        plot(2, e, HookSqrtDalitzMapping{3}()),
+    plot(layout=grid(1,2), size=(1000,400),
+        plot(2, e, HookSqrtDalitzMapping{3}(), lab=""),
         plot(e, HookSqrtDalitzMapping{3}(), colorbar=false))
 end
 

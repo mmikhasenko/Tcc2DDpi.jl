@@ -1,17 +1,23 @@
 using Pkg
-cd(joinpath(@__DIR__,".."))
+cd(joinpath(@__DIR__,"..", ".."))
 Pkg.activate(".")
 # 
 using X2DDpi
 using Parameters
 using Measurements
 
+using Markdown
 using Plots
 using LaTeXStrings
 theme(:wong2, frame=:box, grid=false, minorticks=true, 
     guidefontvalign=:top, guidefonthalign=:right,
     # xlim=(:auto,:auto), ylim=(:auto,:auto),
     xlab=L"\delta m_{D^0D^0\pi^+}\,\,[\mathrm{MeV}]", lw=1.2, lab="")
+
+
+md"""
+**A check**: the integration with π1 → 3π
+"""
 
 ch = πDD((m1=mπ⁺,m2=mπ⁺,m3=mπ⁺), BW(m=0.77,Γ=0.05), BW(m=0.77,Γ=0.05))
 # 
@@ -47,10 +53,8 @@ let #e = -1.0-0.01im
         plot!([x, y], lab="", c=2)
         scatter!([x, y], lab="", c=2)
     end
-    # plot()
-    display(VSCodeServer.InlineDisplay(), "image/svg+xml", plot!())
+    plot!()
 end
-plot()
 
 
 let #e = -1.0-0.01im
@@ -67,9 +71,7 @@ let #e = -1.0-0.01im
     heatmap(xv,yv,calv)
     plot!([σ3_0, σ3_3], c=1)
     scatter!([σ3_0, σ3_3], c=1, ms=6)
-    # plot()
-    display(VSCodeServer.InlineDisplay(), "image/svg+xml", plot!())
-    # calv
+    plot!()
 end
 
 #

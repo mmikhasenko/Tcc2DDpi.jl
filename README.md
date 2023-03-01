@@ -75,6 +75,7 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
    - [`S-300-complexplaneongrid.jl`](scripts/S-300-complexplaneongrid.jl) Compute the values on the complex grid using the default model
    - [`S-301-DxD_model_without_interference.jl`](scripts/S-301-DxD_model_without_interference.jl) Compute the values on the complex grid using a simplified model
    - [`S-302-plotcomplexplane_3d_plotlyjs.jl`](scripts/S-302-plotcomplexplane_3d_plotlyjs.jl) Visualize the values
+   - [`S-303-integration_domain.jl`](scripts/S-303-integration_domain.jl) Validate that no singularities happen in the integration domain.
 
 5. **Scattering parameters using the cauchy integrals**
 
