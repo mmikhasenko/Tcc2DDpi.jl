@@ -1,3 +1,5 @@
+using Markdown
+
 md"""
 # Effective range of the OPE model
 
