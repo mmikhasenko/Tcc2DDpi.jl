@@ -1,3 +1,10 @@
+md"""
+# Effective range of the OPE model
+
+Two close models are compared: the `model2``has the OPE (Dˣ⁺ + Dˣ⁺), while the `model3` does not.
+The effective range flips the sign. The calculation show that the EFE does not work very well for the OPE model.
+"""
+
 using Pkg
 cd(joinpath(@__DIR__, ".."))
 Pkg.activate(".")
@@ -42,7 +49,7 @@ const δm0_val = δm0.val
 The model with the π⁺D⁰D⁰ system with two Dˣ⁺ resonances.
 """
 const model2 = let
-    ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
+    ch1 = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
     iπDD2 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
         cutoff; estep=estep)
@@ -65,71 +72,78 @@ const model3 = let
     Amplitude((ich3,))
 end
 
-
-function effrange(model)
-	effrangepars = # 12s
+function effrange(model; method)
+    effrangepars = # 12s
         effectiverangeexpansion(
-	        Δe -> denominator_II(model, Eᵦˣ⁺ + Δe, δm0_val),
-	        Δe -> k3b(Eᵦˣ⁺ + Δe),
-	        ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺))/2, 50)))
+            Δe -> denominator_II(model, Eᵦˣ⁺ + Δe, δm0_val),
+            Δe -> k3b(Eᵦˣ⁺ + Δe),
+            method)
     # 
-	(; tophysicsunits(effrangepars)..., effrangepars...)
+    (; tophysicsunits(effrangepars)..., effrangepars...)
 end
 
-efe2 = effrange(model2)
-efe3 = effrange(model3)
+md"""
+## Expansion in the branch point
 
-efe2.r_fm
-efe3.r_fm
+The expansion coeffiecients are obtained using the cauchy integral around the branch point.
+"""
+
+cauchysum = ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺)) / 2, 50))
+
+efe2 = effrange(model2; method=cauchysum)
+efe3 = effrange(model3; method=cauchysum)
 
 efe2.r_fm
 efe3.r_fm
 
 Δr_ope = efe2.r_fm - efe3.r_fm
-Δr_ope = efe2.r_fm - efe3.r_fm
 
-# nominal
-# -0.9396341248075353 + 0.28446733393925405im
-# 
-# 0.95% width
-# -0.8999020429222457 + 0.2583926613878467im
-# 
-# mass + 10e-6
-# -0.9374367692088035 + 0.28323707879081084im
+ere(k, p) = p.N * (p.a⁻¹ + p.r * k^2 / 2 - 1im * k)
 
-ere(k, p) = p.N*(p.a⁻¹ + p.r * k^2 / 2 - 1im* k)
+real(efe2.r) + 1im * imag(efe2.r)
 
-real(efe2.r)+1im*imag(efe2.r)
+let (model, efe) = (model2, efe2)
 
-let
-    plot()
-    plot!(Δe->real(denominator_II(model2, Δe, δm0_val)), -1, 1, lab="real")
-    plot!(Δe->imag(denominator_II(model2, Δe, δm0_val)), -1, 1, lab="imag")
-    #
-    plot!(Δe->real(ere(k3b(Δe),efe2)), -1, 1, c=1, ls=:dash, lab="Eff.range")
-    plot!(Δe->imag(ere(k3b(Δe),efe2)), -1, 1, c=2, ls=:dash, lab="")
+    invD(Δe) = denominator_II(model, Δe, δm0_val)
+    expansion(Δe) = ere(k3b(Δe), efe)
+    minus_iNk(Δe) = ere(k3b(Δe); a⁻¹=0, r=0, N=efe.N)
     # 
-    # efe2′ = (; efe2..., r = real(efe3.r)+1im*imag(efe3.r))
-    # plot!(Δe->real(ere(k3b(Δe),efe2′)), -1, 1, c=1, ls=:dot, lab="r → -0.77fm")
-    # plot!(Δe->imag(ere(k3b(Δe),efe2′)), -1, 1, c=2, ls=:dot, lab="")
-end
-
-
-fitmethod = EffectiveRangeFit(range(-0.1,0.1,10), efe2)
-
-
-efe3_fit = let
-    effrangepars = effectiverangeexpansion(
-	    Δe -> denominator_II(model3, Eᵦˣ⁺ + Δe, δm0_val),
-	    Δe -> k3b(Eᵦˣ⁺ + Δe),
-        fitmethod)
+    plot(layout=grid(1, 2), size=(800, 350), title=["Real" "Imag"])
     # 
-	(; tophysicsunits(effrangepars)..., effrangepars...)
+    elim = (-1, 1)
+    plot!(sp=1, Δe -> real(invD(Δe) - minus_iNk(Δe)), elim..., lab="1/D")
+    plot!(sp=1, Δe -> real(expansion(Δe) - minus_iNk(Δe)), elim..., c=1, ls=:dash, lab="Expansion")
+    # 
+    plot!(sp=2, Δe -> imag(invD(Δe) - minus_iNk(Δe)), elim..., lab="1/D")
+    plot!(sp=2, Δe -> imag(expansion(Δe) - minus_iNk(Δe)), elim..., c=1, ls=:dash, lab="Expansion")
 end
-
-efe3
-efe3_fit
+savefig(joinpath("plots", "ope_effect_effrange_expansion.pdf"))
 
 
-efe3_fit.χ0
-efe3_fit.minimum
+md"""
+## Fit on the real axis
+
+The expansion coeffiecients are obtained by fitting the inverse amplitude on the real axis around the expansion point.
+"""
+
+fitmethod = EffectiveRangeFit(range(-0.1, 0.1, 30),
+    (a⁻¹=-0.027 + 0.0014, r=-3.3 + 1.6, N=0.007 + 0.0im))
+efe2_fit = effrange(model2; method=fitmethod)
+
+let (model, efe) = (model2, efe2_fit)
+
+    invD(Δe) = denominator_II(model, Δe, δm0_val)
+    expansion(Δe) = ere(k3b(Δe), efe)
+    minus_iNk(Δe) = ere(k3b(Δe); a⁻¹=0, r=0, N=efe.N)
+    # 
+    plot(layout=grid(1, 2), size=(800, 350), title=["Real" "Imag"])
+    # 
+    elim = (-1, 1)
+    plot!(sp=1, Δe -> real(invD(Δe) - minus_iNk(Δe)), elim..., lab="1/D")
+    plot!(sp=1, Δe -> real(expansion(Δe) - minus_iNk(Δe)), elim..., c=1, ls=:dash, lab="Fit")
+    # 
+    plot!(sp=2, Δe -> imag(invD(Δe) - minus_iNk(Δe)), elim..., lab="1/D")
+    plot!(sp=2, Δe -> imag(expansion(Δe) - minus_iNk(Δe)), elim..., c=1, ls=:dash, lab="Fit")
+end
+savefig(joinpath("plots", "ope_effect_effrange_fit.pdf"))
+
