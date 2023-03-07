@@ -79,9 +79,11 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
 
 5. **Scattering parameters using the cauchy integrals**
 
-   - [`S-400-effectiverangecauchy.jl`](scripts/S-400-effectiverangecauchy.jl)
-   - [`S-401-plotcompositeness.jl`](scripts/S-401-plotcompositeness.jl)
-   - [`S-402-effective_range_with_fit.jl`](scripts/S-402-effective_range_with_fit.jl)
+   - [`S-400-effectiverangecauchy.jl`](scripts/S-400-effectiverangecauchy.jl) compute the eff. range parameters for 5 models
+   - [`S-401-plotcompositeness.jl`](scripts/S-401-plotcompositeness.jl) compute compositeness from r/a, plot X and Z.
+   - [`S-402-effective_range_with_fit.jl`](scripts/S-402-effective_range_with_fit.jl) fit a⁻¹, r, and N parameters
+   - [`S-403-effect-of-pion-exchange.jl`](scripts/S-403-effect-of-pion-exchange.jl) comparison of the (Dˣ⁺ + Dˣ⁺) model with the (one-Dˣ⁺) model.
+   - [`S-404-effective_range_cusps_in_R.jl`](scripts/S-404-effective_range_cusps_in_R.jl) effect of grid discrimination on the value of the eff. range
 
 6. **Additional plots for talks**
 
