@@ -84,6 +84,7 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
    - [`S-402-effective_range_with_fit.jl`](scripts/S-402-effective_range_with_fit.jl) fit a⁻¹, r, and N parameters
    - [`S-403-effect-of-pion-exchange.jl`](scripts/S-403-effect-of-pion-exchange.jl) comparison of the (Dˣ⁺ + Dˣ⁺) model with the (one-Dˣ⁺) model.
    - [`S-404-effective_range_cusps_in_R.jl`](scripts/S-404-effective_range_cusps_in_R.jl) effect of grid discrimination on the value of the eff. range
+   - [`S-405-validate-effrange-expansion.jl`](scripts/S-405-validate-effrange-expansion.jl) plot EFE over the amplitude (reuse S-400 output)
 
 6. **Additional plots for talks**
 
