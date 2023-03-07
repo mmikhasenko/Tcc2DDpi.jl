@@ -233,7 +233,9 @@ end
 
 
 # test
-df_summary = select(df, :modelnames, [:a_fm, :r_fm] .=> ByRow(x -> round(x; digits=2)) .=> [:a_fm_round, :r_fm_round])
+summarized_columns = vcat((["a_fm" "r_fm"] .* ["", "⁺ᵟ", "⁻ᵟ"])...)
+df_summary = select(df, :modelnames,
+    summarized_columns .=> ByRow(x -> round(x; digits=2)) .=> summarized_columns .* "_round")
 print(df_summary)
 
 md"""
