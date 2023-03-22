@@ -86,6 +86,7 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
    - [`S-404-effective_range_cusps_in_R.jl`](scripts/S-404-effective_range_cusps_in_R.jl) effect of grid discrimination on the value of the eff. range
    - [`S-405-validate-effrange-expansion.jl`](scripts/S-405-validate-effrange-expansion.jl) plot EFE over the amplitude (reuse S-400 output)
    - [`N-406-symbolic-r.jl`](notebooks/N-406-symbolic-r.jl) evaluate effective range symbolically for two-body coupled channels.
+   - [`N-407-fit_intervals.jl`](notebooks/N-407-fit_intervals.jl) Fit model with OPE in different intervals
 
 6. **Additional plots for talks**
 
