@@ -140,7 +140,7 @@ let ymin=-0.1
 	scatter!(TSpoints, ms=8, m=:d, mc=3, lab="triangle singularity")
 	plot!(xlab="Re E", ylab="Im E", leg=:bottomright)
 	#
-	savefig(joinpath("..", "plots","trainglesingularity.pdf"))
+	savefig(joinpath("plots", "trainglesingularity.pdf"))
 	plot!()
 end
 
