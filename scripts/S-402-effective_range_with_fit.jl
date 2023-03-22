@@ -48,31 +48,31 @@ end
 
 
 efe_cauchy = let
-	effrangepars = # 12s
+    effrangepars = # 12s
         effectiverangeexpansion(
-	        Δe -> denominator_II(model, Eᵦˣ⁺ + Δe, δm0_val),
-	        Δe -> k3b(Eᵦˣ⁺ + Δe),
-	        ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺))/2, 50)))
+            Δe -> denominator_II(model, Eᵦˣ⁺ + Δe, δm0_val),
+            Δe -> k3b(Eᵦˣ⁺ + Δe),
+            ComplexBranchPointExpansion(CircularSum(abs(imag(Eᵦˣ⁺)) / 2, 50)))
     # 
-	(; tophysicsunits(effrangepars)..., effrangepars...)
+    (; tophysicsunits(effrangepars)..., effrangepars...)
 end
 
 efe_fit = let
-    fitmethod = EffectiveRangeFit(range(-1,1,10), efe_cauchy)
+    fitmethod = EffectiveRangeFit(range(-1, 1, 10), efe_cauchy)
     # 
     effrangepars = effectiverangeexpansion(
-	    Δe -> denominator_II(model, Δe, δm0_val),
-	    Δe -> k3b(Δe),
+        Δe -> denominator_II(model, Δe, δm0_val),
+        Δe -> k3b(Δe),
         fitmethod)
     # 
-	(; tophysicsunits(effrangepars)..., effrangepars...)
+    (; tophysicsunits(effrangepars)..., effrangepars...)
 end
 
 
 # summarize the resuls
 df = DataFrame()
-push!(df, (; method = :cauchy, efe_cauchy...))
-push!(df, (; method = :fit, NamedTuple{keys(efe_cauchy)}(efe_fit)...))
+push!(df, (; method=:cauchy, efe_cauchy...))
+push!(df, (; method=:fit, NamedTuple{keys(efe_cauchy)}(efe_fit)...))
 select(df, :method, :r_fm, :a⁻¹)
 
 
@@ -85,13 +85,13 @@ however, once you go to the complex plane, the functions start mismatching.
 let
     D(Δe) = denominator_II(model, Δe, δm0_val)
     minusiNk(Δe) = ere(k3b(Δe); a⁻¹=0, r=0, N=efe_cauchy.N)
-    R(Δe) = D(Δe)-minusiNk(Δe)
+    R(Δe) = D(Δe) - minusiNk(Δe)
     shift(Δe) = Δe + Eᵦˣ⁺
     # 
-    R1(Δe) = ere(k3b(Δe), efe_cauchy)-minusiNk(Δe)
-    R2(Δe) = ere(k3b(Δe), efe_fit)-minusiNk(Δe)
+    R1(Δe) = ere(k3b(Δe), efe_cauchy) - minusiNk(Δe)
+    R2(Δe) = ere(k3b(Δe), efe_fit) - minusiNk(Δe)
     # 
-    plot(layout=grid(1,2), size=(700,300), yticks=false, leg=:topleft)
+    plot(layout=grid(1, 2), size=(700, 300), yticks=false, leg=:topleft)
     plot!(sp=1, real ∘ R ∘ shift, -1, 1, title="Real", lab="Model")
     plot!(sp=2, imag ∘ R ∘ shift, -1, 1, title="Imag", lab="")
     #
