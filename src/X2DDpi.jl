@@ -32,7 +32,7 @@ include("constants.jl")
 
 
 import Base.^
-^(ms::NamedTuple{(:m1,:m2,:m3),T} where T, n::Int) = Tuple(ms).^n
+^(ms::NamedTuple{(:m1, :m2, :m3),T} where {T}, n::Int) = Tuple(ms) .^ n
 
 include("covariant_exptessions.jl")
 
