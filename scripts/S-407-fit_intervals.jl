@@ -36,7 +36,7 @@ const δm0_val = δm0.val
 
 # πDD: Dˣ⁺
 """
-The model with the π⁺D⁰D⁰ system with a single, unsymmetrized Dˣ⁺ resonance.
+The model with the π⁺D⁰D⁰ system with two Dˣ⁺ resonances.
 """
 const model = let
     ch1 = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
