@@ -41,10 +41,10 @@ const model = let
     ch1 = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
     @time iπDD2 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep / 2)
+        cutoff; estep=estep)
     @time iπDD3 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep / 2)
+        cutoff; estep=estep)
     Amplitude((iπDD2, iπDD3))
 end
 
@@ -76,6 +76,10 @@ df_summary = select(df, :factor, :Npoints,
 
 writejson(joinpath("results", "nominal", "higher-term-table.json"), df_summary)
 
+i = 3 * 3 + 3
+@assert vcat(fN...)[i] == (0.5, 100)
+ht_cauchy = (; df[i, :]...)
+
 
 let xlim = (-0.1, 0.1)
     D(Δe) = denominator_II(model, Δe, δm0_val)
@@ -100,3 +104,4 @@ let xlim = (-0.1, 0.1)
     plot!(sp=1, real ∘ R3 ∘ shift, xlim..., lw=2, c=4, lab="o(k⁶)")
     plot!(sp=2, imag ∘ R3 ∘ shift, xlim..., lw=2, c=4, lab="")
 end
+savefig(joinpath("plots", "higher-term-match.pdf"))
