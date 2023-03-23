@@ -96,17 +96,18 @@ include("io.jl")
 
 export dalitzplot
 export dpdzspectum, dzdzspectum
-export dzdzpipspectum 
+export dzdzpipspectum
 include("plotrecipes.jl")
 
 
 export circleintegral
-export cauchyintegral, cauchyintegral′, cauchyintegral′′
+export cauchyintegral, cauchyintegral′, cauchyintegral′′, cauchyintegral′′′
+export highertermexpansion
 export effectiverangeexpansion
 export ComplexBranchPointExpansion
 export CircularIntegral, CircularSum
 include("cauchyintegrals.jl")
-export ere
+export ere, hte
 export EffectiveRangeFit
 include("fiteffectiverange.jl")
 
