@@ -29,6 +29,10 @@ circleintegral(F, x₀::Real, method::CircularSum) = circleintegral(F, x₀, met
 
 
 
+ere(k; a⁻¹, r, N) = N * (a⁻¹ + r * k^2 / 2 - 1im * k)
+ere(k, p) = ere(k, a⁻¹=p.a⁻¹, r=p.r, N=p.N)
+hte(k; N, a⁻¹=0, r=0, ξ=0, ζ=0) = N * (a⁻¹ + r * k^2 / 2 + ξ * k^4 + ζ * k^6 - 1im * k)
+hte(k, p) = hte(k; a⁻¹=p.a⁻¹, r=p.r, N=p.N, ξ=p.ξ, ζ=p.ζ)
 
 
 abstract type EffectiveRangeExpansionMethod end
@@ -61,7 +65,7 @@ function effectiverangeexpansion(f, k, method::EffectiveRangeExpansionMethod)
 end
 
 """
-    f(s) / N = a⁻¹ + r k(s)^2 / 2 + ξ k(s)^4 + ζ k(s)^4 - i k(s)
+    f(s) / N = a⁻¹ + r k(s)^2 / 2 + ξ k(s)^4 + ζ k(s)^6 - i k(s)
 
 Is calculated using cauchy integral theorem.
 """
