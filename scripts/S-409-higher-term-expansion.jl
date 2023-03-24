@@ -51,6 +51,7 @@ const model = let
     Amplitude((iπDD2, iπDD3))
 end
 
+
 # ht_cauchy = let
 function ht(factor, Npoints)
     effrangepars = # 12s
@@ -65,7 +66,9 @@ end
 factors = [0.01, 0.1, 0.5]
 Npoints = [50, 100]
 fN = Tuple.(Pair.(factors', Npoints))
-htes = map((f, N) -> ht(f, N), fN)
+htes = map(fN) do (f, N)
+    ht(f, N)
+end
 
 df = DataFrame(vcat(htes...))
 df.factor = vcat(getindex.(fN, 1)...)
@@ -121,3 +124,27 @@ let xlim = (-0.5, 0.5)
     plot!()
 end
 savefig(joinpath("plots", "ope-R-circlesize.pdf"))
+
+function discdown(x, x0, f)
+    ϵ = 1e-6
+    f(x0 + ϵ - 1im * x) - f(x0 - ϵ - 1im * x)
+end
+let
+    N = df.N[6] * (1 + 0.01 * (0.5))
+    R1(e) = discdown(e, Eᵦˣ⁺, e -> denominator_II(model, e, δm0_val) / N) |> abs
+    # 
+    minus_iNk(e) = hte(k3b(e); N=1)
+    R2(e) = discdown(e, Eᵦˣ⁺, minus_iNk) |> abs
+    # 
+    ΔR(e) = (R1(e) - R2(e))
+    factor(x) = x * 1e3
+    #
+    plot(layout=grid(2, 1), size=(400, 600), left_margin=3mm, leg=:topleft,
+        title=["Disc[D]" "Disc[D(model)/N] - Disc[-ik]"], xlab="Δe (MeV)")
+    plot!(sp=1, factor ∘ real ∘ R1, 0.0, 0.1, lab="Model", lw=2)
+    plot!(sp=1, factor ∘ real ∘ R2, 0.0, 0.1, lab="ERE", lw=2)
+    # 
+    plot!(sp=2, factor ∘ real ∘ ΔR, 0.0, 0.1, lab="", c=1, lw=2,
+        ylim=(-0.2, 0.2))
+end
+savefig(joinpath("plots", "difference-in-disc.pdf"))
