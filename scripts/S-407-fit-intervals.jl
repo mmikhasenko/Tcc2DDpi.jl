@@ -58,7 +58,7 @@ samples = [
 # 
 
 # efe_fit = let
-function fitefe(sample)
+function fitefe(sample, model)
     # 
     efe_ini = (a⁻¹=-0.027 + 0im, r=-3.3 + 1.7, N=0.007 + 0im)
     fitmethod = EffectiveRangeFit(sample, efe_ini)
@@ -72,7 +72,7 @@ function fitefe(sample)
 end
 
 
-efes = fitefe.(samples)
+efes = fitefe.(samples, Ref(model))
 
 
 # summarize the resuls
@@ -92,7 +92,7 @@ however, once you go to the complex plane, the functions start mismatching.
 
 let
     plot(layout=grid(1, 2), size=(700, 320),
-        leg=:topright, link=:x, ylim=(-5e-6, 9e-6), yticks=false)
+        leg=:topright, link=:x, ylim=(-5e-5, 9e-5), yticks=false)
 
     D(Δe) = denominator_II(model, Δe, δm0_val)
     R(Δe) = D(Δe)
@@ -107,14 +107,68 @@ let
         plot!(sp=1, real ∘ R2, -1.1, 1.1, lab="", c=c + 1, lw=2)
         plot!(sp=2, imag ∘ R2, -1.1, 1.1, lab="", c=c + 1, lw=2)
         # 
-        shift = c != 2 ? 0 : -1e-6
+        shift = c != 2 ? 0 : -1e-5
         plot!(sp=1, [fit.minE, fit.maxE], [0, 0] .+ shift, lw=12, c=c + 1, lab="$(round(fit.r_fm; digits=2))", alpha=0.7)
         plot!(sp=2, [fit.minE, fit.maxE], [0, 0] .+ shift, lw=12, c=c + 1, lab="", alpha=0.7)
         # 
     end
-    vline!(sp=1, [δm0_val], lc=:red, lab="", ann=(δm0_val, 3e-6, text("Tcc", rotation=90, :bottom, :red, 10)))
-    vline!(sp=2, [δm0_val], lc=:red, lab="", ann=(δm0_val, 3e-6, text("Tcc", rotation=90, :bottom, :red, 10)))
+    vline!(sp=1, [δm0_val], lc=:red, lab="", ann=(δm0_val, 3e-5, text("Tcc", rotation=90, :bottom, :red, 10)))
+    vline!(sp=2, [δm0_val], lc=:red, lab="", ann=(δm0_val, 3e-5, text("Tcc", rotation=90, :bottom, :red, 10)))
     plot!()
 end
 savefig(joinpath("plots", "effective-range-fitintervals.pdf"))
+
+
+md"""
+Now, do the same with the default model
+"""
+
+# retrieve the model
+modelDict = readjson(joinpath("results","nominal","model.json"))
+ichannels = interpolated.(d2nt.(modelDict["ichannels"]))
+channels = getproperty.(ichannels, :channel)
+
+model0 = Amplitude(Tuple(ichannels), zero) # zero is 1/Γ
+
+efes = fitefe.(samples, Ref(model0))
+
+# summarize the resuls
+df0 = DataFrame(efes)
+df0.minE = getindex.(samples, 1)
+df0.maxE = last.(samples)
+df_summary = select(df0, :minE, :maxE,
+    [:r_fm, :a_fm] .=> ByRow(x -> round(x; digits=2)) .=> [:r_fm, :a_fm],
+    All())
+
+# 
+writejson(joinpath("results", "nominal", "fit-effective-range-default-model-intervals.json"),
+    df_summary)
+
+let
+    plot(layout=grid(1, 2), size=(700, 320),
+        leg=:topright, link=:x, ylim=(-5e-5, 9e-5), yticks=false)
+
+    D(Δe) = denominator_II(model0, Δe, δm0_val)
+    R(Δe) = D(Δe)
+    # 
+    plot!(sp=1, [-1.1, 1.1], [0, 0], lw=2, title="Re[Ere-M] ", lab="")
+    plot!(sp=2, [-1.1, 1.1], [0, 0], lw=2, title="Im[Ere-M] ", lab="", legtitle="r [fm]")
+
+    map(enumerate(eachrow(df0))) do (c, fit)
+        R2(Δe) = ere(k3b(Δe), fit) - D(Δe)
+        # 
+        plot!(sp=1, real ∘ R2, -1.1, 1.1, lab="", c=c + 1, lw=2)
+        plot!(sp=2, imag ∘ R2, -1.1, 1.1, lab="", c=c + 1, lw=2)
+        # 
+        shift = c != 2 ? 0 : -1e-5
+        plot!(sp=1, [fit.minE, fit.maxE], [0, 0] .+ shift, lw=12, c=c + 1, lab="", alpha=0.7)
+        plot!(sp=2, [fit.minE, fit.maxE], [0, 0] .+ shift, lw=12, c=c + 1, lab="$(round(fit.r_fm; digits=2))", alpha=0.7)
+        # 
+    end
+    vline!(sp=1, [δm0_val], lc=:red, lab="", ann=(δm0_val, 3e-5, text("Tcc", rotation=90, :bottom, :red, 10)))
+    vline!(sp=2, [δm0_val], lc=:red, lab="", ann=(δm0_val, 3e-5, text("Tcc", rotation=90, :bottom, :red, 10)))
+    plot!()
+end
+savefig(joinpath("plots", "fit-effective-range-default-model-intervals.pdf"))
+
 
