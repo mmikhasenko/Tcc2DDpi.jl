@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="analysis-of-tcc-d⁰d⁰π-amplitude">Analysis of Tcc⁺ → D⁰D⁰π⁺ amplitude</h1>
+<p>The code is used for several projects:</p>
+<ul>
+<li><a href="https://twiki.cern.ch/twiki/bin/viewauth/LHCbPhysics/X2DDstar">LHCb-ANA-2020-041 (internal twiki page)</a></li>
+<li><a href="https://lhcbproject.web.cern.ch/Publications/LHCbProjectPublic/LHCb-PAPER-2021-032.html">LHCb-PAPER-2021-031 (public page)</a> published by <a href="https://www.nature.com/articles/s41567-022-01614-y">Nature Physics</a></li>
+<li><a href="https://lhcbproject.web.cern.ch/Publications/LHCbProjectPublic/LHCb-PAPER-2021-031.html">LHCb-PAPER-2021-032 (public page)</a> published by <a href="https://www.nature.com/articles/s41467-022-30206-w">Nature Communication</a></li>
+<li><a href="https://arxiv.org/abs/2203.04622">Arxiv:2203.04622</a> Accurate computation of the effective-range parameters</li>
+</ul>
+<p>The code implements an analytic continuation of the amplitude to the complex plane and calculation of the effective range parameters.</p>
+<p>The main types exported are:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">struct</span> πDD <span class="op">&lt;:</span> AbstractxDD  <span class="co"># both isospin channels</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">struct</span> γDD <span class="op">&lt;:</span> AbstractxDD</span></code></pre></div>
+<p>with a specific <code>decay_matrix_element_squared(d::AbstractxDD,s,σ3,σ2)</code> for every type.</p>
+<p>The decay amplitude integrated over the phase space is called via</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>ρ_thr(d<span class="op">::</span>AbstractxDD<span class="op">,</span> <span class="cn">e</span>)</span></code></pre></div>
+<p>The latter can be precalculated using the <code>interpolated</code> method,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>interpolated(channel<span class="op">::</span>AbstractxDD<span class="op">,</span> cutoff<span class="op">::</span><span class="dt">Real</span><span class="op">;</span> estep<span class="op">=</span><span class="fl">0.01</span>)</span></code></pre></div>
+<p>at the value of <code>cutoff</code> the expression is merged to the two-body phase-space function. The default value of the discrete grid is 0.01 MeV.</p>
+<p>The precalculated structure can be used to calculate the dispersion integral:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>dispersive(d<span class="op">::</span>interpolated<span class="op">,</span> <span class="cn">e</span>)</span></code></pre></div>
+<p>returns a complex value, for which <code>Im(dispersive) = ρ_thr</code>.</p>
+<h2 id="analysis-scripts">Analysis scripts</h2>
+<ol type="1">
+<li><p><strong>Default analysis</strong></p>
+<ul>
+<li><a href="scripts/S-000-model.jl"><code>S-000-model.jl</code></a> build the default model, cache the tables</li>
+<li><a href="scripts/S-001-computeasymptotics.jl"><code>S-001-computeasymptotics.jl</code></a> save ρInf</li>
+<li><a href="scripts/S-002-effectiverange.jl"><code>S-002-effectiverange.jl</code></a> value of the scattering parameters using the matching method</li>
+<li><a href="scripts/S-003-plotinverseamplitude.jl"><code>S-003-plotinverseamplitude.jl</code></a> matching plot for the inverse amplitude</li>
+<li><a href="scripts/S-004-plotwidthdependance.jl"><code>S-004-plotwidthdependance.jl</code></a> profile for different values Γ</li>
+<li><a href="scripts/S-005-DpDz_spectrum.jl"><code>S-005-DpDz_spectrum.jl</code></a> projection to D+D0</li>
+<li><a href="scripts/S-006-Dpi_spectrum.jl"><code>S-006-Dpi_spectrum.jl</code></a> projection to Dpi</li>
+<li><a href="scripts/S-007-polesearch.jl"><code>S-007-polesearch.jl</code></a> default pole position</li>
+<li><a href="scripts/S-008-polescang.jl"><code>S-008-polescang.jl</code></a> the width saturation curve</li>
+<li><a href="scripts/S-009-plotcomplexplane.jl"><code>S-009-plotcomplexplane.jl</code></a> plot the complex plane for the paper</li>
+<li><a href="scripts/S-010-interference_matrix.jl"><code>S-010-interference_matrix.jl</code></a> contribution of the decay-chain interference</li>
+<li><a href="scripts/S-011-pimDpDp.jl"><code>S-011-pimDpDp.jl</code></a> why π⁻D⁺D⁺ is negligible</li>
+<li><a href="scripts/S-012-loopdiagrams.jl"><code>S-012-loopdiagrams.jl</code></a> plot loop diagrams for the supplemental material</li>
+<li><a href="scripts/S-013-Dxcomplexmass.jl"><code>S-013-Dxcomplexmass.jl</code></a> Tcc parameters in the model with complex D* mass</li>
+</ul></li>
+<li><p><strong>Angular dependence</strong></p>
+<ul>
+<li><a href="scripts/S-100-dalitz_plots.jl"><code>S-100-dalitz_plots.jl</code></a> dalitz plot for different quantum numbers</li>
+<li><a href="scripts/S-101-angular_distribution.jl"><code>S-101-angular_distribution.jl</code></a> anglular distribution (sympy) along the D* band</li>
+<li><a href="scripts/S-102-profile_peakandtail.jl"><code>S-102-profile_peakandtail.jl</code></a> fraction of the tail in different models</li>
+<li><a href="scripts/S-103-DpionL.jl"><code>S-103-DpionL.jl</code></a> Sensiticity of the Dpi spectrum on quantum numbers</li>
+</ul></li>
+<li><p><strong>Isospin dependence</strong></p>
+<ul>
+<li><a href="scripts/S-200-pole_vs_g1g2.jl"><code>S-200-pole_vs_g1g2.jl</code></a></li>
+</ul></li>
+<li><p><strong>Complex plane</strong> for <a href="https://ep-news.web.cern.ch/content/lhcb-discovers-double-charm-tetraquark">EP news</a></p>
+<ul>
+<li><a href="scripts/S-300-complexplaneongrid.jl"><code>S-300-complexplaneongrid.jl</code></a> Compute the values on the complex grid using the default model</li>
+<li><a href="scripts/S-301-DxD_model_without_interference.jl"><code>S-301-DxD_model_without_interference.jl</code></a> Compute the values on the complex grid using a simplified model</li>
+<li><a href="scripts/S-302-plotcomplexplane_3d_plotlyjs.jl"><code>S-302-plotcomplexplane_3d_plotlyjs.jl</code></a> Visualize the values</li>
+<li><a href="scripts/S-303-integration_domain.jl"><code>S-303-integration_domain.jl</code></a> Validate that no singularities happen in the integration domain.</li>
+</ul></li>
+<li><p><strong>Scattering parameters using the cauchy integrals</strong></p>
+<ul>
+<li><a href="scripts/S-400-effectiverangecauchy.jl"><code>S-400-effectiverangecauchy.jl</code></a> compute the eff. range parameters for 5 models</li>
+<li><a href="scripts/S-401-plotcompositeness.jl"><code>S-401-plotcompositeness.jl</code></a> compute compositeness from r/a, plot X and Z.</li>
+<li><a href="scripts/S-402-effective_range_with_fit.jl"><code>S-402-effective_range_with_fit.jl</code></a> fit a⁻¹, r, and N parameters</li>
+<li><a href="scripts/S-403-effect-of-pion-exchange.jl"><code>S-403-effect-of-pion-exchange.jl</code></a> comparison of the (Dˣ⁺ + Dˣ⁺) model with the (one-Dˣ⁺) model.</li>
+<li><a href="scripts/S-404-effective_range_cusps_in_R.jl"><code>S-404-effective_range_cusps_in_R.jl</code></a> effect of grid discrimination on the value of the eff. range</li>
+<li><a href="scripts/S-405-validate-effrange-expansion.jl"><code>S-405-validate-effrange-expansion.jl</code></a> plot EFE over the amplitude (reuse S-400 output)</li>
+<li><a href="notebooks/N-406-symbolic-r.jl"><code>N-406-symbolic-r.jl</code></a> evaluate effective range symbolically for two-body coupled channels.</li>
+<li><a href="scripts/S-407-fit-intervals.jl"><code>S-407-fit-intervals.jl</code></a> Fit model with OPE in different intervals</li>
+<li><a href="scripts/S-408-second-trhreshold.jl"><code>S-408-second-trhreshold.jl</code></a> Effective range for the second threshold</li>
+<li><a href="scripts/S-409-higher-term-expansion.jl"><code>S-409-higher-term-expansion.jl</code></a> Effective range for the second threshold</li>
+</ul></li>
+<li><p><strong>Additional plots for talks</strong></p>
+<ul>
+<li><a href="scripts/S-900-howwidthismade.jl"><code>S-900-howwidthismade.jl</code></a> contributions to the width</li>
+<li><a href="scripts/S-901-xxx.jl"><code>S-901-xxx.jl</code></a> DDpi momentum spectrum. Femtoscopy</li>
+<li><a href="notebooks/N-902-triangle_singularity.jl"><code>N-902-triangle_singularity.jl</code></a> Position of the traingle singularity in the complex energy plane</li>
+</ul></li>
+</ol>
+</body>
+</html>

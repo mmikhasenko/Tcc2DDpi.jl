@@ -1,0 +1,22 @@
+{
+    "phspmatching": {
+            "cutoff" : 4.0,
+            "estep"  : 0.003
+    },
+
+    "polepositiongrid": {
+            "dm_min" : -1.5,
+            "dm_max" : -0.01,
+            "dm_N"   : 20
+    },
+    
+    "fitresults": {
+              "δm0": "-359.2e-3 ± 40.2e-3",
+          "Γ0_68CL_syst": 342.5,
+          "Γ0_90CL_syst": 135.0,
+          "Γ0_95CL_syst": 95.0,
+          "Γ0_68CL_stat": 937.54,
+          "Γ0_90CL_stat": 309.0,
+          "Γ0_95CL_stat": 204.0
+    }
+}

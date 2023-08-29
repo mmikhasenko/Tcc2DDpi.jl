@@ -1,0 +1,19 @@
+diff --git a/src/isobar.jl b/src/isobar.jl
+index 14a2e0d..d12104b 100644
+--- a/src/isobar.jl
++++ b/src/isobar.jl
+@@ -1,12 +1,12 @@
+ function J_I(σ,pars::NamedTuple{(:m,:Γ)})
+ 	m, Γ = pars
+-	FF = 1.0 # (σ-(mD⁰+mπ⁺)^2) / (m^2-(mD⁰+mπ⁺)^2)
++	FF = (σ-(mD⁰+mπ⁺)^2) / (m^2-(mD⁰+mπ⁺)^2)
+ 	1/(m^2 - σ + 1im*m*Γ*FF)
+ end
+ 
+ function J_II(σ,pars::NamedTuple{(:m,:Γ)})
+ 	m, Γ = pars
+-	FF = 1.0 # (σ-(mD⁰+mπ⁺)^2) / (m^2-(mD⁰+mπ⁺)^2)
++	FF = (σ-(mD⁰+mπ⁺)^2) / (m^2-(mD⁰+mπ⁺)^2)
+ 	1/(m^2 - σ - 1im*m*Γ*FF)
+ end
+ 

@@ -1,0 +1,13 @@
+diff --git a/src/constants.jl b/src/constants.jl
+index 5018712..aaf18c0 100644
+--- a/src/constants.jl
++++ b/src/constants.jl
+@@ -6,7 +6,7 @@ const mD⁰ = 1.86483
+ const mD⁺ = 1.86965
+ # 
+ const mDˣ⁺ = 2.01026; const ΓDˣ⁺ = 83.4e-6
+-const mDˣ⁰ = 2.00685; const ΓDˣ⁰ = 55.2e-6
++const mDˣ⁰ = 2.00685; const ΓDˣ⁰ = 53.7e-6
+ const mγ = 0.0
+ 
+ const fm_times_mev = 196.0

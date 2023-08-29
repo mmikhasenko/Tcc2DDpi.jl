@@ -1,0 +1,100 @@
+schema: '2.0'
+stages:
+  pole_position:
+    cmd: julia scripts/X3876.jl
+    deps:
+    - path: scripts/X3876.jl
+      md5: b29f16930a19a5024ece2a7170074310
+      size: 2935
+    - path: src/constants.jl
+      md5: b552b91c2768f8c9f3050f503ebe1e28
+      size: 523
+    params:
+      settings.json:
+        fitresults:
+          δm0: -363e-3 ± 40e-3
+          Γ0_90CL: 135.0
+          Γ0_95CL: 95.0
+        phspmatching:
+          cutoff: 4.0
+          estep: 0.01
+    outs:
+    - path: results/nominal/pole.json
+      md5: 86d2ecb9a88fa71bd374333d1c81baaa
+      size: 700
+    - path: results/nominal/pole_interpolation.json
+      md5: b41a628f04fb9b45f432b5275971dd4e
+      size: 4586
+  model:
+    cmd: julia scripts/model.jl
+    deps:
+    - path: src/constants.jl
+      md5: fd8286685f525567a098d21f9c550022
+      size: 649
+    params:
+      settings.json:
+        fitresults:
+          δm0: -359.2e-3 ± 40.2e-3
+          Γ0_68CL_syst: 342.5
+          Γ0_90CL_syst: 135.0
+          Γ0_95CL_syst: 95.0
+          Γ0_68CL_stat: 937.54
+          Γ0_90CL_stat: 309.0
+          Γ0_95CL_stat: 204.0
+        phspmatching:
+          cutoff: 4.0
+          estep: 0.01
+    outs:
+    - path: results/nominal/model.json
+      md5: ea52619794727d600720c7188cc8bddd
+      size: 1230848
+  effectiverange:
+    cmd: julia scripts/effectiverange.jl
+    deps:
+    - path: results/nominal/model.json
+      md5: ea52619794727d600720c7188cc8bddd
+      size: 1230848
+    params:
+      settings.json:
+        fitresults:
+          δm0: -359.2e-3 ± 40.2e-3
+          Γ0_68CL_syst: 342.5
+          Γ0_90CL_syst: 135.0
+          Γ0_95CL_syst: 95.0
+          Γ0_68CL_stat: 937.54
+          Γ0_90CL_stat: 309.0
+          Γ0_95CL_stat: 204.0
+    outs:
+    - path: results/nominal/effective_range.json
+      md5: 90112ba1e537a9ba27c2c7e630efb47c
+      size: 795
+    - path: results/nominal/inverse_amplitude.json
+      md5: 6fc7f681145bb865860d3eb8f64fa2c5
+      size: 17171
+  polesearch:
+    cmd: julia scripts/polesearch.jl
+    deps:
+    - path: results/nominal/model.json
+      md5: ea52619794727d600720c7188cc8bddd
+      size: 1230848
+    params:
+      settings.json:
+        fitresults:
+          δm0: -359.2e-3 ± 40.2e-3
+          Γ0_68CL_syst: 342.5
+          Γ0_90CL_syst: 135.0
+          Γ0_95CL_syst: 95.0
+          Γ0_68CL_stat: 937.54
+          Γ0_90CL_stat: 309.0
+          Γ0_95CL_stat: 204.0
+        polepositiongrid:
+          dm_min: -1.5
+          dm_max: -0.01
+          dm_N: 20
+    outs:
+    - path: results/nominal/pole_default.json
+      md5: 5fe6f9f3c1c7c6abd0214607706def1a
+      size: 4401
+    - path: results/nominal/pole_interpolation_stat_syst.json
+      md5: 577ddd2f2aded2dbdfc1b8342890112e
+      size: 22142
