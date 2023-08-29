@@ -1,0 +1,62 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Georgia, 'Times New Roman', Times, serif
+}
+
+.index-panel {
+    flex: 1;
+    background-color: #9ed380;
+    padding: 20px;
+    overflow: auto;
+}
+
+.index-panel ul {
+    list-style: none;
+    padding: 0;
+}
+
+.index-panel li {
+    margin: 10px 0;
+}
+
+.container {
+    display: flex;
+    height: 100vh; /* Use viewport height to make it occupy full height */
+    justify-content: center;
+}
+
+.iframe-container {
+    flex: 6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    overflow: auto; /* in case iframe content is bigger than container */
+}
+
+.notebook-display {
+    max-width: 1200px;
+    width: 100%; /* will occupy full width until max-width */
+    height: 90vh; /* adjust height as required */
+    border: none;
+}
+
+.notebook-details {
+    font-size: 0.8em; /* Adjust to your preferred size */
+    margin-top: 4px;
+}
+
+.notebook-details .title {
+    font-weight: bold;
+}
+
+.notebook-details .subtitles {
+    list-style-type: none; /* removes bullet points */
+    padding-left: 0;
+    margin-top: 2px;
+}
+
+.notebook-details .subtitles li {
+    font-weight: normal;
+}
