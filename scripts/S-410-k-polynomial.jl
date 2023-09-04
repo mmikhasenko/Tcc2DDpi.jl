@@ -110,7 +110,8 @@ end |> DataFrame
 select(df_radius, :ϵf,
     :a⁻¹ => ByRow(x -> real(1e3x)) => :Re_a⁻¹_x1e3,
     :a⁻¹ => ByRow(x -> imag(1e3x)) => :Im_a⁻¹_x1e3,
-    :r,
+    :r => ByRow(real) => :Re_r,
+    :r => ByRow(imag) => :Im_r,
     :N => ByRow(x -> real(1e3x)) => :Re_N_x1e3,
     :N => ByRow(x -> imag(1e3x)) => :Im_N_x1e3
 ) |> DataFrames.PrettyTables.pretty_table
