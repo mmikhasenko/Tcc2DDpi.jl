@@ -155,7 +155,7 @@ one can compute the integral of R/x^2 analytically and plot corrections vs circl
 
 indefint0(x) = -x / 2 + sqrt(x) + (x - 1) * log(sqrt(x) + 1)
 disc_indefint0(x) = (2 * sqrt(x) + (x - 1) * log(sqrt(x) + 1) - (x - 1) * log(-sqrt(x) + 1))
-
+N(ϵ) = disc_indefint0(ϵ) / (ϵ * sqrt(ϵ) * 4 / 3) / (-1im)
 
 
 
@@ -179,14 +179,13 @@ indefint2_no_sqrt(x) = indefint2(x) + 2 / sqrt(x)
 Note: -2πi / 2 is given by disc of log(x) / 2
 """
 disc_indefint2_no_sqrt(x) =
-    2 / sqrt(x) +
+    -2 / sqrt(x) - N(x) * (-4 / sqrt(x)) / 1im +
     (x - 1) * log(sqrt(x) + 1) / x -
     (x - 1) * log(-sqrt(x) + 1) / x -
     (-2πi) / 2 # clockwise
 
 
 let cim = CircularSum(0.4ϵ0, 50)
-    N(ϵ) = disc_indefint0(ϵ) / (ϵ * sqrt(ϵ) * 4 / 3) / (-1im)
     N_ = N(-1im * cim.r)
     cauchyintegral′(x -> toy_model(x) / N_ + 1im * sqrtP(x, toy_model.ϕ_sqrt), 0.0, cim),
     -disc_indefint2_no_sqrt(-1im * cim.r) / 2πi / N_
@@ -210,15 +209,9 @@ let df = df_radius[1:end-1, :]
     # plot!(xv, df.N .|> imag, lab="num")
     plot!(xv, imag.(df.r), lab="num")
     # 
-    N(ϵ) = disc_indefint0(ϵ) / (ϵ * sqrt(ϵ) * 4 / 3) / (-1im)
     R′(ϵ) = -disc_indefint2_no_sqrt(ϵ) / (2πi) / N(ϵ)
     r(ϵ) = 2 * R′(ϵ)
     # 
-    # plot!(ϵ -> -1im * ϵ |> N |> imag, xv, lab="ana")
-    @show N(-0.4im)
-    @show R′(-0.4im)
-    @show r(-0.4im)
-
     plot!(x -> imag(r(-1im * x)), xv, lab="ana")
     plot!()
 end
