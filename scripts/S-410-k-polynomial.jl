@@ -56,7 +56,7 @@ const δm0_val = δm0.val
 
 
 # πDD: Dˣ⁺ + Dˣ⁺
-"""
+md"""
 The model with the π⁺D⁰D⁰ system with two Dˣ⁺ resonances.
 """
 const model2 = let
@@ -96,7 +96,7 @@ end
 cauchysum = ComplexBranchPointExpansion(CircularSum(ϵ0 / 20, 50))
 efe2 = effrange(model2; method=cauchysum)
 
-"""
+md"""
 ## Size of the effect that we are fighting
 """
 
