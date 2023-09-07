@@ -154,7 +154,7 @@ one can compute the integral of R/x^2 analytically and plot corrections vs circl
 
 
 indefint0(x) = -x / 2 + sqrt(x) + (x - 1) * log(sqrt(x) + 1)
-disc_indefint0(x) = (2 * sqrt(x) + (x - 1) * log(sqrt(x) + 1) - (x - 1) * log(-sqrt(x) + 1))
+disc_indefint0(x) = 2 * sqrt(x) + (x - 1) * log(sqrt(x) + 1) - (x - 1) * log(-sqrt(x) + 1)
 N(ϵ) = disc_indefint0(ϵ) / (ϵ * sqrt(ϵ) * 4 / 3) / (-1im)
 
 
@@ -184,14 +184,6 @@ disc_indefint2_no_sqrt(x) =
     (x - 1) * log(-sqrt(x) + 1) / x -
     (-2πi) / 2 # clockwise
 
-
-let cim = CircularSum(0.4ϵ0, 50)
-    N_ = N(-1im * cim.r)
-    cauchyintegral′(x -> toy_model(x) / N_ + 1im * sqrtP(x, toy_model.ϕ_sqrt), 0.0, cim),
-    -disc_indefint2_no_sqrt(-1im * cim.r) / 2πi / N_
-end
-
-
 effrange(toy_model; method=ComplexBranchPointExpansion(CircularSum(0.4 * ϵ0, 50)))
 
 plot(c, 0, 1)
@@ -213,6 +205,7 @@ let df = df_radius[1:end-1, :]
     r(ϵ) = 2 * R′(ϵ)
     # 
     plot!(x -> imag(r(-1im * x)), xv, lab="ana")
+    plot!(x -> imag(1im + 32 / 15π * sqrt(-1im * x)), xv, lab="exp")
     plot!()
 end
 
