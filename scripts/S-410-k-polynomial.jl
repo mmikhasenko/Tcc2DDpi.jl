@@ -26,6 +26,8 @@ using Interpolations
 using Statistics
 using LaTeXStrings
 using DataFrames
+using Statistics
+
 
 using Plots
 theme(:wong2, size=(500, 350), minorticks=true, grid=false, frame=:box,
@@ -93,11 +95,11 @@ end
 
 
 ϵ0 = abs(imag(Eᵦˣ⁺))
-cauchysum = ComplexBranchPointExpansion(CircularSum(ϵ0 / 20, 50))
-efe2 = effrange(model2; method=cauchysum)
 
 md"""
-## Size of the effect that we are fighting
+## Size of the effect 
+
+Before further studies, let check how strong the dependce on r, that we are fighting!
 """
 
 df_radius = map([0.0001, 0.001, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2]) do ϵf
@@ -117,11 +119,16 @@ select(df_radius, :ϵf,
 ) |> DataFrames.PrettyTables.pretty_table
 
 
+
 md"""
 ### Consistency check
 
 We are going to expand
 """
+
+cauchysum = ComplexBranchPointExpansion(CircularSum(ϵ0 / 20, 50))
+efe2 = effrange(model2; method=cauchysum)
+
 C0(f, ϵ, N=50) = circleintegral(f, 0.0, CircularSum(ϵ, N))
 
 C0_k = C0(cauchysum.cim.r) do Δe
@@ -132,7 +139,31 @@ C0_D = C0(cauchysum.cim.r) do Δe
 end
 @assert efe2.N == C0_D / C0_k / (-1im)
 
-let (model, efe) = (model2, efe2)
+function linear_regression(xv,yv)
+    Ex = mean(xv)
+    Ey = mean(yv)
+    Exy = mean(xv.*yv)
+    Ex² = mean(xv.^2)
+    Dx = Ex² - Ex^2
+    # 
+    α,β = [Exy - Ex*Ey, Ey*Ex² - Ex*Exy] ./ Dx
+    return (; α,β)
+end
+
+let
+    ϵfv = df_radius.ϵf[4:end-3]
+    xv = sqrt.(ϵfv)
+    yv = df_radius.r[4:end-3]
+    linear_regression(xv,yv)
+end
+
+let
+    model = model2
+#     efe = df_radius[4, :]
+    efe = efe2
+#     dx = efe.ϵf * ϵ0
+    dx = ϵ0
+    elim = (-1, 1) .* (2dx)
 
     invD(Δe) = denominator_II(model, Δe, δm0_val)
     expansion(Δe) = ere(k3b(Δe); a⁻¹=efe.a⁻¹, r=efe.r * (1 - 1e-10 * cis(0.1π)), N=efe.N)
@@ -140,7 +171,6 @@ let (model, efe) = (model2, efe2)
     # 
     plot(layout=grid(1, 2), size=(800, 350), title=["Real" "Imag"], grid=true)
     # 
-    elim = (-1, 1) .* (ϵ0)
     xv = range(elim..., 55)
     invD_yv = map(xv .+ Eᵦˣ⁺) do Δe
         invD(Δe) - minus_iNk(Δe)
