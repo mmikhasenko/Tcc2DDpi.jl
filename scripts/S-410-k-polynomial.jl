@@ -83,7 +83,7 @@ the circular Cauchy integrals are related to the expansion parameters of $R(s)$.
 We find that the expansion of the function is not great in the complex plane in the range ~0.1 MeV.
 """
 
-function effrange(model; method)
+function effrange_denominator_II_k3b(model; method)
     effrangepars =
         effectiverangeexpansion(
             Δe -> denominator_II(model, Eᵦˣ⁺ + Δe, δm0_val),
@@ -103,7 +103,7 @@ Before further studies, let check how strong the dependce on r, that we are figh
 """
 
 df_radius = map([0.0001, 0.001, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2]) do ϵf
-    efe = effrange(model2;
+    efe = effrange_denominator_II_k3b(model2;
         method=ComplexBranchPointExpansion(CircularSum(ϵf * ϵ0, 50)))
     # 
     (; ϵf, efe...)
@@ -127,7 +127,7 @@ We are going to expand
 """
 
 cauchysum = ComplexBranchPointExpansion(CircularSum(ϵ0 / 20, 50))
-efe2 = effrange(model2; method=cauchysum)
+efe2 = effrange_denominator_II_k3b(model2; method=cauchysum)
 
 C0(f, ϵ, N=50) = circleintegral(f, 0.0, CircularSum(ϵ, N))
 
@@ -156,6 +156,13 @@ let
     yv = df_radius.r[4:end-3]
     linear_regression(xv,yv)
 end
+
+md"""
+The extraction algorithm will be:
+1. build model,
+2. effrange_denominator_II_k3b
+3. linear_regression
+"""
 
 let
     model = model2

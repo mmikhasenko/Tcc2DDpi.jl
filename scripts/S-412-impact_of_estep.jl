@@ -49,7 +49,7 @@ const δm0_val = δm0.val
 @unpack cutoff, estep = settings["phspmatching"]
 
 
-function effrange(model; method)
+function effrange_denominator_II_k3b(model; method)
     effrangepars =
         effectiverangeexpansion(
             Δe -> denominator_II(model, Eᵦˣ⁺ + Δe, δm0_val),
@@ -84,7 +84,7 @@ dfv = map(steps) do _estep
     ϵ0 = abs(imag(Eᵦˣ⁺))
     efv = [0.001, 0.002, 0.003, 0.005, 0.007, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2]
     df_radius = map(efv) do ϵf
-        efe = effrange(model;
+        efe = effrange_denominator_II_k3b(model;
             method=ComplexBranchPointExpansion(CircularSum(ϵf * ϵ0, 50)))
         # 
         (; ϵf, efe...)
