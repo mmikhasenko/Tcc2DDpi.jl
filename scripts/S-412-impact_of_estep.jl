@@ -69,26 +69,27 @@ dfv = map(steps) do _estep
         println("Using the file")
         return CSV.File(filename) |> DataFrame
     end
-    # 
-    # model = let
-    #     ch1 = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
-    #     iπDD2 = interpolated(
-    #         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-    #         cutoff; estep=_estep)
-    #     iπDD3 = interpolated(
-    #         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-    #         cutoff; estep=_estep)
-    #     Amplitude((iπDD2, iπDD3))
-    # end
+    
+    model = let
+        ch1 = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
+        iπDD2 = interpolated(
+            ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
+            cutoff; estep=_estep)
+        iπDD3 = interpolated(
+            ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
+            cutoff; estep=_estep)
+        Amplitude((iπDD2, iπDD3))
+    end
 
-    # ϵ0 = abs(imag(Eᵦˣ⁺))
-    # efv = [0.001, 0.002, 0.003, 0.005, 0.007, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2]
-    # df_radius = map(efv) do ϵf
-    #     efe = effrange(model;
-    #         method=ComplexBranchPointExpansion(CircularSum(ϵf * ϵ0, 50)))
-    #     # 
-    #     (; ϵf, efe...)
-    # end |> DataFrame
+    ϵ0 = abs(imag(Eᵦˣ⁺))
+    efv = [0.001, 0.002, 0.003, 0.005, 0.007, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2]
+    df_radius = map(efv) do ϵf
+        efe = effrange(model;
+            method=ComplexBranchPointExpansion(CircularSum(ϵf * ϵ0, 50)))
+        # 
+        (; ϵf, efe...)
+    end |> DataFrame
+    
     df_radius = DataFrame()
     CSV.write(filename, df_radius)
 
@@ -113,3 +114,20 @@ let
     plot!()
 end
 
+df_radius
+
+for (i,df) in enumerate(dfvv)
+    df.estep .= steps[i]
+end
+
+let
+    plot()
+    dfall = vcat(dfvv...)
+    transform!(dfall, :ϵf => x->x.>0.04)
+    combine(groupby(dfall, :ϵf),
+        [:r,:ϵf,:estep] => (r,ϵf,estep)-> let
+        plot!(estep, (r .- r[end]) .|> real, lab="$(ϵf[1])")  
+        plot!(estep, (r .- r[end]) .|> imag, ls=:dash)  
+    end)
+    plot!(legendtitle="ϵf")
+end
