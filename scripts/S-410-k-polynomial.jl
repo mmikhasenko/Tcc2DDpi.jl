@@ -44,11 +44,11 @@ theme(:wong2, size=(500, 350), minorticks=true, grid=false, frame=:box,
 #    _|        _|_|_|  _|    _|    _|_|_|
 
 
-const RegressionResult = NamedTuple{(:α, :β, :SE_α, :SE_β)}
+const PrototypeRegressionResult = NamedTuple{(:α, :β, :SE_α, :SE_β)}
 import Base: *
-*(nt::RegressionResult, f::Number) = RegressionResult(collect(nt) .* f)
+*(nt::PrototypeRegressionResult, f::Number) = PrototypeRegressionResult(collect(nt) .* f)
 
-function Base.show(io::IO, nt::RegressionResult)
+function Base.show(io::IO, nt::PrototypeRegressionResult)
     print(io,
         "Interpolation to zero:",
         "\n\tintercept: ", round(nt.β, digits=2),
@@ -117,7 +117,7 @@ function prototype_linear_regression(xv, yv)
     SE_α = SE_α_real + 1im*SE_α_imag
     SE_β = SE_β_real + 1im*SE_β_imag
 
-    return RegressionResult((; α, β, SE_α, SE_β))
+    return PrototypeRegressionResult((; α, β, SE_α, SE_β))
 end
 
 

@@ -101,14 +101,25 @@ include("plotrecipes.jl")
 
 
 export circleintegral
-export cauchyintegral, cauchyintegral′, cauchyintegral′′, cauchyintegral′′′
+export cauchyintegral, cauchyintegral′
+export cauchyintegral′′, cauchyintegral′′′
 export highertermexpansion
 export effectiverangeexpansion
 export ComplexBranchPointExpansion
 export CircularIntegral, CircularSum
 include("cauchyintegrals.jl")
+
+
 export ere, hte
 export EffectiveRangeFit
 include("fiteffectiverange.jl")
+
+
+export RegressionResult
+export linear_regression
+export effective_range_scan
+export linear_regression_in_sqrt_ϵf
+export effective_range_extrapolation
+include("extrapolation.jl")
 
 end
