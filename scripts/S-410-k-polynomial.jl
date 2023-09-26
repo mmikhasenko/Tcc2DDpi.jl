@@ -82,7 +82,7 @@ result = linear_regression(x, y)
 The function computes the intercept and slope using the formulae derived from the method of least squares.
     It also computes the standard errors for the intercept and slope to provide a measure of the uncertainty associated with these estimates. 
 """
-function linear_regression(xv, yv)
+function prototype_linear_regression(xv, yv)
     Ex = mean(xv)
     Ey = mean(yv)
     Exy = mean(xv .* yv)
@@ -377,12 +377,12 @@ The correction is linear in √circle_r. The functions below do the intepolation
 
 The extraction algorithm will be:
 1. build model,
-2. scan in ϵf with `effective_range_scan`,
+2. scan in ϵf with `prototype_effective_range_scan`,
 3. extrapolate to zero with `effective_range_extrapolation`
 """
 
 
-function effective_range_scan(model, settings)
+function prototype_effective_range_scan(model, settings)
     @unpack ϵ0 = settings
     @unpack ϵf_grid = settings
     @unpack circular_sum_n = settings
@@ -404,19 +404,19 @@ function effective_range_scan(model, settings)
     return scan
 end
 
-function linear_regression_in_sqrt_ϵf(scan, quantity)
+function prototype_linear_regression_in_sqrt_ϵf(scan, quantity)
     ϵfv = getproperty.(scan, :ϵf)
     sqrt_ϵfv = sqrt.(ϵfv)
     # 
     calv = getproperty.(scan, quantity)
-    regression = linear_regression(sqrt_ϵfv, calv)
+    regression = prototype_linear_regression(sqrt_ϵfv, calv)
     # 
     return regression
 end
 
-function effective_range_extrapolation(scan)
-    r_regression = linear_regression_in_sqrt_ϵf(scan, :r)
-    inva_regression = linear_regression_in_sqrt_ϵf(scan, :a⁻¹)
+function prototype_effective_range_extrapolation(scan)
+    r_regression = prototype_linear_regression_in_sqrt_ϵf(scan, :r)
+    inva_regression = prototype_linear_regression_in_sqrt_ϵf(scan, :a⁻¹)
     # 
     (; r_regression, inva_regression)
 end
@@ -430,10 +430,10 @@ effective_range_intepolation_settings = (
     circular_sum_n = 50,
     model_δm0 = δm0_val)
 
-ere_scan = effective_range_scan(model2,
+ere_scan = prototype_effective_range_scan(model2,
     effective_range_intepolation_settings)
 # 
-ssc = effective_range_extrapolation(ere_scan)
+ssc = prototype_effective_range_extrapolation(ere_scan)
 
 @show ssc.r_regression;
 @show ssc.inva_regression * 1000;
