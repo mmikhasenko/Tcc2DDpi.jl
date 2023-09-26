@@ -226,17 +226,28 @@ end
 @assert efe2.N == C0_D / C0_k / (-1im)
 
 
-
+import Plots.PlotMeasures: mm
 let
-    ϵfv = df_radius.ϵf[4:end-3]
+    selected_indices = 4:size(df_radius,1)-2
+    # 
+    ϵfv = df_radius.ϵf[selected_indices]
     xv = sqrt.(ϵfv)
-    yv = df_radius.r[4:end-3]
-    regression = linear_regression(xv,yv)
-    @show regression
+    yv = df_radius.r[selected_indices]
+    regression = linear_regression(xv, yv)
     @unpack α, β = regression
     # 
-    plot(xv, yv .|> real)
-    plot!(x-> real(β + α * x), range(xv[[1,end]]..., 30))
+    plot(layout=grid(1,2), size=(900,400),
+        title = "Regression",
+        ylab=["Re r" "Im r"] .* " [fm]", xlab="scan scale, √ϵf",
+        bottom_margin = 3mm, left_margin = 4mm)
+    # 
+    plot!(sp=1, x-> real(β + α * x), range(xv[[1,end]]..., 30))
+    scatter!(sp=1, xv, yv .|> real, m=(7, :d))
+    #
+    plot!(sp=2, x-> imag(β + α * x), range(xv[[1,end]]..., 30))
+    scatter!(sp=2, xv, yv .|> imag, m=(7, :d))
+    #
+    plot!()
 end
 
 
@@ -296,10 +307,11 @@ C0_N_data = let ϵ = abs(imag(Eᵦˣ⁺)) / 2
 end
 
 let
-    plot(xlab="integral discretization, N")
-    plot!(C0_N_data.Nv, C0_N_data.C0_kv .|> real, lab="|Re[A]|")
-    plot!(C0_N_data.Nv, C0_N_data.C0_kv .|> imag .|> abs, lab="|Im[A]|")
-    vline!([50], lab="N=50")
+    plot(xlab="integral discretization, N",
+        title="Circle integral discretization")
+    plot!(C0_N_data.Nv, 1e6 * C0_N_data.C0_kv .|> real, lab="|Re A|")
+    plot!(C0_N_data.Nv, 1e6 * C0_N_data.C0_kv .|> imag .|> abs, lab="|Im A|")
+    vline!([50], lab="N=50", ylab="C0 × 10⁶")
 end
 
 md"""
@@ -333,11 +345,12 @@ let
     N0 = C0_data.C0_Dv[end] / C0_data.C0_kv[end]
     plot(layout=grid(3, 1, heights=(0.6, 0.2, 0.2)), size=(700, 700),
         xlab="Cauchy integral radius, ϵ")
-    plot!(C0_data.ϵv, C0_data.C0_kv .|> real, lw=1.5)
-    plot!(C0_data.ϵv, (C0_data.C0_Dv ./ N0) .|> real, lw=1.5)
+    plot!(sp=1, C0_data.ϵv, C0_data.C0_kv .|> real, lw=1.5, lab="Re C₀(k)")
+    plot!(sp=1, C0_data.ϵv, (C0_data.C0_Dv ./ N0) .|> real, lw=1.5, lab="Re C₀(A)")
+    plot!(sp=1, title="Comparison of C₀ integral of A and k")
     # 
-    plot!(C0_data.ϵv, C0_data.C0_kv .|> imag, ls=:dash, lw=1.5)
-    plot!(C0_data.ϵv, (C0_data.C0_Dv ./ N0) .|> imag, ls=:dash, lw=1.5)
+    plot!(sp=1, C0_data.ϵv, C0_data.C0_kv .|> imag, ls=:dash, lw=1.5, lab="Im C₀(k)")
+    plot!(sp=1, C0_data.ϵv, (C0_data.C0_Dv ./ N0) .|> imag, ls=:dash, lw=1.5, lab="Im C₀(A)")
     # 
     plot!(sp=2, C0_data.ϵv, (C0_data.C0_Dv ./ N0 .- C0_data.C0_kv) .|> real, lc=2, lw=1.5)
     plot!(sp=2, C0_data.ϵv, (C0_data.C0_Dv ./ N0 .- C0_data.C0_kv) .|> imag, lc=4, lw=1.5, ls=:dash)
@@ -413,7 +426,7 @@ end
 
 effective_range_intepolation_settings = ( 
     ϵ0 = abs(imag(Eᵦˣ⁺)),
-    ϵf_grid = [0.02, 0.05, 0.1, 0.2],
+    ϵf_grid = [0.02, 0.05, 0.1, 0.2, 0.5],
     circular_sum_n = 50,
     model_δm0 = δm0_val)
 
