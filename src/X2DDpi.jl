@@ -19,6 +19,8 @@ import .xDDPhaseSpace: AbstractxDD, masses
 import .xDDPhaseSpace: decay_matrix_element_squared
 import .xDDPhaseSpace: integrand_mapped_thr, ρ_thr
 import .xDDPhaseSpace: mapdalitz, mapdalitzmethod
+import .xDDPhaseSpace: BW, BW_norm, BW_Swave, ZeroBW
+import .xDDPhaseSpace: ρ_tb
 
 # serialization
 import .xDDPhaseSpace: obj2nt
@@ -58,6 +60,11 @@ include("constants.jl")
 # Reexport xDDPhaseSpace functionality
 export AbstractxDD, ρ_thr, masses, interpolated, dispersive
 export πDD, branch_points, constructchannel
+export BW, BW_norm, BW_Swave, ZeroBW
+export λ
+export Jᴵ, Jᴵᴵ
+
+include("covariant_exptessions.jl")
 
 # model 1: main
 export γDD

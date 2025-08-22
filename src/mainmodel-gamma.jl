@@ -1,3 +1,4 @@
+
 # γDD
 struct γDD{T1, T2, T3} <: AbstractxDD
     ms::NamedTuple{(:m1, :m2, :m3), T1}
