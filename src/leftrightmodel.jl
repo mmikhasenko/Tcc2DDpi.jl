@@ -17,10 +17,10 @@ mapdalitzmethod(set::ChannelWithIntegrationMethod) = set.mapdalitzmethod
 
 decay_matrix_element_squared(
     set::ChannelWithIntegrationMethod{T, HookSqrtDalitzMapping{3}} where T <: πDD, s, σ3, σ2) =
-    covertapply(πDD_𝔐²_nonana3, set.channel, s, σ3, σ2)
+    covertapply(xDDPhaseSpace.πDD_𝔐²_nonana3, set.channel, s, σ3, σ2)
 decay_matrix_element_squared(
     set::ChannelWithIntegrationMethod{T, HookSqrtDalitzMapping{2}} where T <: πDD, s, σ3, σ2) =
-    covertapply(πDD_𝔐²_nonana2, set.channel, s, σ3, σ2)
+    covertapply(xDDPhaseSpace.πDD_𝔐²_nonana2, set.channel, s, σ3, σ2)
 
 
 decay_matrix_element_squared(

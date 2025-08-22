@@ -4,8 +4,8 @@ struct DˣD{T1, T2} <: AbstractxDD
 end
 
 function decay_matrix_element_squared(d::DˣD, s, σ3, σ2)
-    A = λ(σ3, d.ms[1]^2, d.ms[2]^2) / (4 * σ3)
-    return Jᴵ(σ3, d.R) * Jᴵᴵ(σ3, d.R) * f² / 3 / 4 * A
+    A = xDDPhaseSpace.λ(σ3, d.ms[1]^2, d.ms[2]^2) / (4 * σ3)
+    return Jᴵ(σ3, d.R) * Jᴵᴵ(σ3, d.R) * xDDPhaseSpace.f² / 3 / 4 * A
 end
 
 function integrand_mapped_thr(d::DˣD, s, x)

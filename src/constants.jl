@@ -15,28 +15,8 @@ const mγ = 0.0
 
 const thr_D⁰Dˣ⁺ = mD⁰ + mDˣ⁺
 
-# Backward compatibility
 e2m(e) = (mD⁰ + mDˣ⁺) + e * 1e-3
 m2e(m) = (m - mD⁰ - mDˣ⁺) * 1e3
-
-# WithThrE type for channel-specific thresholds
-struct WithThrE{T <: Real} <: Real
-    val::T
-    threshold::Float64
-end
-
-# Make WithThrE behave like a number for conversion and comparison only
-Base.convert(::Type{T}, e::WithThrE) where T <: Number = convert(T, e.val)
-Base.promote_rule(::Type{<:Number}, ::Type{<:WithThrE}) = promote_rule(Number, Number)
-
-# Constructor for complex values
-WithThrE(val::Complex, threshold::Float64) = complex(WithThrE(real(val), threshold), WithThrE(imag(val), threshold))
-
-# conversion functions
-e2m(e::WithThrE) = e.threshold + e.val * 1e-3
-e2m(e::Complex{<:WithThrE}) = e.re.threshold + e.re.val * 1e-3 + e.im.val * 1e-3 * 1im
-
-
 
 # NR quantities
 const μDˣ⁺D⁰ = mDˣ⁺ * mD⁰ / (mDˣ⁺ + mD⁰)
@@ -44,7 +24,6 @@ const Eᵦˣ⁺ = m2e(sqrt(mDˣ⁺^2 - 1im * mDˣ⁺ * ΓDˣ⁺) + mD⁰)
 
 # coupling constants
 const h² = 20.13e-3
-const f² = 282.42
 const μ₀ = -3.77
 const μ₊ = 1.0
 
