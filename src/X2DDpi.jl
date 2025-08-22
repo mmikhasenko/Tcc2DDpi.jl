@@ -11,6 +11,11 @@ using Parameters
 using RecipesBase
 using LaTeXStrings
 
+# Include the generic AbstractxDD definitions
+include("AbstractxDDPhaseSpace/abstractxdd.jl")
+include("AbstractxDDPhaseSpace/intepolate_merge.jl")
+include("AbstractxDDPhaseSpace/dispersion.jl")
+
 
 export mγ
 export mπ⁰, mπ⁺
@@ -49,10 +54,12 @@ export LinearDalitzMapping, HookSqrtDalitzMapping
 export mapdalitz
 include("integrationpaths.jl")
 
+export AbstractxDD
 export ρ_thr
 export masses
 export decay_matrix_element_squared
-include("abstractxdd.jl")
+export interpolated
+export dispersive
 
 export ρ_tb
 export πDD, γDD
@@ -65,12 +72,6 @@ include("singlechannel.jl")
 
 export ChannelWithIntegrationMethod
 include("leftrightmodel.jl")
-
-export interpolated
-include("intepolate_merge.jl")
-
-export dispersive
-include("dispersion.jl")
 
 export Amplitude
 export pole_position

@@ -1,5 +1,5 @@
-struct DˣD{T1,T2} <: AbstractxDD
-    ms::NamedTuple{(:m1, :m2, :m3),T1}
+struct DˣD{T1, T2} <: AbstractxDD
+    ms::NamedTuple{(:m1, :m2, :m3), T1}
     R::T2
 end
 

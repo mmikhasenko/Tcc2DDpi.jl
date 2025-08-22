@@ -41,7 +41,3 @@ function ρ_thr(d::AbstractxDD, e::Real)
 	v = cuhre(integrand, 2, 1)[1]
 	v[1] / (8π)^2
 end
-
-
-
-
