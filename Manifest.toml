@@ -2,7 +2,7 @@
 
 julia_version = "1.11.5"
 manifest_format = "2.0"
-project_hash = "8782908ec1eb76065da58a14ddac522c5d23b602"
+project_hash = "dbcc3eae603fb11e0ec1bd8968f974ada74d3a47"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "60665b326b75db6517939d0e1875850bc4a54368"
@@ -1733,6 +1733,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "e7b67590c14d487e734dcb925924c5dc43ec85f3"
 uuid = "dfaa095f-4041-5dcd-9319-2fabd8486b76"
 version = "4.1.0+0"
+
+[[deps.xDDPhaseSpace]]
+deps = ["Cuba", "Parameters"]
+path = "../xDDPhaseSpace"
+uuid = "457bd369-aa38-418d-83c3-59398da2a644"
+version = "0.1.0"
 
 [[deps.xkbcommon_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libxcb_jll", "Xorg_xkeyboard_config_jll"]

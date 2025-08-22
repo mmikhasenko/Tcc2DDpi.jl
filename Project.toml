@@ -23,6 +23,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 ThreadsX = "ac1d9e8a-700a-412c-b207-f0111f4b6c0d"
 ThreeBodyDecays = "e6563dab-9ca1-5843-bde3-2ccf38d63843"
+xDDPhaseSpace = "457bd369-aa38-418d-83c3-59398da2a644"
 
 [compat]
 Cuba = "2.3.0"

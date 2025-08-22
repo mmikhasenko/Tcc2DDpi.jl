@@ -10,31 +10,24 @@ using JSON
 using Parameters
 using RecipesBase
 using LaTeXStrings
-
-# Include the xDDPhaseSpace module
-include("xDDPhaseSpace/src/xDDPhaseSpace.jl")
+using xDDPhaseSpace
 
 # Import specific methods from xDDPhaseSpace module
-import .xDDPhaseSpace: AbstractxDD, masses
-import .xDDPhaseSpace: decay_matrix_element_squared
-import .xDDPhaseSpace: integrand_mapped_thr, ρ_thr
-import .xDDPhaseSpace: mapdalitz, mapdalitzmethod
-import .xDDPhaseSpace: BW, BW_norm, BW_Swave, ZeroBW
-import .xDDPhaseSpace: ρ_tb
+import xDDPhaseSpace: masses
+import xDDPhaseSpace: decay_matrix_element_squared
+import xDDPhaseSpace: integrand_mapped_thr, ρ_thr
+import xDDPhaseSpace: mapdalitz, mapdalitzmethod
+import xDDPhaseSpace: BW, BW_norm, BW_Swave, ZeroBW
+import xDDPhaseSpace: ρ_tb
 
 # serialization
-import .xDDPhaseSpace: obj2nt
+import xDDPhaseSpace: obj2nt
 
 # model
-import .xDDPhaseSpace: πDD, branch_points, constructchannel
-
-# analytic continuation
-import .xDDPhaseSpace: Jᴵ, Jᴵᴵ
+import xDDPhaseSpace: πDD, branch_points, constructchannel
 
 # kinematics
-import .xDDPhaseSpace: e2m
-import .xDDPhaseSpace: σ2of3_pm, σ3of1_pm, σ3of2_pm
-import .xDDPhaseSpace: σ3of1, σ2of1
+import xDDPhaseSpace: e2m
 
 # 
 export mγ
@@ -76,8 +69,8 @@ include("singlechannel.jl")
 
 # model 3: leftright model
 # integration paths
-import .xDDPhaseSpace: AbstractDalitzMapping
-import .xDDPhaseSpace: LinearDalitzMapping, HookSqrtDalitzMapping
+import xDDPhaseSpace: AbstractDalitzMapping
+import xDDPhaseSpace: LinearDalitzMapping, HookSqrtDalitzMapping
 # 
 export ChannelWithIntegrationMethod
 include("leftrightmodel.jl")
