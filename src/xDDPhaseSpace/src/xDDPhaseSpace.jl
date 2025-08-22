@@ -1,8 +1,6 @@
 module xDDPhaseSpace
 
 using Cuba
-using Interpolations
-using QuadGK
 using Parameters
 
 # Reexport all methods from submodules
@@ -11,7 +9,9 @@ export mapdalitzmethod, masses
 export integrand_mapped_thr, ρ_thr
 include("abstractxdd.jl")
 
+
 export e2m
+export WithThrE
 include("withthr.jl")
 
 

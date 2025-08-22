@@ -1,0 +1,21 @@
+name = "xDDPhaseSpace"
+uuid = "457bd369-aa38-418d-83c3-59398da2a644"
+authors = ["Mikhail Mikhasenko <mikhail.mikhasenko@cern.ch>"]
+version = "0.1.0"
+
+[deps]
+Cuba = "8a292aeb-7a57-582c-b821-06e4c11590b1"
+Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+
+[compat]
+Cuba = "2.3.0"
+Parameters = "0.12.3"
+QuadGK = "2.11.2"
+Test = "1.11.0"
+
+[extras]
+QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "QuadGK"]

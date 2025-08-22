@@ -12,7 +12,7 @@ using RecipesBase
 using LaTeXStrings
 
 # Include the xDDPhaseSpace module
-include("xDDPhaseSpace/xDDPhaseSpace.jl")
+include("xDDPhaseSpace/src/xDDPhaseSpace.jl")
 
 # Import specific methods from xDDPhaseSpace module
 import .xDDPhaseSpace: AbstractxDD, masses

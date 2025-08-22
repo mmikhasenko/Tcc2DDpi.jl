@@ -4,30 +4,6 @@ using QuadGK
 using Parameters
 
 
-
-@testset "scalar production" begin
-    s, s12, s13, msq = 1, 2, 3, (2, 3, 5)
-    v = (; s, s12, s13, msq)
-    @test X2DDpi.xDDPhaseSpace.p12_p3(v) + v.s12 == X2DDpi.xDDPhaseSpace.p_p12(v)
-    @test X2DDpi.xDDPhaseSpace.p13_p2(v) + v.s13 == X2DDpi.xDDPhaseSpace.p_p13(v)
-    @test X2DDpi.xDDPhaseSpace.p12_p2(v) + X2DDpi.xDDPhaseSpace.p2_p3(v) == X2DDpi.xDDPhaseSpace.p_p2(v)
-    @test X2DDpi.xDDPhaseSpace.p13_p2(v) + msq[2] == X2DDpi.xDDPhaseSpace.p_p2(v)
-end
-
-@testset "ABCDEG" begin
-    s, s12, s13, msq = 1, 2, 3, (2, 3, 3)
-    v = (; s, s12, s13, msq)
-    @test X2DDpi.xDDPhaseSpace.A(v) != 0
-    @test X2DDpi.xDDPhaseSpace.B(v) != 0
-    @test X2DDpi.xDDPhaseSpace.C(v) != 0
-    @test X2DDpi.xDDPhaseSpace.C((; s, s12, s13, msq)) ≈ X2DDpi.xDDPhaseSpace.C((; s12 = s13, s13 = s12, s, msq))
-    @test X2DDpi.xDDPhaseSpace.D(v) != 0
-    @test X2DDpi.xDDPhaseSpace.E(v) != 0
-    @test X2DDpi.xDDPhaseSpace.G(v) != 0
-end
-
-
-
 @testset "Break up momentum of Dˣ⁺D⁰" begin
 
     @test kNR(Eᵦˣ⁺) + 1 ≈ 1.0 + 0.0im
@@ -51,64 +27,6 @@ end
     end
 end
 
-
-
-# mapping and integrating Dalitz
-
-# real integal
-struct TestCh{T} <: X2DDpi.AbstractxDD
-    ms::T
-end
-import X2DDpi.xDDPhaseSpace: decay_matrix_element_squared
-decay_matrix_element_squared(d::TestCh, s, σ3, σ2) = 1.0
-
-@testset "implementation of the phase-space integral" begin
-
-    e_test = 0.0
-    ms_test = (m1 = mπ⁺, m2 = mD⁰, m3 = mD⁰)
-
-    t = TestCh(ms_test)
-    ρ_2dim = ρ_thr(t, e_test)
-
-    s = e2m(e_test)^2
-    ms = ms_test
-    ρ_1dim = quadgk(σ1 -> sqrt(X2DDpi.xDDPhaseSpace.λ(s, ms.m1^2, σ1) * X2DDpi.xDDPhaseSpace.λ(σ1, ms.m2^2, ms.m3^2)) / σ1,
-        (ms.m2 + ms.m3)^2, (sqrt(s) - ms.m1)^2)[1] / (8π)^2 / (2π * s)
-
-    @test abs(ρ_2dim - ρ_1dim) / ρ_1dim < 1e-4
-end
-
-import X2DDpi.xDDPhaseSpace: σ3of1_pm, σ3of1, σ2of3_pm
-
-# complex integal
-@testset "σ3of1_pm and σ3of1" begin
-    m = e2m(1.1)
-    # 
-    ms = (m1 = mπ⁺, m2 = mD⁰, m3 = mD⁰)
-    σ1 = (ms.m2 + ms.m3)^2 + rand() * ((m - ms.m1)^2 - (ms.m2 + ms.m3)^2)
-    #
-    zm1, z1 = σ3of1_pm(σ1, ms^2, m^2)
-    @test zm1 ≈ σ3of1(σ1, -1, ms^2, m^2)
-    @test z1 ≈ σ3of1(σ1, +1, ms^2, m^2)
-    #
-    σ1_x(x) = (ms.m2 + ms.m3)^2 + x * ((m - ms.m1)^2 - (ms.m2 + ms.m3)^2)
-    #
-    x = rand()
-    @show x
-    @test prod(
-        (ms.m1 + ms.m2)^2 .≤
-        σ3of1_pm(σ1_x(x), ms^2, m^2) .≤
-        (m - ms.m3)^2)
-    #
-    σ3_x(x) = (ms.m1 + ms.m2)^2 + x * ((m - ms.m3)^2 - (ms.m1 + ms.m2)^2)
-    #
-    x = rand()
-    @show x
-    @test prod(
-        (ms.m3 + ms.m1)^2 .≤
-        σ2of3_pm(σ3_x(x), ms^2, m^2) .≤
-        (m - ms.m2)^2)
-end
 
 import X2DDpi.xDDPhaseSpace: HookSqrtDalitzMapping, LinearDalitzMapping
 import X2DDpi.xDDPhaseSpace: BW
@@ -180,7 +98,6 @@ circleintegral(x -> x^2, 2.0, 0.1, 1000)
     @test a_fm ≈ a₀_fm
     @test real(r_fm) ≈ r₀_fm
 end
-
 
 @testset "Channel With Integration Method" begin
 
