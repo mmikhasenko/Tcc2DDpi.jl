@@ -5,7 +5,7 @@ const mπ⁺ = 0.13957039
 const mD⁰ = 1.86483
 const mD⁺ = 1.86965
 # 
-const mDˣ⁺ = 1.86483+145.4258e-3 # m(D) + Δm(D*,D) from PDG
+const mDˣ⁺ = 1.86483 + 145.4258e-3 # m(D) + Δm(D*,D) from PDG
 const mDˣ⁰ = 2.00685
 # 
 const ΓDˣ⁺ = 83.4e-6
@@ -43,15 +43,15 @@ end
 
 
 """
-    kNR(e)
+    k3b(e)
 
-Full elativistic expression for Dˣ⁺D⁰ break-up momentum
+Full relativistic expression for Dˣ⁺D⁰ break-up momentum
 """
 function k3b(e)
     m = e2m(e)
-    M = sqrt(mDˣ⁺^2-1im*mDˣ⁺*ΓDˣ⁺) # taken at the Dˣ⁺ pole
-    p = cis(π/4)*sqrt((m-(M+mD⁰))*cis(-π/2))*
-        sqrt(m+(M+mD⁰))*sqrt(m-(M-mD⁰))*sqrt(m+(M-mD⁰))/(2*m)  # branch cut down
+    M = sqrt(mDˣ⁺^2 - 1im * mDˣ⁺ * ΓDˣ⁺) # taken at the Dˣ⁺ pole
+    p = cis(π / 4) * sqrt((m - (M + mD⁰)) * cis(-π / 2)) *
+        sqrt(m + (M + mD⁰)) * sqrt(m - (M - mD⁰)) * sqrt(m + (M - mD⁰)) / (2 * m)  # branch cut down
     return p
 end
 
@@ -64,6 +64,6 @@ function kNR(e)
     μ = μDˣ⁺D⁰
     Eᵦ = Eᵦˣ⁺
     # 
-    p = cis(π/4)*sqrt(2μ*(e-Eᵦ)/1e3*cis(-π/2)) # branch cut down
+    p = cis(π / 4) * sqrt(2μ * (e - Eᵦ) / 1e3 * cis(-π / 2)) # branch cut down
     return p
 end
