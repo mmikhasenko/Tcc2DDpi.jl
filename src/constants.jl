@@ -12,6 +12,9 @@ const ΓDˣ⁺ = 83.4e-6
 const ΓDˣ⁰ = 55.2e-6
 const mγ = 0.0
 # 
+
+const thr_D⁰Dˣ⁺ = mD⁰ + mDˣ⁺
+
 # Backward compatibility
 e2m(e) = (mD⁰ + mDˣ⁺) + e * 1e-3
 m2e(m) = (m - mD⁰ - mDˣ⁺) * 1e3

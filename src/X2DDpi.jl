@@ -17,6 +17,7 @@ export mπ⁰, mπ⁺
 export mD⁰, mD⁺
 export mDˣ⁺, ΓDˣ⁺
 export mDˣ⁰, ΓDˣ⁰
+export thr_D⁰Dˣ⁺
 # 
 export μDˣ⁺D⁰, Eᵦˣ⁺
 # 
