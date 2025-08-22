@@ -21,6 +21,7 @@ export mDˣ⁰, ΓDˣ⁰
 export μDˣ⁺D⁰, Eᵦˣ⁺
 # 
 export e2m, m2e
+export WithThrE
 export fm_times_mev
 # 
 export ΔNLL_90CL, ΔNLL_95CL, ΔNLL_68CL
