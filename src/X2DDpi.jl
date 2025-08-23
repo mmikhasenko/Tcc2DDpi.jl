@@ -69,6 +69,9 @@ include("singlechannel.jl")
 
 # model 3: leftright model
 # integration paths
+import xDDPhaseSpace: σ2of3_pm, σ3of1_pm, σ3of2_pm
+import xDDPhaseSpace: σ3of1, σ2of1
+# 
 import xDDPhaseSpace: AbstractDalitzMapping
 import xDDPhaseSpace: LinearDalitzMapping, HookSqrtDalitzMapping
 # 
