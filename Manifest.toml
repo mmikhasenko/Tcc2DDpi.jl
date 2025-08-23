@@ -1736,7 +1736,7 @@ version = "4.1.0+0"
 
 [[deps.xDDPhaseSpace]]
 deps = ["Cuba", "Parameters"]
-path = "../xDDPhaseSpace"
+path = "../xDDPhaseSpace.jl"
 uuid = "457bd369-aa38-418d-83c3-59398da2a644"
 version = "0.1.0"
 
