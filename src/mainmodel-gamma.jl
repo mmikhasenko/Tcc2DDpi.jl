@@ -4,8 +4,8 @@ struct γDD{T1, T2, T3} <: AbstractxDD
     ms::NamedTuple{(:m1, :m2, :m3), T1}
     R12::T2
     R13::T3
-    μ12::Float64
-    μ13::Float64
+    μ12::Float64 # Transition matrix element < D | mu | D* >
+    μ13::Float64 # Transition matrix element < D | mu | D* >
 end
 
 γDD(ms, R12, R13) = γDD(ms, R12, R13, μ₊, μ₀)
