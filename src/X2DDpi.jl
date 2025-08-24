@@ -24,7 +24,9 @@ import xDDPhaseSpace: ρ_tb
 import xDDPhaseSpace: obj2nt
 
 # model
-import xDDPhaseSpace: πDD, branch_points, constructchannel
+import xDDPhaseSpace: covertapply
+import xDDPhaseSpace: πDD, γDD
+import xDDPhaseSpace: branch_points, constructchannel
 
 # kinematics
 import xDDPhaseSpace: e2m

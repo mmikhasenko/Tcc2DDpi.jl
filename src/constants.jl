@@ -22,11 +22,6 @@ m2e(m) = (m - mD⁰ - mDˣ⁺) * 1e3
 const μDˣ⁺D⁰ = mDˣ⁺ * mD⁰ / (mDˣ⁺ + mD⁰)
 const Eᵦˣ⁺ = m2e(sqrt(mDˣ⁺^2 - 1im * mDˣ⁺ * ΓDˣ⁺) + mD⁰)
 
-# coupling constants
-const h² = 20.13e-3
-const μ₀ = -3.77
-const μ₊ = 1.0
-
 # Δllh = Δ² / 2σ²
 const ΔNLL_90CL = 1.352 # 90% → Δ=1.644σ; 
 const ΔNLL_95CL = 1.921 # 95% → Δ=1.959σ
