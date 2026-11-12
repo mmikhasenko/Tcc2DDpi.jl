@@ -10,10 +10,15 @@ jobs:
       - name: Checkout this repository
         uses: actions/checkout@v2
 
+      - name: Check out the sibling phase-space dependency
+        run: |
+          git clone https://github.com/mmikhasenko/xDDPhaseSpace.jl.git ../xDDPhaseSpace.jl
+          git -C ../xDDPhaseSpace.jl checkout 3590e02cda1d2366b9d2e32fc9342fde4ef7d44c
+
       - name: Install Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: 1.9.2
+          version: '1.12'
 
       - name: Cache Julia artifacts & such
         uses: julia-actions/cache@v1
@@ -22,7 +27,7 @@ jobs:
 
       # We set up a folder that Pluto can use to cache exported notebooks. If the notebook file did not change, then Pluto can take the exported file from cache instead of running the notebook.
       - name: Set up notebook state cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: pluto_state_cache
           key: ${{ runner.os }}-pluto_state_cache-v2-${{ hashFiles('**/Project.toml', '**/Manifest.toml', '.github/workflows/*' ) }}-${{ hashFiles('**/*jl') }}
