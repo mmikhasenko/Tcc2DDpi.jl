@@ -1,6 +1,7 @@
 using X2DDpi
 using Test
 using QuadGK
+using Cuba
 using Parameters
 
 
@@ -37,13 +38,22 @@ import X2DDpi.xDDPhaseSpace: BW
     #
     method1 = HookSqrtDalitzMapping{3}()
     set1 = ChannelWithIntegrationMethod(ch, method1)
-    value1 = ρ_thr(set1, e)
+    value1 = ρ_thr(set1, e2m(e))
     # 
     method2 = LinearDalitzMapping()
-    set2 = ChannelWithIntegrationMethod(ch, method1)
-    value2 = ρ_thr(set2, e)
+    set2 = ChannelWithIntegrationMethod(ch, method2)
+    value2 = ρ_thr(set2, e2m(e))
     # 
-    @test value1 ≈ value2
+    # rho_thr uses Cuba's default rtol=1e-4, so compare its public results
+    # at that accuracy, then independently check contour convergence below.
+    @test isapprox(value1, value2; rtol = 1e-4)
+    function integrate_contour(set)
+        integrand(x, f) = f[1:2] .= reim(X2DDpi.integrand_mapped_thr(set, e2m(e)^2, x))
+        result = cuhre(integrand, 2, 2; rtol = 1e-10, atol = 1e-16, maxevals = 10_000_000)
+        @test result.fail == 0
+        return complex(result.integral...) / (8π)^2
+    end
+    @test integrate_contour(set1) ≈ integrate_contour(set2)
 end
 
 
@@ -112,15 +122,15 @@ end
     @test set3 isa ChannelWithIntegrationMethod{T, HookSqrtDalitzMapping{3}} where T <: πDD
     @test set2 isa ChannelWithIntegrationMethod{T, HookSqrtDalitzMapping{2}} where T <: πDD
 
-    full_safe = ρ_thr(ch1, e_safe)
-    ρ3_safe = ρ_thr(set3, e_safe)
-    ρ2_safe = ρ_thr(set2, e_safe)
+    full_safe = ρ_thr(ch1, e2m(e_safe))
+    ρ3_safe = ρ_thr(set3, e2m(e_safe))
+    ρ2_safe = ρ_thr(set2, e2m(e_safe))
     sum23_safe = ρ2_safe + ρ3_safe
     @test abs((full_safe - sum23_safe) / full_safe) < 1e-4
 
-    full_pole = ρ_thr(ch1, e_pole)
-    ρ3_pole = ρ_thr(set3, e_pole)
-    ρ2_pole = ρ_thr(set2, e_pole)
+    full_pole = ρ_thr(ch1, e2m(e_pole))
+    ρ3_pole = ρ_thr(set3, e2m(e_pole))
+    ρ2_pole = ρ_thr(set2, e2m(e_pole))
     sum23_pole = ρ2_pole + ρ3_pole
     @test abs((full_pole - sum23_pole) / full_pole) > 1e-4
 end
