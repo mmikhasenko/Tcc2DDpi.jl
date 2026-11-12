@@ -11,7 +11,7 @@ begin
     cd(joinpath(@__DIR__, ".."))
     Pkg.activate(".")
 
-    using ThreeBodyDecay
+    using ThreeBodyDecays
     using Plots
     using LaTeXStrings
     using Parameters
@@ -97,9 +97,9 @@ begin
         _ms = ms(m0)
         tbs = ThreeBodySystem(; ms = _ms, two_js = (0, 0, 0, j0) .|> x2)
         Ps = ('-', '-', '-', P0)
-        d = DecayChainLS(2, lineshape; two_s = 2j, parity, Ps, tbs)
-        Xlineshape = X3b(; lineshape, m0, mk = _ms[k], L = div(d.HRk.two_ls[1], 2))
-        return DecayChainLS(k, Xlineshape; two_s = 2j, parity, Ps, tbs)
+        d = DecayChainLS(; k = 2, Xlineshape = lineshape, jp = SpinParity(2j, parity), Ps, tbs)
+        Xlineshape = X3b(; lineshape, m0, mk = _ms[k], L = div(d.HRk.h.two_ls[1], 2))
+        return DecayChainLS(; k, Xlineshape, jp = SpinParity(2j, parity), Ps, tbs)
     end
     function amplitude(wave::Wave, s::Float64, σs, λ::Int)
         @unpack lineshape3b = wave
@@ -112,8 +112,8 @@ end
 function Osym(dc::T, σs, λ::Int) where T <: DecayChain
     dc.k == 1 && return amplitude(dc, σs, (0, 0, 0, 2λ))
     dc.k == 2 && return amplitude(dc, σs, (0, 0, 0, 2λ)) +
-                        minusone()^div(dc.two_s, 2) *
-                        amplitude(DecayChain(dc, k = 3), σs, (0, 0, 0, 2λ))
+                        minusone()^div(dc.two_j, 2) *
+                        amplitude(DecayChain(dc; k = 3), σs, (0, 0, 0, 2λ))
     error("Unaccounted case, k=$(dc.k)")
 end
 
@@ -139,7 +139,7 @@ md"""
 """
 
 # ╔═╡ 3c56835d-16f1-4958-89ed-02ebba3b15b4
-wave(_jp::jp) = (lineshape3b = BW_Tcc, j0 = _jp.j, P0 = _jp.p, k = 2, lineshape = BW_Dˣ, j = 1, parity = '-')
+wave(_jp::SpinParity) = (lineshape3b = BW_Tcc, j0 = d2(_jp.two_j), P0 = _jp.p, k = 2, lineshape = BW_Dˣ, j = 1, parity = '-')
 
 # ╔═╡ 40473fac-21c4-4be7-8a3e-99fbede99b86
 const jMax = 1

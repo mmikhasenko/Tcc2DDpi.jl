@@ -95,3 +95,9 @@ returns a complex value, for which `Im(dispersive) = ρ_thr`.
    - [`S-900-howwidthismade.jl`](scripts/S-900-howwidthismade.jl) contributions to the width
    - [`S-901-xxx.jl`](scripts/S-901-xxx.jl) DDpi momentum spectrum. Femtoscopy
    - [`N-902-triangle_singularity.jl`](notebooks/N-902-triangle_singularity.jl) Position of the traingle singularity in the complex energy plane
+
+## ThreeBodyDecays 0.16
+
+Uses ThreeBodyDecays 0.16. The `3dimsmodel.jl` notebook uses the keyword-only `DecayChainLS` constructor, `SpinParity`, `Vertex.h` recouplings, and `two_j`. Its scalar daughters have no helicity-reference dependence, and the parent keeps reference 1.
+
+The compatibility range also permits Interpolations 0.15–0.16, required by the current sibling xDDPhaseSpace checkout. The existing relative sibling dependency layout is retained.
