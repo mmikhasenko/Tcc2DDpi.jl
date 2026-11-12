@@ -37,11 +37,11 @@ import X2DDpi.xDDPhaseSpace: BW
     #
     method1 = HookSqrtDalitzMapping{3}()
     set1 = ChannelWithIntegrationMethod(ch, method1)
-    value1 = ρ_thr(set1, e)
+    value1 = ρ_thr(set1, e2m(e))
     # 
     method2 = LinearDalitzMapping()
-    set2 = ChannelWithIntegrationMethod(ch, method1)
-    value2 = ρ_thr(set2, e)
+    set2 = ChannelWithIntegrationMethod(ch, method2)
+    value2 = ρ_thr(set2, e2m(e))
     # 
     @test value1 ≈ value2
 end
