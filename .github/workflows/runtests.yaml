@@ -10,13 +10,17 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.8.5'
+          - '1.12'
         os:
           - ubuntu-latest
         arch:
           - x64
     steps:
       - uses: actions/checkout@v2
+      - name: Check out the sibling phase-space dependency
+        run: |
+          git clone https://github.com/mmikhasenko/xDDPhaseSpace.jl.git ../xDDPhaseSpace.jl
+          git -C ../xDDPhaseSpace.jl checkout 3590e02cda1d2366b9d2e32fc9342fde4ef7d44c
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
