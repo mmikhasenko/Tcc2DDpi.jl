@@ -134,3 +134,18 @@ end
     sum23_pole = ρ2_pole + ρ3_pole
     @test abs((full_pole - sum23_pole) / full_pole) > 1e-4
 end
+
+@testset "Nominal cache supports both mass and energy grids" begin
+    model = readjson(joinpath(@__DIR__, "..", "results", "nominal", "model.json"))
+    for entry in model["ichannels"]
+        cached = interpolated(d2nt(entry))
+        legacy = copy(entry)
+        legacy["cutoff"] = m2e(pop!(legacy, "m_cutoff"))
+        legacy["knots"] = m2e.(legacy["knots"])
+        recovered = interpolated(d2nt(legacy))
+
+        for m in (e2m(-0.3592), cached.m_cutoff + 0.001)
+            @test ρ_thr(cached, m) ≈ ρ_thr(recovered, m)
+        end
+    end
+end
