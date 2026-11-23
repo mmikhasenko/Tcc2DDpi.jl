@@ -11,7 +11,7 @@ end
 decay_matrix_element_squared(d::ChannelWithIntegrationMethod, s, σ3, σ2) =
     decay_matrix_element_squared(d.channel, s, σ3, σ2)
 masses(set::ChannelWithIntegrationMethod) = masses(set.channel)
-ρ_tb(set::ChannelWithIntegrationMethod, e::Real) = ρ_tb(set.channel, e)
+ρ_tb(set::ChannelWithIntegrationMethod, m::Real) = ρ_tb(set.channel, m)
 mapdalitzmethod(set::ChannelWithIntegrationMethod) = set.mapdalitzmethod
 
 

@@ -21,13 +21,13 @@ with a specific `decay_matrix_element_squared(d::AbstractxDD,s,σ3,σ2)` for eve
 The decay amplitude integrated over the phase space is called via
 
 ```julia
-ρ_thr(d::AbstractxDD, e)
+ρ_thr(d::AbstractxDD, m)
 ```
 
 The latter can be precalculated using the `interpolated` method,
 
 ```julia
-interpolated(channel::AbstractxDD, cutoff::Real; estep=0.01)
+interpolated(channel::AbstractxDD, m_cutoff::Real; e_step=0.01)
 ```
 
 at the value of `cutoff` the expression is merged to the two-body phase-space function. The default value of the discrete grid is 0.01 MeV.
@@ -35,7 +35,7 @@ at the value of `cutoff` the expression is merged to the two-body phase-space fu
 The precalculated structure can be used to calculate the dispersion integral:
 
 ```julia
-dispersive(d::interpolated, e)
+dispersive(d::interpolated, m)
 ```
 
 returns a complex value, for which `Im(dispersive) = ρ_thr`.
