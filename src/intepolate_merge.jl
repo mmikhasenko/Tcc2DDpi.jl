@@ -17,7 +17,7 @@ function ρ_thr(d::interpolated, e::Real)
     e < m2e(sum(masses(d.channel))) && return 0.0
     e < d.cutoff ?
         d.itr(e) :
-    ρ_tb( d.channel, e) * d.cutoffratio
+    ρ_tb(d.channel, e2m(e)) * d.cutoffratio
 end
 ρ_thr(d::interpolated, e::Complex) = ρ_thr(d.channel,e)
 
@@ -33,8 +33,17 @@ obj2nt(ich::interpolated) =
 # deserialization
 interpolated(x::NamedTuple{(:coefs, :cutoff, :channel, :cutoffratio, :knots),T} where T) =
     interpolated(
-        constructchannel(x.channel),
+        construct_cached_channel(x.channel),
         x.cutoff,
         x.cutoffratio,
         interpolate((x.knots,), x.coefs, Gridded(Linear()))
     )
+
+# Older nominal caches predate explicit magnetic transition moments.
+function construct_cached_channel(channel)
+    if startswith(channel.type, "γDD") && !hasproperty(channel, :μ12)
+        channel = NamedTuple{(:R12, :R13, :μ12, :μ13, :ms, :type)}(
+            merge(channel, (; μ12 = 1.0, μ13 = -3.77)))
+    end
+    return constructchannel(channel)
+end

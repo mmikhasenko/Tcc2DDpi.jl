@@ -57,7 +57,7 @@ end;
 # ╔═╡ 8467b165-92d4-4c0b-b5a1-84ab33674ed6
 @time intensity_dist =
     NumericalDistributions.interpolated(range(-2.0, 3.0, 500)) do e
-        abs2(1 / denominator_I(ampX0, e, δm0.val)) * ρ_thr(ich_D⁰D⁰π⁺, e2m(e))
+        abs2(1 / denominator_I(ampX0, e, δm0.val)) * ρ_thr(ich_D⁰D⁰π⁺, e)
     end;
 
 # ╔═╡ b9458d32-ea2a-4ea3-a940-07b257278c7b
