@@ -1,4 +1,4 @@
-dispersive(d::interpolated, m::Real) = dispersive(d, m + 1e-6im)
+dispersive(d::interpolated, m::Real) = dispersive(d, m + 1e-9im)
 function dispersive(d::interpolated, m)
     s = m^2
     mth = sum(masses(d.channel))

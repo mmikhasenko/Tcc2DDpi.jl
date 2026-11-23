@@ -31,11 +31,19 @@ obj2nt(ich::interpolated) =
         knots = ich.itr.knots[1],
         coefs = ich.itr.coefs)
 #
-# deserialization
-interpolated(x::NamedTuple{(:m_cutoff, :coefs, :channel, :cutoffratio, :knots), T} where T) =
-    interpolated(
-        constructchannel(x.channel),
-        x.m_cutoff,
+# Translate older energy grids at the cache boundary.
+function interpolated(x::NamedTuple)
+    channel = x.channel
+    if startswith(channel.type, "γDD") && !hasproperty(channel, :μ12)
+        channel = merge(channel, (; μ12 = 1.0, μ13 = -3.77))
+    end
+    channel = NamedTuple{Tuple(sort(collect(keys(channel))))}(channel)
+    cutoff, knots = hasproperty(x, :m_cutoff) ?
+        (x.m_cutoff, x.knots) : (e2m(x.cutoff), e2m.(x.knots))
+    return interpolated(
+        constructchannel(channel),
+        cutoff,
         x.cutoffratio,
-        interpolate((x.knots,), x.coefs, Gridded(Linear())),
+        interpolate((knots,), x.coefs, Gridded(Linear())),
     )
+end
