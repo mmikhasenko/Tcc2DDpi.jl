@@ -1,11 +1,19 @@
 name: Setup GitHub Pages
-on: push
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   build-and-deploy:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     env:
-      PYTHON: ""
+      GKSwstype: "100"
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v2
@@ -56,7 +64,12 @@ jobs:
           sudo apt-get install pandoc
           pandoc README.md -s -o README.html
 
+      - name: Verify notebook index targets
+        run: |
+          python3 -c 'from pathlib import Path; import re; missing = [p for p in re.findall(r"""href="([^"]+)" """.strip(), Path("index.html").read_text()) if not Path(p).is_file()]; assert not missing, missing'
+
       - name: Deploy to gh-pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@releases/v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

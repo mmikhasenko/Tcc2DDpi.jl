@@ -1,17 +1,11 @@
-using Pkg
-Pkg.activate(joinpath(@__DIR__, ".."))
-Pkg.instantiate()
-# 
-using Pluto
-
-# make sure the script is located in the notebooks folder
-# the script assumes it is a subfolder of the project
 notebooks_dir = "notebooks"
 @assert splitpath(@__DIR__)[end] == notebooks_dir
 
+firstline_is_pluto(io) = readline(io) == "### A Pluto.jl notebook ###"
+
 files = readdir(@__DIR__)
 notebooks = filter(files) do f
-    Pluto.is_pluto_notebook(joinpath(@__DIR__, f))
+    endswith(f, ".jl") && open(firstline_is_pluto, joinpath(@__DIR__, f))
 end
 
 function extract_md_blocks(content::AbstractString)
@@ -105,10 +99,11 @@ function extend_itemized_list(notebooks, html_string)
         notebook_html = replace(notebook, ".jl" => ".html")
         index = build_index_structure(read(joinpath(@__DIR__, notebook), String))
 
-        # Extract titles and subtitles from the index
-        length(index) != 1 && error("Fishy index, not `Title=>[Subs...]`\n\nindex = $(index)\n")
-        title = first(index[1])
-        subtitles = last(index[1])
+        title, subtitles = if length(index) == 1 && first(only(index)) != "Untitled"
+            only(index)
+        else
+            (splitext(notebook)[1], index)
+        end
 
         subtitle_list_items = ""
         for subtitle in subtitles
