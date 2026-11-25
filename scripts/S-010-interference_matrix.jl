@@ -88,7 +88,7 @@ total_interference = x->2real(x)/(2+2real(x))
 ##########################################################
 # 
 # 
-MI_π⁺D⁰D⁰ = maexprho_π⁺D⁰D⁰(δm) = [1e6*ρ_thr(πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), ξs...), δm)
+MI_π⁺D⁰D⁰ = maexprho_π⁺D⁰D⁰(δm) = [1e6*ρ_thr(πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), ξs...), e2m(δm))
 for ξs in [(mΓDˣ⁺, mΓDˣ⁺), (mΓDˣ⁺,noR), (noR, mΓDˣ⁺), (imΓDˣ⁺, mΓDˣ⁺), (mΓDˣ⁺, imΓDˣ⁺)]]
 # 
 trix_and_interference(exprho_π⁺D⁰D⁰)
@@ -97,7 +97,7 @@ MI_π⁺D⁰D⁰.I |> total_interference
 ##########################################################
 # 
 # 
-exprho_π⁰D⁺D⁰(δm) = [1e6*ρ_thr(πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), ξs...), δm)
+exprho_π⁰D⁺D⁰(δm) = [1e6*ρ_thr(πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), ξs...), e2m(δm))
     for ξs in [(mΓDˣ⁺, mΓDˣ⁰), (mΓDˣ⁺, noR), (noR, mΓDˣ⁰), (imΓDˣ⁺, mΓDˣ⁰), (mΓDˣ⁺, imΓDˣ⁰)]]
 # 
 MI_π⁰D⁺D⁰ = matrix_and_interference(exprho_π⁰D⁺D⁰)
@@ -106,7 +106,7 @@ MI_π⁰D⁺D⁰.I |> total_interference
 ##########################################################
 # 
 # 
-exprho_γD⁺D⁰(δm) = [1e6*ρ_thr(γDD((m1=mγ, m2=mD⁺,m3=mD⁰), ξs...), δm)
+exprho_γD⁺D⁰(δm) = [1e6*ρ_thr(γDD((m1=mγ, m2=mD⁺,m3=mD⁰), ξs...), e2m(δm))
     for ξs in [(mΓDˣ⁺, mΓDˣ⁰), (mΓDˣ⁺, noR), (noR, mΓDˣ⁰), (imΓDˣ⁺, mΓDˣ⁰), (mΓDˣ⁺, imΓDˣ⁰)]]
 #
 MI_γD⁺D⁰ = matrix_and_interference(exprho_γD⁺D⁰)

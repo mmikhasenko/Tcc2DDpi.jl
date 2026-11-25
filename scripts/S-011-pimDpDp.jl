@@ -34,8 +34,8 @@ channels = [
     πDD((m1 = mπ⁺, m2 = mD⁺, m3 = mD⁺), (m = mDˣ⁰, Γ = ΓDˣ⁰), (m = mDˣ⁰, Γ = ΓDˣ⁰)),
 ]
 
-ichannels13 = interpolated.(channels[1:3], m_cutoff; e_step)
-ichannels4 = interpolated(channels[4], e2m(50.0); e_step = 0.1)
+ichannels13 = interpolated.(channels[1:3], m_cutoff; mstep = e_step / 1e3)
+ichannels4 = interpolated(channels[4], e2m(50.0); mstep = 0.1 / 1e3)
 #
 ichannels = [ichannels13..., ichannels4]
 ampX0 = Amplitude(Tuple(ichannels), zero)

@@ -11,7 +11,8 @@ theme(:wong2, frame=:box, grid=false, minorticks=true,
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 
 ere(k; a⁻¹, r, N) = N*(a⁻¹ + r * k^2 / 2 - 1im* k)
 ere(k, p) = ere(k, a⁻¹ = p.a⁻¹, r = p.r, N = p.N)
@@ -21,7 +22,7 @@ ere(k, p) = ere(k, a⁻¹ = p.a⁻¹, r = p.r, N = p.N)
 const A₀_DˣD = Amplitude(
     interpolated(
         DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺)),
-        cutoff; estep=0.2*estep))
+        m_cutoff; mstep = (0.2*e_step) / 1e3))
 # 
 ERE_DˣD = let
     @time effrangepars = # 12s
@@ -51,7 +52,7 @@ end
 const A₀_DˣD_course = Amplitude(
     interpolated(
         DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺)),
-        cutoff; estep=estep))
+        m_cutoff; mstep = e_step / 1e3))
 # 
 ERE_DˣD_course = let
     @time effrangepars = # 12s

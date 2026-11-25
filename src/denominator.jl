@@ -5,12 +5,25 @@ end
 
 Amplitude(ik) = Amplitude(ik, zero)
 
+"""
+    denominator_I(a::Amplitude, e, δm)
+
+First-sheet inverse amplitude. `e` and the subtraction point `δm` are MeV
+relative to the D⁰D*⁺ reference threshold. The correction receives `e` in
+MeV; phase-space and dispersion calls receive absolute masses in GeV.
+"""
 function denominator_I(a::Amplitude{<:interpolated}, e, δm)
     m = e2m(e)
     m0 = e2m(δm)
     -(dispersive(a.ik, m) - real(dispersive(a.ik, m0))) + a.corrections(e)
 end
 
+"""
+    denominator_II(a::Amplitude, e, δm)
+
+Continue the inverse amplitude to sheet II below the real axis. Both
+energy arguments retain the same MeV convention as `denominator_I`.
+"""
 function denominator_II(a::Amplitude{<:interpolated}, e, δm)
     imag(e) ≥ 0 ?
     denominator_I(a, e, δm) :

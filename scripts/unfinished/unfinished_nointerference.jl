@@ -15,7 +15,8 @@ theme(:wong2, frame=:box, grid=false, minorticks=true,
 
 
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
 #
@@ -24,7 +25,7 @@ full = [
     πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁺,Γ=ΓDˣ⁺)),
     πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)),
     γDD((m1=mγ, m2=mD⁺,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺), (m=mDˣ⁰,Γ=ΓDˣ⁰)) ]
-ifull = interpolated.(full, cutoff; estep=estep)
+ifull = interpolated.(full, m_cutoff; mstep = e_step / 1e3)
 
 ampX0 = Amplitude(Tuple(ifull), zero)
 

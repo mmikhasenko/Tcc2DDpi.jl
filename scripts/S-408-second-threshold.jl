@@ -18,7 +18,8 @@ settings = transformdictrecursively!(readjson("settings.json"),
     ifstringgivemeasurement)
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 #
 
 const model = let
@@ -27,13 +28,13 @@ const model = let
         πDD((m1=mπ⁰, m2=mD⁺, m3=mD⁰), ZeroBW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁰, Γ=ΓDˣ⁰)),
         γDD((m1=mγ, m2=mD⁺, m3=mD⁰), ZeroBW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁰, Γ=ΓDˣ⁰))]
     # 
-    @time ichannels = interpolated.(channels, cutoff; estep=estep) # cutoff
+    @time ichannels = interpolated.(channels, m_cutoff; mstep = e_step / 1e3) # cutoff
     # 
     Amplitude(Tuple(ichannels), zero)
 end
 
 let xlim = m2e(mDˣ⁰ + mD⁺) .+ (-0.5, 0.5)
-    plot(Δe -> ρ_thr(model.ik[3], Δe), xlim...)
+    plot(Δe -> ρ_thr(model.ik[3], e2m(Δe)), xlim...)
 end
 
 

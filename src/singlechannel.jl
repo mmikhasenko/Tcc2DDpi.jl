@@ -21,6 +21,7 @@ function ρ_thr(d::DˣD, m::Complex)
 end
 
 function ρ_thr(d::DˣD, m::Real)
+    m <= sum(masses(d)) && return 0.0
     integrand(x) = real(integrand_mapped_thr(d, m^2, x))
     v = quadgk(integrand, 0, 1)[1]
     v[1] / (8π)^2

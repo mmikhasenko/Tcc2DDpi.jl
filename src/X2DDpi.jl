@@ -26,10 +26,11 @@ import xDDPhaseSpace: obj2nt
 # model
 import xDDPhaseSpace: covertapply
 import xDDPhaseSpace: πDD, γDD
-import xDDPhaseSpace: branch_points, constructchannel
+import xDDPhaseSpace: branch_points
 
 # kinematics
 import xDDPhaseSpace: e2m
+import xDDPhaseSpace: WithThrE
 
 # 
 export mγ
@@ -53,7 +54,7 @@ export k3b, kNR
 include("constants.jl")
 
 # Reexport xDDPhaseSpace functionality
-export AbstractxDD, ρ_thr, masses, interpolated, dispersive
+export AbstractxDD, ρ_thr, ρ_tb, masses, interpolated, dispersive
 export πDD, branch_points, constructchannel
 export BW, BW_norm, BW_Swave, ZeroBW
 export λ
@@ -83,6 +84,7 @@ include("leftrightmodel.jl")
 
 # advanced functions
 export interpolated
+include("serialization.jl")
 include("intepolate_merge.jl")
 
 export dispersive

@@ -17,7 +17,8 @@ theme(:wong2, frame=:box, grid=false, minorticks=true,
 
 
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
 #
@@ -30,7 +31,7 @@ ifull = interpolated.(d2nt.(modelDict["ichannels"]))
 full = getproperty.(ifull, :channel)
 # 
 sngl = [DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺))]
-isngl = interpolated.(sngl, cutoff; estep=estep)
+isngl = interpolated.(sngl, m_cutoff; mstep = e_step / 1e3)
 
 # 
 models = [ sngl,  full[1:1],  full]
@@ -47,13 +48,13 @@ amps = [Amplitude(Tuple(ichv), zero) for ichv in ichvs]
 plt = let
     plot()
     for (f,l) in zip(models,labels)
-        n = sum(ρ_thr.(f, 0.0))
-        plot!(e->sum(ρ_thr.(f,e)) / n * (ΓDˣ⁺*1e6), -2:0.02:1, lab=l)
+        n = sum(ρ_thr.(f, e2m(0.0)))
+        plot!(e->sum(ρ_thr.(f, e2m(e))) / n * (ΓDˣ⁺*1e6), -2:0.02:1, lab=l)
     end
     vline!([δm0_val], lab="", lw=2, leg=:topright)
     scatter!([0], [ΓDˣ⁺*1e6], lab="", m=(2, :red))
     scatter!([δm0_val δm0_val δm0_val],
-        [sum(ρ_thr.(f, δm0_val)) / sum(ρ_thr.(f, 0.0)) * (ΓDˣ⁺*1e6) for f in models]',
+        [sum(ρ_thr.(f, e2m(δm0_val))) / sum(ρ_thr.(f, e2m(0.0))) * (ΓDˣ⁺*1e6) for f in models]',
         c=[1 2 3], lab="", ylab=L"\rho_\mathrm{thr}\,\,/\,\,\mathrm{norm}")
     lens!(-0.360 .+ 0.05 .* [-1,1], [0,30], inset = (1, bbox(0.1, 0.1, 0.5, 0.5)))
 end
@@ -102,10 +103,10 @@ derivative_data = let
     xv = range(-0.5, 2.5, length=300)
     yvs = [map(
         e->FiniteDiff.finite_difference_derivative(
-            ex->sum(ρ_thr.(m,ex)), e,
+            ex->sum(ρ_thr.(m, e2m(ex))), e,
             absstep=1e-2),
         xv) for m in models]
-    norm_yvs = yvs ./ [sum(ρ_thr.(m,δm0_val)) for m in models]
+    norm_yvs = yvs ./ [sum(ρ_thr.(m, e2m(δm0_val))) for m in models]
     (; xv, yvs=norm_yvs)
 end
 
@@ -144,7 +145,7 @@ savefig(joinpath("plots","nominal","rhoprimeoverrho.pdf"))
 let
     plot(ylab=L"\rho(\delta m)")
     plot!(e->ρ_DˣD(e)/ρ_DˣD(0), -1.0, 1.0, lab=labels[1], lc=2)
-    plot!(e->ρ_thr(full[1],e)/ρ_thr(full[1],0), -1.0, 1.0,
+    plot!(e->ρ_thr(full[1], e2m(e))/ρ_thr(full[1], e2m(0)), -1.0, 1.0,
         lab=L"(D^0\pi^+)D^0\,\,\mathrm{approx}", lc=2, ls=:dash)
 end
 
@@ -162,7 +163,7 @@ integrals_m1_p2h[1]
 @time analytic_width(models[1],δm0_val)
 
 function analytic_width(model, δm0)
-    ρ(e) = sum(ρ_thr.(model,e))
+    ρ(e) = sum(ρ_thr.(model, e2m(e)))
     ρ′(e) = FiniteDiff.finite_difference_derivative(ρ,e)
     ρ0 = ρ(δm0)
     Γ⁻¹ = real(quadgk(e->ρ′(e) / ρ0 / (e-δm0-1e-5im), -0.5, Inf)[1])/(2π)
@@ -173,7 +174,7 @@ const xmax = 2.5
 const invwidth_contribution_above_xmax = 
     let
     model = models[1]
-    ρ(e) = sum(ρ_thr.(model,e))
+    ρ(e) = sum(ρ_thr.(model, e2m(e)))
     ρ′(e) = FiniteDiff.finite_difference_derivative(ρ,e)
     ρ′max = ρ′(xmax)
     ΔΓ⁻¹ = real(quadgk(e->ρ′(e) / ρ′max / (e-δm0_val-1e-5im), xmax, Inf)[1])/(2π)
@@ -209,9 +210,9 @@ writejson(joinpath("results","nominal","widththreemodels.json"), Dict(
 derivative_data_middle = let
     xv = range(2.5, 10.5, length=30)
     yvs = [map(
-        e->FiniteDiff.finite_difference_derivative(ex->sum(ρ_thr.(m,ex)), e),
+        e->FiniteDiff.finite_difference_derivative(ex->sum(ρ_thr.(m, e2m(ex))), e),
         xv) for m in models]
-    norm_yvs = yvs ./ [sum(ρ_thr.(m,δm0_val)) for m in models]
+    norm_yvs = yvs ./ [sum(ρ_thr.(m, e2m(δm0_val))) for m in models]
     (; xv, yvs=norm_yvs)
 end
 

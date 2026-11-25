@@ -46,7 +46,8 @@ begin
 	#
 	@unpack δm0 = settings["fitresults"]
 	const δm0_val = δm0.val
-	@unpack cutoff, estep = settings["phspmatching"]
+	@unpack e_cutoff, e_step = settings["phspmatching"]
+	m_cutoff = e2m(e_cutoff)
 end
 
 # ╔═╡ 3fdd51a5-8cdf-4716-81ac-da3cbe37ed76
@@ -65,10 +66,10 @@ const model = let
     ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
     iπDD2 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=0.2*estep)
+        m_cutoff; mstep = (0.2*e_step) / 1e3)
     iπDD3 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=0.2*estep)
+        m_cutoff; mstep = (0.2*e_step) / 1e3)
     Amplitude((iπDD2, iπDD3))
 end;
 
@@ -77,10 +78,10 @@ const model_course = let
     ch1 = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), BW(m=mDˣ⁺,Γ=ΓDˣ⁺))
     iπDD2 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     iπDD3 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     Amplitude((iπDD2, iπDD3))
 end;
 

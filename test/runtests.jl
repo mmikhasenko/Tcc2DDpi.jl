@@ -149,3 +149,6 @@ end
         end
     end
 end
+
+include("test-mass-api.jl")
+include("test-WithThrE.jl")

@@ -30,7 +30,8 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 #
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 
 
 #                            _|            
@@ -55,24 +56,24 @@ const model0 = let
     # 
     @time iπDD2 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     @time iπDD3 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     @time iπDD2′ = interpolated(
         ChannelWithIntegrationMethod(ch2, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     @time iπDD3′ = interpolated(
         ChannelWithIntegrationMethod(ch2, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     @time iγDD2 = interpolated(
         ChannelWithIntegrationMethod(ch3, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     @time iγDD3 = interpolated(
         ChannelWithIntegrationMethod(ch3, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     Amplitude((iπDD2, iπDD3, iπDD2′, iπDD3′, iγDD2, iγDD3))
 end
@@ -93,19 +94,19 @@ const model1 = let
     # 
     # iπDD2 = interpolated(
     #     ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-    #     cutoff; estep=estep)
+    #     m_cutoff; mstep = e_step / 1e3)
     # iπDD3 = interpolated(
     #     ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-    #     cutoff; estep=estep)
+    #     m_cutoff; mstep = e_step / 1e3)
     iπDD2, iπDD3 = model0.ik[1], model0.ik[2]
     # 
     @time iπDD3′ = interpolated(
         ChannelWithIntegrationMethod(ch2, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     @time iγDD3 = interpolated(
         ChannelWithIntegrationMethod(ch3, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     Amplitude((iπDD2, iπDD3, iπDD3′, iγDD3))
 end
@@ -119,7 +120,7 @@ const model2 = let
     iπDD2, iπDD3 = model0.ik[1], model0.ik[2]
     # 
     # set3 = ChannelWithIntegrationMethod(ch, HookSqrtDalitzMapping{3}())
-    # ich3 = interpolated(set3, cutoff; estep=estep)
+    # ich3 = interpolated(set3, m_cutoff; mstep = e_step / 1e3)
     # 
     Amplitude((iπDD2, iπDD3))
 end
@@ -132,7 +133,7 @@ const model3 = let
     ch = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺), ZeroBW(m=mDˣ⁺, Γ=ΓDˣ⁺))
     # 
     set3 = ChannelWithIntegrationMethod(ch, HookSqrtDalitzMapping{3}())
-    ich3 = interpolated(set3, cutoff; estep=estep)
+    ich3 = interpolated(set3, m_cutoff; mstep = e_step / 1e3)
     # 
     Amplitude((ich3,))
 end
@@ -141,7 +142,7 @@ end
 const model4 = Amplitude(
     interpolated(
         DˣD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺)),
-        cutoff; estep=estep))
+        m_cutoff; mstep = e_step / 1e3))
 # 
 # 
 modelnames = [:model0, :model1, :model2, :model3, :model4]

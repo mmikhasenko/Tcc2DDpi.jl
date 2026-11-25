@@ -14,7 +14,7 @@ channels = [
     πDD((m1 = mπ⁰, m2 = mD⁺, m3 = mD⁰), BW(m = mDˣ⁺, Γ = ΓDˣ⁺), BW(m = mDˣ⁰, Γ = ΓDˣ⁰)),
     γDD((m1 = mγ, m2 = mD⁺, m3 = mD⁰), BW(m = mDˣ⁺, Γ = ΓDˣ⁺), BW(m = mDˣ⁰, Γ = ΓDˣ⁰))]
 #
-ichannels = interpolated.(channels, m_cutoff; e_step) # cutoff
+ichannels = interpolated.(channels, m_cutoff; mstep = e_step / 1e3) # cutoff
 
 # save
 writejson(joinpath("results", "nominal", "model.json"), Dict(
