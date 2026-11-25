@@ -40,6 +40,8 @@ dispersive(d::interpolated, e)
 
 returns a complex value, for which `Im(dispersive) = ρ_thr`.
 
+To refresh the published notebooks and documentation, see the [local site build instructions](website/README.md).
+
 ## Analysis scripts
 
 1. **Default analysis**
