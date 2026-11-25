@@ -167,11 +167,14 @@ begin
 end
 
 # ╔═╡ ecac90d0-1682-4816-94e6-eed9350fbe0b
-binomialcoeff(e, F2, F3) = sympy.Poly(e, F2, F3).coeffs()
+function binomialcoeff(e, F2, F3)
+    polynomial = sympy.Poly(e, F2, F3)
+    return [polynomial.coeff_monomial(term) for term in (F2^2, F2 * F3, F3^2)]
+end
 
 # ╔═╡ 574d4a03-03cd-4a83-a30e-4fc97c6aeb50
 function niceprint(e, F2, F3)
-	cv = binomialcoeff(e, F2, F3) .|> sympy.trigsimp .|> sympy.simplify
+	cv = [sympy.simplify(sympy.trigsimp(c)) for c in binomialcoeff(e, F2, F3)]
 	"""
 	|$(sympy.latex(F2))|^2 \\left[$(sympy.latex(cv[1]))\\right]+\\\\&\\qquad
 	\\text{Re}($(sympy.latex(F2))\\overline{$(sympy.latex(F3))}) \\left[$(sympy.latex(cv[2]))\\right]+\\\\&\\qquad
@@ -229,23 +232,23 @@ function expr2ccode(exp, extrasubs)
 			Sym("F2")^2 => Sym("F2abs2"),
 			Sym("F3")^2 => Sym("F3abs2"),
 			Sym("F2")*Sym("F3")=>Sym("ReF2F3x")))
-	sympy.ccode(exp′′′)
+	string(sympy.ccode(exp′′′))
 end
 
 # ╔═╡ 97c44e67-e3c6-498b-9275-2c68aecb5fb3
 begin
-	codes = Dict()
+	codes = Dict{String,String}()
 	for k in keys(IγDD)
 		extrasubs = Dict(
 				_γDD.F2=>Sym("F2"),
 				_γDD.F3=>Sym("F3"))
-		codes[k] = expr2ccode(IγDD[k], extrasubs)
+		codes[string(k)] = expr2ccode(IγDD[k], extrasubs)
 	end
 	for k in keys(IπDD)
 		extrasubs = Dict(
 				_πDD.F2=>Sym("F2"),
 				_πDD.F3=>Sym("F3"))
-		codes[k] = expr2ccode(IπDD[k], extrasubs)
+		codes[string(k)] = expr2ccode(IπDD[k], extrasubs)
 	end
 end
 
