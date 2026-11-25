@@ -50,7 +50,7 @@ mktempdir() do tempdir
         for file in notebooks
             name = splitext(file)[1]
             isfile(joinpath(exports, name * ".html")) || continue
-            heading = match(r"(?m)^# ([^\r\n]+)$", read(joinpath(root, "notebooks", file), String))
+            heading = match(r"md\x22\x22\x22\r?\n# ([^\r\n]+)", read(joinpath(root, "notebooks", file), String))
             title = isnothing(heading) ? name : heading.captures[1]
             title = replace(title, "&" => "&amp;", "<" => "&lt;", ">" => "&gt;")
             println(io, """<li><a href="./notebooks/$name.html">$title</a> · <a href="https://github.com/mmikhasenko/Tcc2DDpi.jl/blob/master/notebooks/$file">Julia source</a></li>""")
