@@ -1,1 +1,0 @@
-var DOC_VERSIONS = [];

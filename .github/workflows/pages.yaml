@@ -2,9 +2,9 @@ name: Publish static documentation
 on:
   push:
     branches: [master]
-    paths: [public-site/**, website/**, notebooks/**, .github/workflows/pages.yaml]
+    paths: [website/**, notebooks/**, .github/workflows/pages.yaml]
   pull_request:
-    paths: [public-site/**, website/**, notebooks/**, .github/workflows/pages.yaml]
+    paths: [website/**, notebooks/**, .github/workflows/pages.yaml]
 
 permissions:
   contents: read
@@ -14,21 +14,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  static-pages:
+  build-pages:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify static site
-        run: python3 website/check.py public-site --complete
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install documentation dependencies
+        run: julia --project=website -e 'using Pkg; Pkg.instantiate()'
+      - name: Build and verify documentation
+        run: julia --project=website website/build.jl
+      - name: Stage the verified site
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: public-site
+          include-hidden-files: true
 
   deploy:
-    needs: static-pages
+    needs: build-pages
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     permissions:
       contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: documentation
+          path: public-site
       - uses: JamesIves/github-pages-deploy-action@releases/v4
         with:
           branch: gh-pages
