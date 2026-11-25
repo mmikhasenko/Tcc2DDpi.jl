@@ -134,3 +134,14 @@ end
     sum23_pole = ρ2_pole + ρ3_pole
     @test abs((full_pole - sum23_pole) / full_pole) > 1e-4
 end
+
+@testset "Energy interpolation wraps mass-based channels" begin
+    ch = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰),
+        BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
+    cutoff = 2.0
+    cached = interpolated(ch, cutoff; estep=0.5)
+    @test ρ_thr(cached, 0.0) > 0
+    @test ρ_thr(cached, cutoff) ≈ ρ_thr(ch, e2m(cutoff))
+    e = -0.3592 - 0.02im
+    @test ρ_thr(cached, e) ≈ ρ_thr(ch, e2m(e))
+end

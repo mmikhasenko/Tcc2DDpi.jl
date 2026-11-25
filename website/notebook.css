@@ -1,0 +1,10 @@
+:root { color-scheme: light dark; }
+pluto-editor > main { max-width: 920px; margin-inline: auto; }
+pluto-output img { max-width: 100%; height: auto; }
+.notebook-nav {
+  max-width: 920px;
+  margin: 1rem auto;
+  padding-inline: 1rem;
+  font: 0.9rem system-ui, sans-serif;
+}
+.notebook-nav a { color: light-dark(#126562, #6ad1c8); }

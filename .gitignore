@@ -9,3 +9,5 @@ quickcheck/*.csv
 # Local Finder metadata and accidental unnamed plot export
 .DS_Store
 /.png
+
+/public-site/

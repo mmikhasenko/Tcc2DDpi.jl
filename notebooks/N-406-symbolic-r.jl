@@ -4,17 +4,15 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 61b01d0b-1f8f-4e9d-805a-b533cd39410c
+begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+end
+
 # ╔═╡ ac869de2-bdbf-11ed-112d-15f08551dee2
 # ╠═╡ show_logs = false
 begin
-	using Pkg
-	Pkg.add([
-		Pkg.PackageSpec("PyCall"),
-		Pkg.PackageSpec("SymPy"),
-		Pkg.PackageSpec("Parameters"),
-		Pkg.PackageSpec("Plots"),
-		Pkg.PackageSpec("DataFrames"),
-		])
 	# 
 	using Parameters
 	using SymPy
@@ -22,13 +20,7 @@ begin
 	import Plots.PlotMeasures: mm
 	using DataFrames
 	# 
-	import PyCall
-	PyCall.pyimport_conda("sympy.physics.wigner",       "sympy")
-	PyCall.pyimport_conda("sympy.physics.quantum.spin", "sympy")
-	# 
-	import_from(sympy.physics.wigner)
-	# import_from(sympy.physics.quantum.cg, )
-    import_from(sympy.physics.quantum.spin, (:WignerD, :CG), typ=:Any)
+
 end
 
 # ╔═╡ 0ae0767b-6b8c-490f-8d5c-8dd89b662ade
@@ -339,6 +331,7 @@ begin
 end
 
 # ╔═╡ Cell order:
+# ╠═61b01d0b-1f8f-4e9d-805a-b533cd39410c
 # ╟─0ae0767b-6b8c-490f-8d5c-8dd89b662ade
 # ╠═ac869de2-bdbf-11ed-112d-15f08551dee2
 # ╠═1936cdb9-70e2-4716-9778-2a4eee9a0103

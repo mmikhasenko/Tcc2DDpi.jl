@@ -4,13 +4,16 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 61b01d0b-1f8f-4e9d-805a-b533cd39410c
+begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+end
+
 # ╔═╡ 96463f8e-8c97-11f0-3099-2dfd09730179
 # ╠═╡ show_logs = false
 begin
-	using Pkg
 	cd(joinpath(@__DIR__, ".."))
-	Pkg.activate(".")
-
 	using Plots
 	using LaTeXStrings
 	using Random
@@ -69,7 +72,7 @@ let
 	end
     #
     vline!([0], lab = "", l = (:green, :dash), lw = 1)
-	savefig(joinpath(@__DIR__, "..", "plots", "no-resolution.png"))
+	savefig(joinpath(get(ENV, "TCC_EXPORT_OUTPUTS", joinpath(@__DIR__, "..", "plots")), "no-resolution.png"))
 	plot!()
 end
 
@@ -127,10 +130,11 @@ let
 		#
 		Plots.frame(anim)
 	end
-	_gif = gif(anim, joinpath(@__DIR__, "..", "plots", "resolution.gif"); fps=5, loop=0)
+	_gif = gif(anim, joinpath(get(ENV, "TCC_EXPORT_OUTPUTS", joinpath(@__DIR__, "..", "plots")), "resolution.gif"); fps=5, loop=0)
 end
 
 # ╔═╡ Cell order:
+# ╠═61b01d0b-1f8f-4e9d-805a-b533cd39410c
 # ╟─5f534c6c-14d5-4665-a39e-e9a4aa198e38
 # ╠═96463f8e-8c97-11f0-3099-2dfd09730179
 # ╠═0135ec0d-da27-45b5-aefe-a5fcdef0a22c

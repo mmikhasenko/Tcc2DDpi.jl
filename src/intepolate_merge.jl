@@ -4,12 +4,18 @@ struct interpolated{T<:AbstractxDD,F1<:Real,F2<:Real,V}
     cutoffratio::F2
     itr::V
 end
+# xDDPhaseSpace channels use absolute mass. The local single-channel model
+# still uses the energy offset, just like the interpolation grid.
+phase_space_argument(::AbstractxDD, e) = e2m(e)
+phase_space_argument(::DˣD, e) = e
+
 function interpolated(channel::AbstractxDD, cutoff::Real; estep=0.01)
     eth = m2e(sum(masses(channel)))
     ev = eth:estep:(cutoff+2*estep)
-    calv = ρ_thr.(Ref(channel),ev)
+    calv = map(e -> ρ_thr(channel, phase_space_argument(channel, e)), ev)
     itr = interpolate((ev,), calv, Gridded(Linear()))
-    cutoffratio = real(ρ_thr(channel,cutoff))/ρ_tb(channel,cutoff)
+    arg = phase_space_argument(channel, cutoff)
+    cutoffratio = real(ρ_thr(channel, arg)) / ρ_tb(channel, arg)
     interpolated(channel,cutoff,cutoffratio,itr)
 end
 # 
@@ -17,9 +23,9 @@ function ρ_thr(d::interpolated, e::Real)
     e < m2e(sum(masses(d.channel))) && return 0.0
     e < d.cutoff ?
         d.itr(e) :
-    ρ_tb(d.channel, e2m(e)) * d.cutoffratio
+    ρ_tb(d.channel, phase_space_argument(d.channel, e)) * d.cutoffratio
 end
-ρ_thr(d::interpolated, e::Complex) = ρ_thr(d.channel,e)
+ρ_thr(d::interpolated, e::Complex) = ρ_thr(d.channel, phase_space_argument(d.channel, e))
 
 
 # serialization
