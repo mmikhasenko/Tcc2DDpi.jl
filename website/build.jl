@@ -46,14 +46,16 @@ mktempdir() do tempdir
 
     open(joinpath(source, "examples.md"), "w") do io
         println(io, "# Notebook examples\n\nRead the saved outputs or open the Julia source in Pluto.\n")
+        println(io, "```@raw html\n<ul>")
         for file in notebooks
             name = splitext(file)[1]
             isfile(joinpath(exports, name * ".html")) || continue
             heading = match(r"(?m)^# ([^\r\n]+)$", read(joinpath(root, "notebooks", file), String))
             title = isnothing(heading) ? name : heading.captures[1]
             title = replace(title, "&" => "&amp;", "<" => "&lt;", ">" => "&gt;")
-            println(io, "- <a href=\"./notebooks/$name.html\">$title</a> · [Julia source](https://github.com/mmikhasenko/Tcc2DDpi.jl/blob/master/notebooks/$file)")
+            println(io, """<li><a href="./notebooks/$name.html">$title</a> · <a href="https://github.com/mmikhasenko/Tcc2DDpi.jl/blob/master/notebooks/$file">Julia source</a></li>""")
         end
+        println(io, "</ul>\n```")
     end
 
     withenv("CI" => "true") do
