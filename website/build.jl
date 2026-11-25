@@ -18,7 +18,8 @@ function export_notebook(session, path, output)
     end
 end
 
-mktempdir() do tmp
+mktempdir() do tempdir
+    tmp = realpath(tempdir)
     source = joinpath(tmp, "src")
     cp(joinpath(@__DIR__, "src"), source)
     exports = mkpath(joinpath(tmp, "notebooks"))
@@ -64,6 +65,8 @@ mktempdir() do tmp
     isfile(joinpath(site, "examples.html")) || error("Missing built examples page")
     cp(exports, joinpath(site, "notebooks"))
     write(joinpath(site, ".nojekyll"), "")
+    # DocumenterVitepress references this even for a single unversioned site.
+    write(joinpath(site, "versions.js"), "var DOC_VERSIONS = [];\n")
     run(`python3 $(joinpath(@__DIR__, "check.py")) $site`)
     cp(site, published; force=true)
 end

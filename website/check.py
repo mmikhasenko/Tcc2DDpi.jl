@@ -9,10 +9,16 @@ class Links(HTMLParser):
     def __init__(self):
         super().__init__()
         self.hrefs = set()
+        self.assets = set()
 
     def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag in {"link", "script"}:
+            asset = attrs.get("href") if tag == "link" else attrs.get("src")
+            if asset and asset.startswith("/Tcc2DDpi.jl/"):
+                self.assets.add(asset)
         if tag == "a":
-            href = dict(attrs).get("href")
+            href = attrs.get("href")
             if href:
                 self.hrefs.add(href)
 
@@ -21,6 +27,16 @@ site = Path(sys.argv[1])
 for entry in ("index.html", "examples.html", "notebooks/notebook.css", ".nojekyll"):
     if not (site / entry).is_file():
         sys.exit(f"Missing published file: {entry}")
+
+for page in ("index.html", "examples.html"):
+    html = Links()
+    html.feed((site / page).read_text(encoding="utf-8"))
+    if not html.assets:
+        sys.exit(f"{page} has no assets under the GitHub Pages base")
+    for asset in html.assets:
+        target = unquote(urlsplit(asset).path).removeprefix("/Tcc2DDpi.jl/")
+        if not (site / target).is_file():
+            sys.exit(f"{page} links to missing asset: {asset}")
 
 index = Links()
 index.feed((site / "examples.html").read_text(encoding="utf-8"))
