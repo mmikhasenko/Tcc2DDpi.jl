@@ -4,14 +4,18 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 61b01d0b-1f8f-4e9d-805a-b533cd39410c
+begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+end
+
 # ╔═╡ 2fae0580-b7b9-11ed-1301-cd79a7c1ff1b
 # ╠═╡ show_logs = false
 begin
     cd(joinpath(@__DIR__, ".."))
-    import Pkg
-    Pkg.activate(".")
-    Pkg.instantiate()
     # 
+    using X2DDpi
     using SymPy
     #
     using Plots
@@ -139,11 +143,12 @@ let ymin = -0.25
     scatter!([E_Tcc], m=(8, :+, stroke(6)), mc=:black, lab="Tcc pole")
     plot!(xlab="Re E", ylab="Im E", leg=:bottomleft)
     #
-    savefig(joinpath("plots", "trainglesingularity.pdf"))
+    savefig(joinpath(get(ENV, "TCC_EXPORT_OUTPUTS", "plots"), "trainglesingularity.pdf"))
     plot!(aspect_ratio=1)
 end
 
 # ╔═╡ Cell order:
+# ╠═61b01d0b-1f8f-4e9d-805a-b533cd39410c
 # ╟─0e34c3ac-2601-495f-a538-cae3fe21622e
 # ╠═2fae0580-b7b9-11ed-1301-cd79a7c1ff1b
 # ╠═7a1b1e69-e221-478f-a6b0-4edd1cff7c0a

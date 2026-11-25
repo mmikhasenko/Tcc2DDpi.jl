@@ -51,4 +51,13 @@ for href in index.hrefs:
 expected = {p.relative_to(site).as_posix() for p in (site / "notebooks").glob("*.html")}
 if not expected or targets != expected:
     sys.exit(f"Notebook index mismatch: missing files {targets - expected}, missing links {expected - targets}")
+if "--complete" in sys.argv[2:]:
+    sources = Path(__file__).resolve().parents[1] / "notebooks"
+    required = set()
+    for source in sources.glob("*.jl"):
+        with source.open(encoding="utf-8") as notebook:
+            if notebook.readline().strip() == "### A Pluto.jl notebook ###":
+                required.add(f"notebooks/{source.stem}.html")
+    if required != expected:
+        sys.exit(f"Notebook coverage mismatch: missing exports {required - expected}, obsolete exports {expected - required}")
 print(f"Verified {len(expected)} notebook links")

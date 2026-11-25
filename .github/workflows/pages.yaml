@@ -2,9 +2,9 @@ name: Publish static documentation
 on:
   push:
     branches: [master]
-    paths: [public-site/**, website/**, .github/workflows/pages.yaml]
+    paths: [public-site/**, website/**, notebooks/**, .github/workflows/pages.yaml]
   pull_request:
-    paths: [public-site/**, website/**, .github/workflows/pages.yaml]
+    paths: [public-site/**, website/**, notebooks/**, .github/workflows/pages.yaml]
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Verify static site
-        run: python3 website/check.py public-site
+        run: python3 website/check.py public-site --complete
 
   deploy:
     needs: static-pages

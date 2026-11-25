@@ -7,8 +7,11 @@ ENV["GKSwstype"] = "100"
 function export_notebook(session, path, output)
     notebook = Pluto.SessionActions.open(session, path; run_async=false)
     try
-        failed = [cell.cell_id for cell in notebook.cells if cell.errored]
-        isempty(failed) || error("$(basename(path)) has failed cells: $failed")
+        failed = filter(cell -> cell.errored, notebook.cells)
+        for cell in failed
+            @error "Notebook cell failed" notebook=basename(path) cell=cell.cell_id output=cell.output.body
+        end
+        isempty(failed) || error("$(basename(path)) has $(length(failed)) failed cells")
         html = Pluto.generate_html(notebook)
         nav = """<nav class="notebook-nav"><a href="../examples.html">← Notebook examples</a></nav>"""
         html = replace(html, "</head>" => """<link rel="stylesheet" href="notebook.css"></head>"""; count=1)
@@ -39,10 +42,22 @@ mktempdir() do tempdir
     all(in(notebooks), selected) || error("Pass notebook filenames from notebooks/ or --all")
     session = Pluto.ServerSession(; options=Pluto.Configuration.from_flat_kwargs(
         disable_writing_notebook_files=true))
+    failures = String[]
     for file in selected
-        export_notebook(session, joinpath(root, "notebooks", file),
-            joinpath(exports, splitext(file)[1] * ".html"))
+        @info "Exporting notebook" file
+        try
+            elapsed = @elapsed withenv("TCC_EXPORT_OUTPUTS" => tmp) do
+                export_notebook(session, joinpath(root, "notebooks", file),
+                    joinpath(exports, splitext(file)[1] * ".html"))
+            end
+            @info "Exported notebook" file seconds=round(elapsed; digits=1)
+        catch err
+            err isa InterruptException && rethrow()
+            @error "Notebook export failed" file exception=(err, catch_backtrace())
+            push!(failures, file)
+        end
     end
+    isempty(failures) || error("Notebook exports failed: $(join(failures, ", "))")
 
     open(joinpath(source, "examples.md"), "w") do io
         println(io, "# Notebook examples\n\nRead the saved outputs or open the Julia source in Pluto.\n")

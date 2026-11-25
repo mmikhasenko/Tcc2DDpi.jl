@@ -4,12 +4,15 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 61b01d0b-1f8f-4e9d-805a-b533cd39410c
+begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+end
+
 # ╔═╡ c26b8580-e57a-11ec-37cd-f9e7a240c1de
 begin
 	cd(joinpath(@__DIR__, ".."))
-	import Pkg
-	Pkg.activate(".")
-	Pkg.instantiate()
 	# 
 	using X2DDpi
 	using Plots
@@ -89,9 +92,10 @@ begin
 end
 
 # ╔═╡ a417f197-7655-483b-8c5c-ca286703e72e
-savefig(joinpath("plots", "coorelation_function.pdf"))
+savefig(joinpath(get(ENV, "TCC_EXPORT_OUTPUTS", "plots"), "coorelation_function.pdf"))
 
 # ╔═╡ Cell order:
+# ╠═61b01d0b-1f8f-4e9d-805a-b533cd39410c
 # ╠═c26b8580-e57a-11ec-37cd-f9e7a240c1de
 # ╠═fb0a593c-35b7-4248-853a-4c82fc5be7c6
 # ╠═483d68b3-de26-417f-a1af-b0b19d6b3cdd

@@ -4,19 +4,20 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 61b01d0b-1f8f-4e9d-805a-b533cd39410c
+begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+end
+
 # ╔═╡ 5ac3c9c0-0ce8-11ed-102b-03e4d63d6c1b
 # ╠═╡ show_logs = false
 begin
 	cd(joinpath(@__DIR__, ".."))
-	import Pkg
-	Pkg.activate(".")
-	Pkg.instantiate()
 	# 
 	using SymPy
 	import PyCall
-	PyCall.pyimport_conda("sympy.physics.quantum.spin", "sympy")
-	import_from(sympy.physics.quantum.spin, (:CG, ), typ=:Any)
-	import_from(sympy.physics.quantum.spin.Rotation, (:d,), typ=:Any)
+	spin = PyCall.pyimport("sympy.physics.quantum.spin")
 	#
 	using Parameters
 	using LaTeXStrings
@@ -25,8 +26,8 @@ end
 
 # ╔═╡ 04808f8e-25bf-4c6c-9794-5a9d59b197e8
 begin
-	wignerd(J,λ1,λ2,θ) = d(Sym(J),λ1,λ2,θ)
-	clgd(j1,λ1,j2,λ2,j,λ) = CG(j1,λ1,j2,λ2,j,λ)
+	wignerd(J,λ1,λ2,θ) = Sym(PyCall.pycall(spin.Rotation.d, PyCall.PyObject, J, λ1, λ2, ↓(θ)))
+	clgd(j1,λ1,j2,λ2,j,λ) = Sym(PyCall.pycall(spin.CG, PyCall.PyObject, j1, λ1, j2, λ2, j, λ))
 end
 
 # ╔═╡ f907394e-a7e0-43d0-8394-328c01dcca7c
@@ -261,9 +262,10 @@ function writejson(path, obj)
 end
 
 # ╔═╡ a3ad21c1-e02b-4eed-9f70-10a8d0c7cb58
-writejson("code_gDD.json", codes)
+writejson(joinpath(get(ENV, "TCC_EXPORT_OUTPUTS", "."), "code_gDD.json"), codes)
 
 # ╔═╡ Cell order:
+# ╠═61b01d0b-1f8f-4e9d-805a-b533cd39410c
 # ╠═5ac3c9c0-0ce8-11ed-102b-03e4d63d6c1b
 # ╠═04808f8e-25bf-4c6c-9794-5a9d59b197e8
 # ╠═f907394e-a7e0-43d0-8394-328c01dcca7c
