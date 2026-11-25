@@ -25,11 +25,15 @@ mktempdir() do tmp
     if isdir(joinpath(published, "notebooks")) && ARGS != ["--all"]
         cp(joinpath(published, "notebooks"), exports; force=true)
     end
-    cp(joinpath(@__DIR__, "notebook.css"), joinpath(exports, "notebook.css"); force=true)
 
     notebooks = sort(filter(readdir(joinpath(root, "notebooks"))) do file
         endswith(file, ".jl") && Pluto.is_pluto_notebook(joinpath(root, "notebooks", file))
     end)
+    expected = Set(splitext(file)[1] * ".html" for file in notebooks)
+    for file in readdir(exports)
+        endswith(file, ".html") && !(file in expected) && rm(joinpath(exports, file))
+    end
+    cp(joinpath(@__DIR__, "notebook.css"), joinpath(exports, "notebook.css"); force=true)
     selected = ARGS == ["--all"] ? notebooks : ARGS
     all(in(notebooks), selected) || error("Pass notebook filenames from notebooks/ or --all")
     session = Pluto.ServerSession(; options=Pluto.Configuration.from_flat_kwargs(
@@ -44,12 +48,15 @@ mktempdir() do tmp
         for file in notebooks
             name = splitext(file)[1]
             isfile(joinpath(exports, name * ".html")) || continue
-            println(io, "- <a href=\"./notebooks/$name.html\">$name</a> · [Julia source](https://github.com/mmikhasenko/Tcc2DDpi.jl/blob/master/notebooks/$file)")
+            heading = match(r"(?m)^# ([^\r\n]+)$", read(joinpath(root, "notebooks", file), String))
+            title = isnothing(heading) ? name : heading.captures[1]
+            title = replace(title, "&" => "&amp;", "<" => "&lt;", ">" => "&gt;")
+            println(io, "- <a href=\"./notebooks/$name.html\">$title</a> · [Julia source](https://github.com/mmikhasenko/Tcc2DDpi.jl/blob/master/notebooks/$file)")
         end
     end
 
     withenv("CI" => "true") do
-        makedocs(; root=tmp, sitename="X2DDpi", pages=["Overview" => "index.md", "Examples" => "examples.md"],
+        makedocs(; root=tmp, remotes=nothing, sitename="X2DDpi", pages=["Overview" => "index.md", "Examples" => "examples.md"],
             format=MarkdownVitepress(repo="github.com/mmikhasenko/Tcc2DDpi.jl", devbranch="master", write_inventory=false,
                 deploy_url="https://mmikhasenko.github.io/Tcc2DDpi.jl/"))
     end

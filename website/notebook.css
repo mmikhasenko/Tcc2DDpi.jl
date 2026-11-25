@@ -1,5 +1,5 @@
 :root { color-scheme: light dark; }
-pluto-notebook { max-width: 920px; margin-inline: auto; }
+pluto-editor > main { max-width: 920px; margin-inline: auto; }
 pluto-output img { max-width: 100%; height: auto; }
 .notebook-nav {
   max-width: 920px;
