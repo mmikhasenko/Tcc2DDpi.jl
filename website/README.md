@@ -1,13 +1,18 @@
 # Refresh the documentation site
 
-Use Julia 1.12, Node.js with npm, Python 3, and the package's normal sibling
-`xDDPhaseSpace.jl` checkout. The shared notebook environment uses PyCall with Python SymPy. Configure
-PyCall once before exporting if your default Python environment lacks SymPy.
+Use Julia 1.12, Node.js with npm, Python 3, and the sibling
+`xDDPhaseSpace.jl` checkout at commit
+`3590e02cda1d2366b9d2e32fc9342fde4ef7d44c` (the package CI pin).
+The notebooks share `notebooks/Project.toml` and its lockfile. The
+exporter and documentation tools use the separate `website/` environment.
 
-From the repository root:
+From the repository root, set up PyCall's Python and instantiate both
+Julia environments once:
 
 ```sh
-julia +1.12 --project=notebooks -e 'using Pkg; Pkg.instantiate()'
+python3 -m venv /tmp/tcc-notebook-python
+/tmp/tcc-notebook-python/bin/python -m pip install -r notebooks/requirements.txt
+PYTHON=/tmp/tcc-notebook-python/bin/python julia +1.12 --project=notebooks -e 'using Pkg; Pkg.instantiate(); Pkg.build("PyCall")'
 julia +1.12 --project=website -e 'using Pkg; Pkg.instantiate()'
 julia +1.12 --project=website website/build.jl N-100-resolution-animation.jl
 python3 website/check.py public-site --complete
