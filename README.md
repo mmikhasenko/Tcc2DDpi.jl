@@ -101,6 +101,8 @@ The suite covers the mass/MeV boundary, channels with different masses,
 serialization order and legacy caches, interpolation versus direct phase space,
 and real/complex dispersion and amplitude continuation.
 
+To refresh the published notebooks and documentation, see the [local site build instructions](website/README.md).
+
 ## Analysis scripts
 
 1. **Default analysis**

@@ -152,3 +152,14 @@ end
 
 include("test-mass-api.jl")
 include("test-WithThrE.jl")
+
+@testset "Mass interpolation of nominal pion channel" begin
+    ch = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰),
+        BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
+    m_cutoff = e2m(2.0)
+    cached = interpolated(ch, m_cutoff; mstep=0.5e-3)
+    @test ρ_thr(cached, e2m(0.0)) > 0
+    @test ρ_thr(cached, m_cutoff) ≈ ρ_thr(ch, m_cutoff)
+    m = e2m(-0.3592 - 0.02im)
+    @test ρ_thr(cached, m) ≈ ρ_thr(ch, m)
+end

@@ -4,13 +4,16 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 61b01d0b-1f8f-4e9d-805a-b533cd39410c
+begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+end
+
 # ╔═╡ 5ac3c9c0-0ce8-11ed-102b-03e4d63d6c1b
 # ╠═╡ show_logs = false
 begin
 	cd(joinpath(@__DIR__, ".."))
-	import Pkg
-	Pkg.activate(".")
-	Pkg.instantiate()
 	# 
 	using X2DDpi
 	using Parameters	
@@ -134,6 +137,7 @@ let elim = (-0.5, 0.5)
 end
 
 # ╔═╡ Cell order:
+# ╠═61b01d0b-1f8f-4e9d-805a-b533cd39410c
 # ╟─d095fe63-50e0-4069-ab16-9bb66f63839e
 # ╠═5ac3c9c0-0ce8-11ed-102b-03e4d63d6c1b
 # ╠═13804d6e-fee0-47a2-a0f2-4883ce14bcb6

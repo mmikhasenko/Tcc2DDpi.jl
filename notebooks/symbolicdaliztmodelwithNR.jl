@@ -4,19 +4,20 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 61b01d0b-1f8f-4e9d-805a-b533cd39410c
+begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+end
+
 # ╔═╡ 3dbb29a8-1f37-407f-8907-698c80f2bd00
 # ╠═╡ show_logs = false
 begin
 	cd(joinpath(@__DIR__, ".."))
-	import Pkg
-	Pkg.activate(".")
-	Pkg.instantiate()
 	# 
 	using SymPy
 	import PyCall
-	PyCall.pyimport_conda("sympy.physics.quantum.spin", "sympy")
-	import_from(sympy.physics.quantum.spin, (:CG, ), typ=:Any)
-	import_from(sympy.physics.quantum.spin.Rotation, (:d,), typ=:Any)
+	spin = PyCall.pyimport("sympy.physics.quantum.spin")
 	#
 	using Parameters
 	using LaTeXStrings
@@ -25,8 +26,8 @@ end
 
 # ╔═╡ 04808f8e-25bf-4c6c-9794-5a9d59b197e8
 begin
-	wignerd(J,λ1,λ2,θ) = d(Sym(J),λ1,λ2,θ)
-	clgd(j1,λ1,j2,λ2,j,λ) = CG(j1,λ1,j2,λ2,j,λ)
+	wignerd(J,λ1,λ2,θ) = Sym(PyCall.pycall(spin.Rotation.d, PyCall.PyObject, J, λ1, λ2, ↓(θ)))
+	clgd(j1,λ1,j2,λ2,j,λ) = Sym(PyCall.pycall(spin.CG, PyCall.PyObject, j1, λ1, j2, λ2, j, λ))
 end
 
 # ╔═╡ f907394e-a7e0-43d0-8394-328c01dcca7c
@@ -165,17 +166,18 @@ Markdown.parse(
 \\begin{align}
 I &=
 """*
-sympy.latex([chains...]')*
+string(sympy.latex([chains...]'))*
 "\\cdot"*
-sympy.latex(M)*
+string(sympy.latex(M))*
 "\\cdot"*
-sympy.latex([chains...])*
+string(sympy.latex([chains...]))*
 """
 \\end{align}
 ```
 """)
 
 # ╔═╡ Cell order:
+# ╠═61b01d0b-1f8f-4e9d-805a-b533cd39410c
 # ╠═3dbb29a8-1f37-407f-8907-698c80f2bd00
 # ╠═04808f8e-25bf-4c6c-9794-5a9d59b197e8
 # ╠═f907394e-a7e0-43d0-8394-328c01dcca7c

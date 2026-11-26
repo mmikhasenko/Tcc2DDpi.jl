@@ -4,13 +4,16 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 61b01d0b-1f8f-4e9d-805a-b533cd39410c
+begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+end
+
 # ╔═╡ d8489d70-cf9f-11ec-1f26-0b616e422d52
 # ╠═╡ show_logs = false
 begin
-    using Pkg: Pkg
     cd(joinpath(@__DIR__, ".."))
-    Pkg.activate(".")
-
     using ThreeBodyDecays
     using Plots
     using LaTeXStrings
@@ -163,6 +166,7 @@ plot(
      for _jp in ["1+", "0-", "2-", "1-"]]..., layout = grid(2, 2))
 
 # ╔═╡ Cell order:
+# ╠═61b01d0b-1f8f-4e9d-805a-b533cd39410c
 # ╠═d8489d70-cf9f-11ec-1f26-0b616e422d52
 # ╠═47666396-b2dd-40c7-afe2-02fa25591963
 # ╟─bb9a04d6-8fe9-4295-9a87-74200c485013
