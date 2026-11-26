@@ -17,7 +17,8 @@ theme(:wong2, size=(500,350), minorticks=true, grid=false, frame=:box,
 
 
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
 #
@@ -35,7 +36,7 @@ function precalculate_channels_g1g2(g1,g2)
         πDD((m1=mπ⁰,m2=mD⁺,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1), BW_norm(m=mDˣ⁰,Γ=ΓDˣ⁰,n=g2)),
         γDD((m1=mγ, m2=mD⁺,m3=mD⁰), BW_norm(m=mDˣ⁺,Γ=ΓDˣ⁺,n=g1), BW_norm(m=mDˣ⁰,Γ=ΓDˣ⁰,n=g2))]
     #
-    ichannels = interpolated.(channels, cutoff; estep=estep)
+    ichannels = interpolated.(channels, m_cutoff; mstep = e_step / 1e3)
     # 
     (; g1, g2, channels, ichannels)
 end
@@ -124,7 +125,7 @@ ps2 = [let #m = models[6]
     Nbins = 200
     ev = range(-1, 2.5, length=Nbins+1)
     calv = map(e->1/abs2(denominator_I(m, e, δm0_val)), ev)/1e3
-    phsps = map(e->ρ_thr(ich[1],e), ev)
+    phsps = map(e->ρ_thr(ich[1], e2m(e)), ev)
 
     plot(xlab=L"e\,\,[MeV]", ylab=L"|A|^2 \rho")
     plot!(ev, calv .* phsps, lab="", fill=0, α=0.5, c=:red)

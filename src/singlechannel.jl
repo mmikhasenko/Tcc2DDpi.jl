@@ -14,23 +14,24 @@ function integrand_mapped_thr(d::DˣD, s, x)
     return decay_matrix_element_squared(d, s, σ3, σ2) / (2π * s) * jac
 end
 
-function ρ_thr(d::DˣD, e::Complex)
-    integrand(x) = integrand_mapped_thr(d, e2m(e)^2, x)
+function ρ_thr(d::DˣD, m::Complex)
+    integrand(x) = integrand_mapped_thr(d, m^2, x)
     v = quadgk(integrand, 0, 1)[1]
     v / (8π)^2
 end
 
-function ρ_thr(d::DˣD, e::Real)
-    integrand(x) = real(integrand_mapped_thr(d, e2m(e)^2, x))
+function ρ_thr(d::DˣD, m::Real)
+    m <= sum(masses(d)) && return 0.0
+    integrand(x) = real(integrand_mapped_thr(d, m^2, x))
     v = quadgk(integrand, 0, 1)[1]
     v[1] / (8π)^2
 end
 
-function ρ_tb(d::DˣD, e::Real)
-    M, m = d.R.m, d.ms.m3
-    sqrts = e2m(e)
-    sqrts < M + m ? 0.0 :
-    sqrt(λ(e2m(e)^2, M^2, m^2)) / e2m(e)^2
+function ρ_tb(d::DˣD, m::Real)
+    mR, mB = d.R.m, d.ms.m3
+    sqrts = m
+    sqrts < mR + mB ? 0.0 :
+    sqrt(λ(m^2, mR^2, mB^2)) / m^2
 end
 
 

@@ -10,12 +10,12 @@ theme(:wong2, frame=:box, grid=false, minorticks=true,
 
 channel(Γ) = DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺; Γ))
 
-underthrconst(Γ) = Γ*ρ_thr(channel(Γ), branch_position(Γ)-1e-7)
+underthrconst(Γ) = Γ*ρ_thr(channel(Γ), e2m(branch_position(Γ)-1e-7))
 
 # to justify the factor Γ above 
 let fΓ = 0.01
-    plot(e->ρ_thr(channel(ΓDˣ⁺), e), -1, 1)
-    plot!(e->fΓ*ρ_thr(channel(fΓ*ΓDˣ⁺), e), -1, 1)
+    plot(e->ρ_thr(channel(ΓDˣ⁺), e2m(e)), -1, 1)
+    plot!(e->fΓ*ρ_thr(channel(fΓ*ΓDˣ⁺), e2m(e)), -1, 1)
 end
 
 let

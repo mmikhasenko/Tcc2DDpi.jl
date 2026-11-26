@@ -46,7 +46,8 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 #
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 
 
 function effrange_denominator_II_k3b(model; method)
@@ -64,7 +65,7 @@ steps = [0.001, 0.003, 0.007]
 dfv = map(steps) do _estep
     @show _estep
 
-    filename = joinpath("results","nominal","df_radius_cutoff=$(cutoff)_estep=$(_estep).csv")
+    filename = joinpath("results","nominal","df_radius_cutoff=$(e_cutoff)_estep=$(_estep).csv")
     if isfile(filename)
         println("Using the file")
         return CSV.File(filename) |> DataFrame
@@ -74,10 +75,10 @@ dfv = map(steps) do _estep
         ch1 = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
         iπDD2 = interpolated(
             ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-            cutoff; estep=_estep)
+            m_cutoff; mstep = _estep / 1e3)
         iπDD3 = interpolated(
             ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-            cutoff; estep=_estep)
+            m_cutoff; mstep = _estep / 1e3)
         Amplitude((iπDD2, iπDD3))
     end
 

@@ -11,12 +11,12 @@ function Δk3b(r=1e-3,ϵ=1e-3)
 end
 function Δρ_thr(r=1e-3,ϵ=1e-3)
     ev = Eᵦ .+ r*(1e3ΓDˣ⁺) .* cis.(-π/2 .+ ϵ.*[-1, 1])
-    f(e) = ρ_thr(channel(ΓDˣ⁺), e)
+    f(e) = ρ_thr(channel(ΓDˣ⁺), e2m(e))
     return diff(f.(ev))[1]
 end
 
 N = Δρ_thr(1e-4)/Δk3b(1e-4) # 0.003475797316511961 - 3.7679086257784454e-5im
-Σsum(e) = -1im*ρ_thr(channel(ΓDˣ⁺), e) + 1im*N*k3b(e)
+Σsum(e) = -1im*ρ_thr(channel(ΓDˣ⁺), e2m(e)) + 1im*N*k3b(e)
 
 # check if the path is continues
 ϕv = range(-π, π, length=600)
@@ -30,7 +30,7 @@ let f = Σsum
 end
 
 let
-    c1 = circleintegral(e->ρ_thr(channel(ΓDˣ⁺), Eᵦ+e), abs(imag(Eᵦ))/20)
+    c1 = circleintegral(e->ρ_thr(channel(ΓDˣ⁺), e2m(Eᵦ+e)), abs(imag(Eᵦ))/20)
     c2 = circleintegral(e->k3b(Eᵦ+e), abs(imag(Eᵦ))/20)
     c1/c2
 end # 0.003475797316511961 - 3.7679086257784454e-5im

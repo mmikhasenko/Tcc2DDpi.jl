@@ -27,7 +27,8 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 #
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 
 
 #                            _|            
@@ -49,7 +50,7 @@ chγ⁺⁰_⁺X = γDD((m1=mγ, m2=mD⁺,m3=mD⁰), BW(m=mDˣ⁺,Γ=ΓDˣ⁺), Z
 
 @time for qch in [:ch⁺⁰⁰_⁺⁺, :ch⁺⁰⁰_⁺X, :ch⁰⁺⁰_⁺⁰, :ch⁰⁺⁰_⁺X, :chγ⁺⁰_⁺⁰, :chγ⁺⁰_⁺X]
     eval(quote
-       $(Symbol("i",qch)) = interpolated($(qch), cutoff; estep=estep)
+       $(Symbol("i",qch)) = interpolated($(qch), m_cutoff; mstep = e_step / 1e3)
     end)
 end
 
@@ -69,7 +70,7 @@ const A₀_DˣD = (ich⁺⁰⁰_⁺X,) |> Amplitude
 # πDD: Dˣ⁺
 const A₀′_DˣD = (interpolated(
         DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺)),
-        cutoff; estep=estep),) |> Amplitude
+        m_cutoff; mstep = e_step / 1e3),) |> Amplitude
 # 
 # 
 modelnames = [:A₀_full, :A₀_full_DˣD, :A₀_π⁺D⁰D⁰, :A₀_DˣD, :A₀′_DˣD]
@@ -84,7 +85,7 @@ end
 
 function lineshape(a::Amplitude, ev=-1:0.003:2.5)
     yv = broadcast(e->1/abs2(denominator_I(a, e, δm0_val)), ev)
-    yv .*= broadcast(e->ρ_thr(a.ik[1],e), ev)
+    yv .*= broadcast(e->ρ_thr(a.ik[1], e2m(e)), ev)
     return TccLineshape(ev, yv)
 end
 

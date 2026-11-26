@@ -18,27 +18,88 @@ struct γDD <: AbstractxDD
 
 with a specific `decay_matrix_element_squared(d::AbstractxDD,s,σ3,σ2)` for every type.
 
-The decay amplitude integrated over the phase space is called via
+## Mass and energy conventions
+
+Phase space and dispersion use **absolute masses in GeV**. These routines
+use the masses stored in each channel, so they also apply to channels with
+masses different from the nominal Tcc system. This matches the mass-parametric
+API in the sibling `../xDDPhaseSpace.jl` package.
+
+| API | Units |
+| --- | --- |
+| `ρ_thr(channel, m)`, `ρ_tb(channel, m)` | Absolute mass `m` in GeV |
+| `interpolated(channel, m_cutoff; mstep=1e-5)` | Cutoff and grid spacing in GeV |
+| `dispersive(ichannel, m)` | Absolute real or complex mass in GeV |
+| `denominator_I/II(amp, e, δm)` | Offsets from D⁰D*⁺ threshold in MeV |
+| `pole_position(amp, δm)` | Input and returned pole offsets in MeV |
+| `k3b(e)`, `kNR(e)` | Energy offset in MeV; momentum in GeV |
+| Dalitz integration and projection arguments `s`, `σᵢ` | Squared masses in GeV² |
+
+For ordinary numbers, `e2m(e) = mD⁰ + mDˣ⁺ + e/1000` and `m2e` is its
+inverse. The amplitude converts at the boundary; its correction function
+continues to receive energy in MeV. The phase-space/interpolation/dispersion
+kernels do not use that reference threshold. For another mass system, construct
+channels with its masses and call those kernels with absolute masses directly.
+The Tcc amplitude and momentum helpers retain their Tcc conventions.
+`WithThrE(e, reference_mass)` from xDDPhaseSpace can express a different
+reference for conversion with `e2m`; convert it before mass-API calls. It is
+not a general arithmetic or unit-tracking type.
 
 ```julia
-ρ_thr(d::AbstractxDD, e)
+using X2DDpi
+
+channel = πDD((m1=mπ⁺, m2=mD⁰, m3=mD⁰),
+    BW(m=mDˣ⁺, Γ=ΓDˣ⁺), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
+e_cutoff, e_step = 4.0, 0.003  # MeV, as in settings.json
+ichannel = interpolated(channel, e2m(e_cutoff); mstep=e_step/1000)
+e = -0.3592  # MeV
+ρ = ρ_thr(ichannel, e2m(e))
+Σ = dispersive(ichannel, e2m(e))
+D = denominator_I(Amplitude(ichannel), e, e)
 ```
 
-The latter can be precalculated using the `interpolated` method,
+The interpolator returns zero below the three-body threshold, uses a linear
+mass grid below `m_cutoff`, and matches to a rescaled two-body phase space above
+it. Complex masses bypass interpolation and evaluate the underlying channel.
+The once-subtracted dispersion integral integrates over squared mass, with
+subtraction at `s=0`. Its upper-rim imaginary part approaches `ρ_thr`; real
+arguments use a `1e-9im` GeV regulator, equivalent to the former `1e-6im` MeV.
 
-```julia
-interpolated(channel::AbstractxDD, cutoff::Real; estep=0.01)
+### Migrating callers and caches
+
+Version 0.2 changes the meaning of the phase-space and dispersion arguments.
+Replace `ρ_thr(channel, e)` with `ρ_thr(channel, e2m(e))`, and do the same for
+`ρ_tb` and `dispersive`. For interpolation, replace
+`interpolated(channel, cutoff; estep=step)` with
+`interpolated(channel, e2m(cutoff); mstep=step/1000)` when the old values are MeV.
+The draft PR's intermediate `e_step` keyword is also replaced by `mstep` in GeV.
+Settings use `e_cutoff` and `e_step`, both in MeV. Convert them explicitly when
+constructing an interpolator. `mstep` matches xDDPhaseSpace's keyword and units.
+
+New serialized interpolators store `m_cutoff` and `knots` in GeV; `coefs` and
+`cutoffratio` retain their normalization. `interpolated(d2nt(entry))` also reads
+historical Tcc caches with `cutoff` and knots in MeV, converting coordinates on
+load. That legacy format always uses the historical D⁰D*⁺ reference threshold;
+it must not be used to encode an arbitrary mass reference. Field order is
+irrelevant, including nested masses and lineshapes. Historical photon channels
+without explicit couplings receive the analysis defaults `(1.0, -3.77)`.
+
+X2DDpi retains its own interpolator and dispersion implementation and the
+historical-cache adapter. It uses xDDPhaseSpace's mass-parametric channel
+kernels; the two packages' interpolator types and cache formats are not aliases.
+
+### Validation
+
+With the sibling xDDPhaseSpace checkout available at `../xDDPhaseSpace.jl`:
+
+```sh
+julia --project -e 'using Pkg; Pkg.instantiate()'
+julia --project test/runtests.jl
 ```
 
-at the value of `cutoff` the expression is merged to the two-body phase-space function. The default value of the discrete grid is 0.01 MeV.
-
-The precalculated structure can be used to calculate the dispersion integral:
-
-```julia
-dispersive(d::interpolated, e)
-```
-
-returns a complex value, for which `Im(dispersive) = ρ_thr`.
+The suite covers the mass/MeV boundary, channels with different masses,
+serialization order and legacy caches, interpolation versus direct phase space,
+and real/complex dispersion and amplitude continuation.
 
 To refresh the published notebooks and documentation, see the [local site build instructions](website/README.md).
 

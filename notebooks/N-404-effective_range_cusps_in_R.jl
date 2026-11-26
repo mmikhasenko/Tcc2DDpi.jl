@@ -49,7 +49,8 @@ begin
 	#
 	@unpack δm0 = settings["fitresults"]
 	const δm0_val = δm0.val
-	@unpack cutoff, estep = settings["phspmatching"]
+	@unpack e_cutoff, e_step = settings["phspmatching"]
+	m_cutoff = e2m(e_cutoff)
 end
 
 # ╔═╡ 3fdd51a5-8cdf-4716-81ac-da3cbe37ed76
@@ -67,13 +68,13 @@ md"""
 const model = Amplitude(
     interpolated(
         DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺)),
-        cutoff; estep=0.2*estep));
+        m_cutoff; mstep = (0.2*e_step) / 1e3));
 
 # ╔═╡ 8f1cba70-78c6-4e36-96f8-490ea7cabac7
 const model_course = Amplitude(
     interpolated(
         DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺)),
-        cutoff; estep=estep));
+        m_cutoff; mstep = e_step / 1e3));
 
 # ╔═╡ 549a4df0-75e5-4ab3-bad4-7ce0f173323a
 md"""

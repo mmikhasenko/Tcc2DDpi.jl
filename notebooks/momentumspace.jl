@@ -56,7 +56,7 @@ const ampX0 = Amplitude(Tuple(ichannels), zero) # zero is 1/Γ
 D(e) = denominator_I(ampX0, e, δm0_val)
 
 # ╔═╡ c31e7105-4fe1-4303-80bd-d2067f0982b9
-I(e) = 1/abs2(D(e))*ρ_thr(ampX0.ik[1], e)
+I(e) = 1/abs2(D(e))*ρ_thr(ampX0.ik[1], e2m(e))
 
 # ╔═╡ 0fe42f23-ece0-4256-aaf2-6825b27633f8
 let

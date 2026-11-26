@@ -1,10 +1,19 @@
-dispersive(d::interpolated, e::Real) = dispersive(d, e + 1e-6im)
-function dispersive(d::interpolated, e)
-    s = e2m(e)^2
-    eth = m2e(sum(masses(d.channel)))
+"""
+    dispersive(channel::interpolated, m)
+
+Once-subtracted dispersion integral in s = m², with absolute mass m in GeV.
+The subtraction is at s = 0. For real masses evaluate the upper-rim limit
+using m + 1e-9im GeV (the former 1e-6im MeV regulator).
+The channel threshold and spectral density determine the result; no Tcc
+reference mass enters this calculation.
+"""
+dispersive(d::interpolated, m::Real) = dispersive(d, m + 1e-9im)
+function dispersive(d::interpolated, m)
+    s = m^2
+    mth = sum(masses(d.channel))
     function integrand(s′)
-        e′ = m2e(sqrt(s′))
-        ρ_thr(d, e′) / s′ / (s′ - s)
+        m′ = sqrt(s′)
+        ρ_thr(d, m′) / s′ / (s′ - s)
     end
-    s / π * quadgk(integrand, e2m(eth)^2, Inf)[1]
+    s / π * quadgk(integrand, mth^2, Inf)[1]
 end

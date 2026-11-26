@@ -35,7 +35,7 @@ const ich_D⁰D⁰π⁺ = ichannels[1]
 
 @time intensity_dist = let
     NumericalDistributions.interpolated(range(-2.0, 4.0, 200)) do e
-        abs2(1 / denominator_I(ampX0, e, δm0.val)) * ρ_thr(ich_D⁰D⁰π⁺, e)
+        abs2(1 / denominator_I(ampX0, e, δm0.val)) * ρ_thr(ich_D⁰D⁰π⁺, e2m(e))
     end
 end
 

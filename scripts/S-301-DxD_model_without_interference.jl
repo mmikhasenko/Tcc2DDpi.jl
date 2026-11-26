@@ -7,14 +7,15 @@ using Parameters
 using QuadGK
 
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
 #
 
 channel = DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), (m=mDˣ⁺,Γ=ΓDˣ⁺))
 
-ichannel = interpolated(channel, cutoff; estep=estep) # cutoff
+ichannel = interpolated(channel, m_cutoff; mstep = e_step / 1e3) # cutoff
 
 const ampX = Amplitude(ichannel, zero)
 

@@ -13,7 +13,8 @@ theme(:wong2, frame=:box, grid=false, minorticks=true,
 settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeasurement)
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 
 
 
@@ -21,7 +22,7 @@ const δm0_val = δm0.val
 const A₀_DˣD = Amplitude(
     interpolated(
         DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺)),
-        cutoff; estep=estep))
+        m_cutoff; mstep = e_step / 1e3))
 # 
 plot(e->abs2(denominator_II(A₀_DˣD, e, δm0_val)), -1, 1)
 plot(Δe->abs2(denominator_II(A₀_DˣD, Eᵦˣ⁺ + Δe, δm0_val)), -1, 1)
@@ -52,8 +53,8 @@ const A₀_πDD = let ch = πDD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺,Γ=�
     set3 = ChannelWithIntegrationMethod(ch, HookSqrtDalitzMapping{3}())
     set2 = ChannelWithIntegrationMethod(ch, HookSqrtDalitzMapping{2}())
     # 
-    ich2 = interpolated(set2, cutoff; estep=estep)
-    ich3 = interpolated(set3, cutoff; estep=estep)
+    ich2 = interpolated(set2, m_cutoff; mstep = e_step / 1e3)
+    ich3 = interpolated(set3, m_cutoff; mstep = e_step / 1e3)
     # 
     Amplitude((ich2,ich3))
 end
@@ -63,7 +64,7 @@ plot(Δe->abs2(denominator_II(A₀_πDD, Eᵦˣ⁺ + Δe, δm0_val)), -1, 1)
 
 
 # D₀ = denominator_I(A₀_πDD, 0.0, δm0_val)
-# ich = interpolated(ch, cutoff; estep=estep)
+# ich = interpolated(ch, m_cutoff; mstep = e_step / 1e3)
 # Aₓ = Amplitude(ich)
 # Dₓ = denominator_I(Aₓ, 0.0, δm0_val)
 # # test
@@ -112,24 +113,24 @@ end
     # 
     iπDD2 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     iπDD3 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     iπDD2′ = interpolated(
         ChannelWithIntegrationMethod(ch2, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     iπDD3′ = interpolated(
         ChannelWithIntegrationMethod(ch2, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     iγDD2 = interpolated(
         ChannelWithIntegrationMethod(ch3, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     iγDD3 = interpolated(
         ChannelWithIntegrationMethod(ch3, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     Amplitude((iπDD2,iπDD3,iπDD2′,iπDD3′,iγDD2,iγDD3))
 end
@@ -138,7 +139,7 @@ plot(e->abs2(denominator_II(A₀_full, e, δm0_val)), -1, 1)
 plot(Δe->abs2(denominator_II(A₀_full, Eᵦˣ⁺ + Δe, δm0_val)), -1, 1)
 
 # D₀ = denominator_I(A₀_πDD, 0.0, δm0_val)
-# ich = interpolated(ch, cutoff; estep=estep)
+# ich = interpolated(ch, m_cutoff; mstep = e_step / 1e3)
 # Aₓ = Amplitude(ich)
 # Dₓ = denominator_I(Aₓ, 0.0, δm0_val)
 # # test

@@ -31,7 +31,8 @@ settings = transformdictrecursively!(readjson("settings.json"), ifstringgivemeas
 #
 @unpack δm0 = settings["fitresults"]
 const δm0_val = δm0.val
-@unpack cutoff, estep = settings["phspmatching"]
+@unpack e_cutoff, e_step = settings["phspmatching"]
+m_cutoff = e2m(e_cutoff)
 
 
 # πDD: Dˣ⁺
@@ -43,10 +44,10 @@ const model = let
     # 
     @time iπDD2 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{2}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     @time iπDD3 = interpolated(
         ChannelWithIntegrationMethod(ch1, HookSqrtDalitzMapping{3}()),
-        cutoff; estep=estep)
+        m_cutoff; mstep = e_step / 1e3)
     # 
     Amplitude((iπDD2, iπDD3))
 end

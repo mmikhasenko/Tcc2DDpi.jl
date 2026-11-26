@@ -7,7 +7,7 @@ theme(:wong2, frame=:box, grid=false, minorticks=true,
     xlim=(:auto,:auto), ylim=(:auto,:auto), lw=1.2)
 
 const ch₀ = DˣD((m1=mπ⁺,m2=mD⁰,m3=mD⁰), BW(m=mDˣ⁺, Γ=ΓDˣ⁺))
-ρ₀(e) = ρ_thr(ch₀, e)
+ρ₀(e) = ρ_thr(ch₀, e2m(e))
 
 let
     plot(ylab=L"\mathrm{Real\,\,part}", xlab=L"e / \Gamma^{*+}")
